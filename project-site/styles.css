@@ -1,0 +1,6 @@
+:root { --av-accent: #2a78d6; }
+.callout-note { border-left-color: var(--av-accent); }
+figure img { max-width: 100%; height: auto; }
+table { font-size: 0.88rem; }
+.reveal table { font-size: 0.55em; }
+.reveal .slide-figure img { max-height: 520px; }

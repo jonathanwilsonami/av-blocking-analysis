@@ -1,0 +1,12 @@
+Statistic,Duration (minutes)
+n,120
+Mean,52.1
+SD,76.7
+Median (bootstrap 95% CI),23 (17-36)
+IQR,9-63
+90th percentile,126
+Max,603
+Share > 20 min,52%
+Share > 40 min,38%
+Share >= 60 min,28%
+Multi-AV incidents,20 (17%)

@@ -1,0 +1,28 @@
+| Hazard   | Impact tier k   |   n with impact >= k |   P(>=1 in 30 d) | Probability    | Risk level   |
+|:---------|:----------------|---------------------:|-----------------:|:---------------|:-------------|
+| H1       | 1 Insignificant |                    6 |            0.625 | Likely         | Medium       |
+| H1       | 2 Minor         |                    6 |            0.625 | Likely         | Medium       |
+| H1       | 3 Significant   |                    6 |            0.625 | Likely         | High         |
+| H1       | 4 Major         |                    6 |            0.625 | Likely         | Very high    |
+| H2       | 1 Insignificant |                    6 |            0.625 | Likely         | Medium       |
+| H2       | 2 Minor         |                    6 |            0.625 | Likely         | Medium       |
+| H2       | 3 Significant   |                    6 |            0.625 | Likely         | High         |
+| H2       | 4 Major         |                    6 |            0.625 | Likely         | Very high    |
+| H2       | 5 Severe        |                    3 |            0.411 | Moderate       | Very high    |
+| H3       | 1 Insignificant |                    8 |            0.723 | Likely         | Medium       |
+| H3       | 2 Minor         |                    8 |            0.723 | Likely         | Medium       |
+| H3       | 3 Significant   |                    8 |            0.723 | Likely         | High         |
+| H4       | 1 Insignificant |                    4 |            0.493 | Moderate       | Low          |
+| H4       | 2 Minor         |                    4 |            0.493 | Moderate       | Medium       |
+| H4       | 3 Significant   |                    4 |            0.493 | Moderate       | Medium       |
+| H5       | 1 Insignificant |                    9 |            0.762 | Likely         | Medium       |
+| H5       | 2 Minor         |                    9 |            0.762 | Likely         | Medium       |
+| H5       | 3 Significant   |                    3 |            0.411 | Moderate       | Medium       |
+| H6       | 1 Insignificant |                   17 |            0.929 | Almost certain | Medium       |
+| H6       | 2 Minor         |                   17 |            0.929 | Almost certain | High         |
+| H6       | 3 Significant   |                   10 |            0.795 | Likely         | High         |
+| H7       | 1 Insignificant |                   70 |            1     | Almost certain | Medium       |
+| H7       | 2 Minor         |                   48 |            0.999 | Almost certain | High         |
+| H7       | 3 Significant   |                   17 |            0.929 | Almost certain | Very high    |
+
+: Risk-curve candidates: each observed impact tier with its own frequency and risk level. {#tbl-risk-curves}

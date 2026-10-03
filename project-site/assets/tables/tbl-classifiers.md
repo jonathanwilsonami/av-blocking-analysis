@@ -1,0 +1,9 @@
+| method                            |   macro_F1 | macro_F1_sd   |   accuracy |   kappa |
+|:----------------------------------|-----------:|:--------------|-----------:|--------:|
+| Majority class + count rule       |      0.249 | —             |      0.724 |   0.433 |
+| TF-IDF + XGBoost (CV)             |      0.32  | 0.074         |      0.735 |   0.477 |
+| TF-IDF + logistic regression (CV) |      0.47  | 0.085         |      0.774 |   0.582 |
+| Zero-shot BART-MNLI               |      0.396 | —             |      0.585 |   0.378 |
+| Rule-based (selected; in-sample)  |      0.978 | —             |      0.992 |   0.987 |
+
+: Narrative classifiers scored against the manual audit labels (learned models: mean and SD over 4-fold x 5 repeated stratified CV). {#tbl-classifiers}

@@ -1,0 +1,27 @@
+---
+title: "AV Blocking Incidents in San Francisco"
+subtitle: "Frequency, hazard classification, and risk-matrix placement of robotaxi blocking events"
+---
+
+When an autonomous vehicle (AV) becomes immobilized in a travel lane, intersection, transit
+lane, or emergency scene, it can obstruct traffic and first responders until a remote
+operator or a field technician recovers it. This project analyzes the San Francisco
+Department of Emergency Management (DEM) log of such **AV blocking incidents** for 2025.
+
+{{< include assets/snippets/headline.md >}}
+
+![](assets/figures/fig-risk-matrix.png){fig-alt="Five-by-five risk matrix with seven AV-blocking hazards placed by probability and impact."}
+
+## Read the analysis
+
+- **[Paper](paper.qmd)**: arguments, methods, mathematics, statistical tests, and results.
+- **[Slides](paper-slides.html)**: the key findings as a presentation, rendered from the same source.
+- **[Notebook](notebook.html)**: the executed analysis notebook that produces every figure and table.
+
+## Acknowledgment
+
+The incident records come from the San Francisco DEM. Most of the difficult original cleaning
+and coding of these records was done by **Dr. Missy Cummings**, on which this analysis builds.
+
+Source code and reproduction instructions:
+[github.com/jonathanwilsonami/av-blocking-analysis](https://github.com/jonathanwilsonami/av-blocking-analysis).

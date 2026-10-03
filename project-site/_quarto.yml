@@ -1,0 +1,38 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - index.qmd
+    - paper.qmd
+  resources:
+    - notebook.html
+
+website:
+  title: "AV Blocking Incidents"
+  site-url: https://jonathanwilsonami.github.io/av-blocking-analysis/
+  repo-url: https://github.com/jonathanwilsonami/av-blocking-analysis
+  repo-actions: [source, issue]
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: paper.qmd
+        text: Paper
+      - href: paper-slides.html
+        text: Slides
+      - href: notebook.html
+        text: Notebook
+    right:
+      - icon: github
+        href: https://github.com/jonathanwilsonami/av-blocking-analysis
+  page-footer:
+    center: "Data: San Francisco Department of Emergency Management, original cleaning by Dr. Missy Cummings."
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    number-sections: false
+
+bibliography: references.bib
