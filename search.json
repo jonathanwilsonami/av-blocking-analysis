@@ -1,0 +1,212 @@
+[
+  {
+    "objectID": "paper.html",
+    "href": "paper.html",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "",
+    "text": "NoteReproducibility and data credit\n\n\n\nEvery number, figure, and table in this paper is produced by notebooks/av_blocking_analysis.ipynb and exported to project-site/assets/. Inline numbers are read from _variables.yml, so re-running the notebook updates the paper. The incident records come from the San Francisco Department of Emergency Management. Most of the difficult original data cleaning was performed by Dr. Missy Cummings, and this analysis builds directly on that work."
+  },
+  {
+    "objectID": "paper.html#source-and-cleaning",
+    "href": "paper.html#source-and-cleaning",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "2.1 Source and cleaning",
+    "text": "2.1 Source and cleaning\nThe primary source is the DEM Incidents sheet of AV-Brick-Report.xlsx. Each record has a date, location, free-text dispatcher narrative, number of AVs involved, and the times the event started and cleared. The records originate with the San Francisco Department of Emergency Management. Dr. Missy Cummings compiled and cleaned them from raw dispatch records, which was the hard part.\nWe apply light, documented cleaning (Table 1):\n\nparse the mixed time formats;\ncompute duration as clear minus start, modulo 1,440 minutes, so events crossing midnight are handled;\nflag missing and truncated narratives;\nextract the operator;\ntreat a missing AV count as at least one.\n\n\n\n\nTable 1: Data inventory and quality checks for the primary DEM sheet.\n\n\n\n\n\n\n\n\n\nQuantity\nValue\n\n\n\n\nIncidents (primary sheet)\n123\n\n\nDate range\n2025-02-01 to 2025-10-31\n\n\nMonths present\n2025-02, 2025-03, 2025-06, 2025-07, 2025-08, 2025-09, 2025-10\n\n\nCovered months used for rates\n2025-03, 2025-06, 2025-07, 2025-08, 2025-09, 2025-10\n\n\nCovered exposure (days)\n184\n\n\nIncidents in covered months\n120\n\n\nNarrative missing\n1\n\n\nNarrative likely truncated\n83 (67%)\n\n\nAV count missing\n3\n\n\nDurations crossing midnight\n3\n\n\nOperator = Waymo / Zoox / unstated\n110 / 1 / 12\n\n\n\n\n\n\nNarrative truncation. 67% of narratives (83 of 123) appear to have been cut at about 45–60 characters by the export. This limits what any text classifier can recover, and it turns out to matter for the trend analysis (Section 6.3).\nCoverage. The log is not continuous. February holds only three incidents, all on its first three days, and April and May are absent. Treating absent months as zero-incident months would bias every rate and trend estimate. All rates and trend tests therefore use the 6 fully covered months (March and June–October: 184 days, 120 incidents). The February incidents still count toward hazard classification and impact scoring. Section 8 shows that the conclusions do not change if February is included."
+  },
+  {
+    "objectID": "paper.html#secondary-sheets-and-data-engineering",
+    "href": "paper.html#secondary-sheets-and-data-engineering",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "2.2 Secondary sheets and data engineering",
+    "text": "2.2 Secondary sheets and data engineering\nThe analyzed workbook (AV-Brick-Report-analyzed.xlsx) contributes four things:\n\nExtra fields. The AV company’s ETA (given for 22 incidents; median 14.5 minutes), other parties involved, and emergency-responder and transit-impact flags. These are joined on date and location, and all 123 primary rows match.\nA neighborhood zone (1–10) hand-coded in DEM Incidents Quant (119 of 123 match). The same sheet’s derived flags (multi-AV, 4-hour time-of-day bin, &gt;20 / &gt;40-minute durations) are recomputed from source fields.\n8 additional incidents that have narratives but no times. They are excluded from duration analysis but used in a frequency sensitivity check.\nThe plots and stats sheet. Monthly duration summaries, a six-group normality/rank-sum table, and a March-vs-October Mann–Whitney test (W = 377, p = 0.063). We replicate this result and extend it in Section 6.\n\nThe analyzed sheet’s emergency-responder flag marks responder involvement, for example police called to direct traffic around a stalled AV. It does not mark obstruction of an emergency, so it is kept as a feature and does not define a hazard."
+  },
+  {
+    "objectID": "paper.html#design-principles",
+    "href": "paper.html#design-principles",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "3.1 Design principles",
+    "text": "3.1 Design principles\nA hazard is defined by its consequence: what the immobilized AV obstructed or put at risk. Two design rules make the classes defensible.\n\nConsequence and cause are separate axes. Why the AV stopped (a vehicle fault, a dark signal, a passenger, a routing edge case) is recorded separately as a contributing cause. Ad-hoc incident codes often mix the two, producing overlapping categories whose frequencies cannot be compared.\nMutually exclusive and exhaustive, by precedence. An incident can match several descriptions, for example two AVs stuck at a working fire. Each incident takes the most severe class it matches, in the order H1 &gt; H2 &gt; … &gt; H7, with H7 as the default. Every incident therefore counts exactly once, and frequencies add up to the total.\n\nH6 (multi-AV clustering) is a class of its own because several AVs failing together at one site signals a common-mode, fleet-level failure, a mechanism distinct from one vehicle’s fault. It also takes a disproportionate share of road capacity. Single events in the log involve up to 60 vehicles.\n\n\n\nTable 2: Consequence-based hazard taxonomy (assigned by severity-first precedence).\n\n\n\n\n\n\n\n\n\n\nCode\nHazard\nDefinition\n\n\n\n\nH1\nAV-involved collision\nThe AV made (or was reported to make) contact with another road user, vehicle, or animal, leaving the AV or the scene blocking the roadway.\n\n\nH2\nEmergency-response obstruction\nThe AV obstructed an emergency response (medics, fire, police) or became stuck inside an active emergency scene (fire, crash scene, police investigation).\n\n\nH3\nTransit / rail obstruction\nThe AV blocked a public-transit vehicle, lane, or track (Muni bus or rail, cable car) or a railroad track.\n\n\nH4\nPedestrian / accessibility obstruction\nThe AV blocked a crosswalk, curb ramp, or bike lane, pushing vulnerable road users into traffic.\n\n\nH5\nOccupant-related immobilization\nA passenger condition or action immobilized the AV: unresponsive/asleep rider, occupant trapped or calling for help, or a door left open.\n\n\nH6\nMulti-AV clustering / gridlock\nTwo or more AVs immobilized together at one location (a common-mode, fleet-level failure) with none of the above consequences.\n\n\nH7\nSingle-AV traffic obstruction\nOne AV stalled in a travel lane, intersection, or roadway, obstructing general traffic only. Default class."
+  },
+  {
+    "objectID": "paper.html#sec-classification",
+    "href": "paper.html#sec-classification",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "3.2 Classification method",
+    "text": "3.2 Classification method\nChoosing a classifier is a question of fit to the data. The data here are 123 short, often truncated narratives written in dispatcher shorthand (blkng, ntfyd, LP). There are no gold-standard labels, and the safety-relevant classes have only 4–9 examples. We compared four approaches:\n\nTransparent rules: keyword and regular-expression patterns plus the AV-count field, implemented in av_blocking.taxonomy.\nSupervised TF-IDF models: word and character n-grams with multinomial logistic regression, and with XGBoost (Chen and Guestrin 2016).\nZero-shot NLI transformer: BART-large-MNLI (Lewis et al. 2020; Yin, Hay, and Roth 2019), scoring each narrative against plain-language hazard descriptions.\nMajority-class baseline.\n\nFine-tuning a transformer was not attempted. With so few examples it would overfit, and the result could not be audited.\nAs a reference, every narrative was read and hand-coded, with notes on ambiguous cases (data/labels/manual_hazard_labels.csv). Agreement between the rules and the manual labels is 99.2% (Cohen’s \\(\\kappa\\) = 0.99) (Cohen 1960), where\n\\[\n\\kappa = \\frac{p_o - p_e}{1 - p_e},\n\\]\n\\(p_o\\) is the observed agreement and \\(p_e\\) the agreement expected by chance from the label margins. The rules were written by the same analyst who made the reference labels, so this figure is an internal-consistency check, not an independent validation. The one remaining disagreement is a genuinely ambiguous crash scene (Table 4).\nThe learned models are scored out-of-sample, by 4-fold × 5-repeat stratified cross-validation (Table 3, Figure 1). They improve only modestly on the majority baseline: macro-F1 0.47 for logistic regression and 0.32 for XGBoost, against 0.25 for the baseline. Logistic regression’s F1 on emergency obstruction is 0, and the rare, high-consequence classes are precisely the ones that drive the risk matrix. The zero-shot model needs no labels, but it reaches macro-F1 0.4 and labels about a third of all narratives “collision”. General-purpose NLI models do not read dispatcher shorthand well.\nChoice: the rule set. It is transparent, deterministic, auditable line by line, and uses domain vocabulary the learned models cannot pick up from ~120 examples. If the log grows, the manual labels can seed a supervised model.\n\n\n\nTable 3: Narrative classifiers scored against the manual audit labels (learned models: mean and SD over 4-fold x 5 repeated stratified CV).\n\n\n\n\n\n\n\n\n\n\n\n\nmethod\nmacro_F1\nmacro_F1_sd\naccuracy\nkappa\n\n\n\n\nMajority class + count rule\n0.249\n—\n0.724\n0.433\n\n\nTF-IDF + XGBoost (CV)\n0.32\n0.074\n0.735\n0.477\n\n\nTF-IDF + logistic regression (CV)\n0.47\n0.085\n0.774\n0.582\n\n\nZero-shot BART-MNLI\n0.396\n—\n0.585\n0.378\n\n\nRule-based (selected; in-sample)\n0.978\n—\n0.992\n0.987\n\n\n\n\n\n\n\n\n\nTable 4: Incidents where the rule classifier and the manual audit disagree.\n\n\n\n\n\n\n\n\n\n\n\n\nIncident\nRule\nManual\nNarrative\nNote\n\n\n\n\nINC-066\nH2\nH1\nTraffic hazard due to a veh accident..need PD for traffic control..tow truck en route no eta..PD resp..Waymo able to move AV..no need for PD\nAmbiguous: ‘veh accident’ with the Waymo subsequently moved and a tow en route suggests AV involvement.\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 1: Macro-F1 of each classifier against the manual audit labels. Learned models show mean ± 1 SD across cross-validation folds. The rule-based score is in-sample."
+  },
+  {
+    "objectID": "paper.html#contributing-causes",
+    "href": "paper.html#contributing-causes",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "3.3 Contributing causes",
+    "text": "3.3 Contributing causes\nTable 5 cross-tabulates hazard against contributing cause. Most narratives give no cause at all (“stalled”, “stuck”). That reflects the terse, truncated dispatcher text, and it is why cause is reported descriptively rather than used to define hazards.\n\n\n\nTable 5: Hazard (consequence) by contributing cause (mechanism), all 123 incidents.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nHazard\nAV collision / contact\nExternal event or scene (fire, crash, protest, police activity)\nInfrastructure failure (signal or power outage)\nManeuver or routing edge case (turn, parking lot, cul-de-sac, queue)\nPassenger condition or action\nTampering / vandalism\nUnstated (stalled/stuck with no cause given)\nVehicle fault (hardware, battery, tire, sensor damage)\n\n\n\n\nAV-involved collision\n6\n0\n0\n0\n0\n0\n0\n0\n\n\nEmergency-response obstruction\n0\n5\n0\n0\n0\n0\n2\n0\n\n\nTransit / rail obstruction\n0\n0\n1\n1\n0\n0\n6\n0\n\n\nPedestrian / accessibility obstruction\n0\n0\n0\n0\n0\n0\n4\n0\n\n\nOccupant-related immobilization\n0\n0\n0\n0\n9\n0\n0\n0\n\n\nMulti-AV clustering / gridlock\n0\n1\n2\n6\n0\n0\n8\n0\n\n\nSingle-AV traffic obstruction\n0\n2\n3\n6\n0\n1\n47\n13"
+  },
+  {
+    "objectID": "paper.html#model",
+    "href": "paper.html#model",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "5.1 Model",
+    "text": "5.1 Model\nIncidents of a given kind are modeled as a Poisson process with daily rate \\(\\lambda\\) over the \\(T\\) = 184 covered days. With \\(n\\) observed events, the maximum likelihood estimate is \\(\\hat\\lambda = n/T\\), and its exact 95% confidence interval follows from the chi-square quantiles (Garwood 1936):\n\\[\n\\left[\\tfrac{1}{2T}\\chi^2_{0.025}(2n),\\ \\tfrac{1}{2T}\\chi^2_{0.975}(2n+2)\\right].\n\\]\nFor a Bayesian treatment that stays sensible at small \\(n\\), we use the Jeffreys prior \\(p(\\lambda) \\propto \\lambda^{-1/2}\\) (Jeffreys 1946), giving the posterior\n\\[\n\\lambda \\mid n \\sim \\operatorname{Gamma}\\!\\left(n + \\tfrac12,\\ T\\right),\n\\]\nand the posterior-predictive probability of at least one event in the next \\(h\\) days (a negative-binomial predictive):\n\\[\nP(N_h \\ge 1 \\mid n) = 1 - \\left(\\frac{T}{T + h}\\right)^{n + 1/2}.\n\\]\nThe log has no exposure denominator, such as AV trips or vehicle-miles. Rates are therefore per calendar day. They describe the system as operated in San Francisco in 2025, not per-mile safety."
+  },
+  {
+    "objectID": "paper.html#results",
+    "href": "paper.html#results",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "5.2 Results",
+    "text": "5.2 Results\nBlocking incidents occur at 19.6 per 30 days (95% CI 16.2–23.4), about 4.6 per week, or one every 1.5 days. Single-AV traffic obstruction (H7) accounts for most of them, at about 11.41 per 30 days. Even the rarest hazards recur on a monthly timescale: collisions (H1) and emergency-response obstruction (H2) each average one every 31 days (Table 7, Figure 3).\n\n\n\nTable 7: Hazard frequencies over the 184 covered days (Mar, Jun-Oct 2025).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCode\nHazard\nn\nShare\nMLE per 30 d (95% CI)\nPosterior per 30 d (95% CrI)\nMean days between\nP(&gt;=1 in 30 d)\nBand (all impacts)\n\n\n\n\nH1\nAV-involved collision\n6\n5%\n0.98 (0.36-2.13)\n1.06 (0.41-2.02)\n30.7\n0.625\nLikely\n\n\nH2\nEmergency-response obstruction\n6\n5%\n0.98 (0.36-2.13)\n1.06 (0.41-2.02)\n30.7\n0.625\nLikely\n\n\nH3\nTransit / rail obstruction\n8\n7%\n1.30 (0.56-2.57)\n1.39 (0.62-2.46)\n23\n0.723\nLikely\n\n\nH4\nPedestrian / accessibility obstruction\n4\n3%\n0.65 (0.18-1.67)\n0.73 (0.22-1.55)\n46\n0.493\nModerate\n\n\nH5\nOccupant-related immobilization\n9\n8%\n1.47 (0.67-2.79)\n1.55 (0.73-2.68)\n20.4\n0.762\nLikely\n\n\nH6\nMulti-AV clustering / gridlock\n17\n14%\n2.77 (1.61-4.44)\n2.85 (1.68-4.34)\n10.8\n0.929\nAlmost certain\n\n\nH7\nSingle-AV traffic obstruction\n70\n58%\n11.41 (8.90-14.42)\n11.49 (8.97-14.33)\n2.6\n1\nAlmost certain\n\n\nAll\nAll blocking incidents\n120\n100%\n19.57 (16.22-23.40)\n19.65 (16.30-23.31)\n1.5\n1\nAlmost certain\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 3: Posterior mean frequency per 30 days with 95% Jeffreys credible intervals (log scale)."
+  },
+  {
+    "objectID": "paper.html#choosing-the-tests",
+    "href": "paper.html#choosing-the-tests",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "6.1 Choosing the tests",
+    "text": "6.1 Choosing the tests\nTwo features of the data rule out normal-theory methods. There are only six monthly counts, and durations are strongly right-skewed: skewness ≈ 3.9, excess kurtosis ≈ 22, Shapiro–Wilk \\(p &lt; 10^{-15}\\) (Shapiro and Wilk 1965). Log-durations, by contrast, are approximately normal (Shapiro–Wilk p ≈ 0.38). Each question is therefore matched to a test whose assumptions hold:\n\nMonotone trend in monthly rates: Mann–Kendall (Mann 1945; Kendall 1975). The statistic is \\[S = \\sum_{i&lt;j} \\operatorname{sgn}(x_j - x_i).\\] With \\(n = 6\\), its null distribution is computed exactly by enumerating all \\(6! = 720\\) orderings, so no normal approximation is needed. Sen’s slope (Sen 1968) gives the magnitude.\nEqual rates across months: the Poisson homogeneity chi-square, \\(\\sum_m (n_m - E_m)^2/E_m\\) with \\(E_m \\propto\\) days in month \\(m\\).\nTwo-period rate comparison: the exact conditional binomial test. Given \\(n_1 + n_2\\), under \\(H_0\\) the count \\(n_2\\) is \\(\\operatorname{Bin}\\!\\left(n_1 + n_2,\\ \\tfrac{T_2}{T_1 + T_2}\\right)\\).\nParametric cross-check: a Poisson GLM with a \\(\\log(\\text{days})\\) offset, giving an interpretable rate ratio per month.\nDuration differences across months: Kruskal–Wallis (Kruskal and Wallis 1952), \\[H = \\frac{12}{N(N+1)} \\sum_g \\frac{R_g^2}{n_g} - 3(N+1).\\]\nTwo months: Mann–Whitney (Mann and Whitney 1947), \\[U = \\sum_{i}\\sum_{j}\\left[\\mathbb 1(x_i &gt; y_j) + \\tfrac12 \\mathbb 1(x_i = y_j)\\right].\\]\nAn ordered shift across months: Jonckheere–Terpstra (Jonckheere 1954), \\(J = \\sum_{g&lt;h} U_{gh}\\), with a permutation p-value. This is more powerful than Kruskal–Wallis against monotone alternatives.\nTrend in a proportion (the multi-AV share): Cochran–Armitage (Armitage 1955).\nHazard mix by period: a chi-square statistic with a Monte-Carlo permutation p-value, because 71% of expected cell counts are below 5."
+  },
+  {
+    "objectID": "paper.html#incident-counts-and-durations",
+    "href": "paper.html#incident-counts-and-durations",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "6.2 Incident counts and durations",
+    "text": "6.2 Incident counts and durations\nThe monthly rate fluctuates between about 11 and 24 per 30 days (Figure 4). Every fluctuation is consistent with a constant underlying rate:\n\nPoisson homogeneity: p = 0.2.\nMann–Kendall: \\(\\tau\\) = 0.13, exact p = 0.86.\nMarch versus October rate ratio: 1.04 (95% CI 0.57–1.9), p = 1.\nPoisson GLM rate ratio: 0.983 per month (0.91–1.063), p = 0.67.\n\nDurations also show no significant change (Figure 5):\n\nKruskal–Wallis: H = 6.88, p = 0.23.\nJonckheere–Terpstra: p = 0.19.\nSpearman: \\(\\rho\\) = 0.1, p = 0.29.\nThe Theil–Sen slope of log-duration is 5.3% per 30 days, with a 95% interval of -5.1% to +16.8% that comfortably includes zero.\n\nReplicating the class result. The class worksheet’s March-vs-October Mann–Whitney test reproduces exactly (W = 377.5, p = 0.064) once the 603-minute March 12 record is dropped, as the worksheet did. With that record included, p = 0.123. Either way, the October median is longer than March’s, but the difference is not significant at the 5% level.\nAbsence of evidence is not evidence of absence. With six months of data, these tests can detect only large trends. The defensible statement is that the data show no detectable change, not that nothing is changing.\n\n\n\n\n\n\nFigure 4: Monthly incident rate per 30 days with exact 95% Poisson intervals. Gray bands mark months absent from (or only partially present in) the log.\n\n\n\n\n\n\n\n\n\nFigure 5: Incident duration by month (log scale). Box plots show medians and quartiles; points are individual incidents."
+  },
+  {
+    "objectID": "paper.html#sec-mix",
+    "href": "paper.html#sec-mix",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "6.3 The hazard mix shift is a reporting artifact",
+    "text": "6.3 The hazard mix shift is a reporting artifact\nOne test does reject. The hazard mix differs between March–July and August–October (permutation p = 0.007; Figure 6). Taken at face value, this would suggest emergency and transit obstructions are new. But the composition of the narratives changed at the same moment. 98% of March–July narratives are truncated fragments, against 41% in August–October (Fisher p &lt; 0.001). Context such as “fire”, “medic”, or “Muni” is exactly what a 50-character fragment loses. Two further checks support this reading:\n\nThe shift is a reshuffle among the text-dependent classes H1–H5. Their combined share does not differ between periods (Fisher p = 0.22).\nThe one composition measure taken from a structured field, the multi-AV share, shows no trend (Cochran–Armitage p = 0.17).\n\nThe defensible conclusion is that the shift is not attributable to a change in AV behavior. It is most plausibly a recording artifact.\n\n\n\nTable 8: Statistical tests for change over time (covered months).\n\n\n\n\n\n\n\n\n\n\n\n\n\nQuantity\nNull hypothesis\nTest\nStatistic / effect\np\nReject at 0.05?\n\n\n\n\nMonthly incident rate\nEqual rate across months\nPoisson homogeneity chi-square\nchi2(5) = 7.30\n0.199\nNo\n\n\nMonthly incident rate\nNo monotone trend\nMann-Kendall (exact)\nS = 2, tau = 0.13\n0.856\nNo\n\n\nMonthly incident rate\nMar rate = Oct rate\nExact conditional binomial\nRR = 1.04 (0.57-1.90)\n1.000\nNo\n\n\nMonthly incident rate\nNo log-linear trend\nPoisson GLM, log(days) offset\nRR/month = 0.983 (0.910-1.063)\n0.671\nNo\n\n\nDuration\nSame distribution in all months\nKruskal-Wallis\nH(5) = 6.88, eps2 = 0.017\n0.229\nNo\n\n\nDuration\nMar = Oct\nMann-Whitney U\nU = 222.5, r_rb = 0.26\n0.123\nNo\n\n\nDuration\nMar = Oct (603-min record dropped, replicates class sheet)\nMann-Whitney U\nW = 377.5\n0.064\nNo\n\n\nDuration\nNo ordered shift across months\nJonckheere-Terpstra (permutation)\nJT = 3248, z = 1.32\n0.186\nNo\n\n\nDuration\nNo association with date\nSpearman; Theil-Sen on log duration\nrho = 0.10; +5.3%/30 d (-5.1 to +16.8)\n0.291\nNo\n\n\nHazard mix\nIndependent of period\nPermutation chi-square\nchi2 = 16.43\n0.007\nYes\n\n\nNarrative truncation\nIndependent of period\nFisher exact\n98% vs 41% truncated\n&lt; 0.001\nYes\n\n\nText-dependent hazards (H1-H5) share\nIndependent of period\nFisher exact\n22% vs 33%\n0.223\nNo\n\n\nMulti-AV share\nNo monotone trend\nCochran-Armitage\nz = 1.37\n0.169\nNo\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 6: Share of each period’s incidents by hazard class."
+  },
+  {
+    "objectID": "paper.html#probability-and-impact-bands",
+    "href": "paper.html#probability-and-impact-bands",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "7.1 Probability and impact bands",
+    "text": "7.1 Probability and impact bands\nThe matrix structure, labels, cell levels, and colors follow the team’s reference template. Its risk level is a lookup per cell, not a threshold on the probability × impact score: score 4 is Low at (2, 2) but Medium at (1, 4).\n\nProbability is the posterior-predictive \\(p = P(N_{30} \\ge 1)\\). A 30-day horizon matches a monthly operations-review cycle. The bands are Rare \\(&lt; 0.05 \\le\\) Unlikely \\(&lt; 0.25 \\le\\) Moderate \\(&lt; 0.50 \\le\\) Likely \\(&lt; 0.90 \\le\\) Almost certain.\nImpact is the incident-level score from Section 4."
+  },
+  {
+    "objectID": "paper.html#risk-curve-placement",
+    "href": "paper.html#risk-curve-placement",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "7.2 Risk-curve placement",
+    "text": "7.2 Risk-curve placement\nA hazard does not have a single consequence. Collisions range from minor to injurious, and emergency obstructions from routine to life-threatening. The common shortcut pairs a hazard’s total frequency with its worst (or 90th-percentile) consequence. That overstates risk, because the worst outcome is rarer than the hazard as a whole. We instead evaluate the hazard’s risk curve. For hazard \\(h\\) and impact tier \\(k\\), let\n\\[\nn_{h,\\ge k} = \\#\\{\\text{incidents of } h \\text{ with impact} \\ge k\\},\\qquad\np_{h,k} = 1 - \\left(\\frac{T}{T+30}\\right)^{n_{h,\\ge k} + 1/2}.\n\\]\nEach tier \\(k\\) that was observed gives a candidate cell \\(\\big(\\mathrm{band}(p_{h,k}),\\, k\\big)\\). The hazard is placed at\n\\[\nk^*_h = \\arg\\max_{k \\le k^{\\max}_h} \\; \\mathrm{Level}\\!\\big(\\mathrm{band}(p_{h,k}),\\, k\\big),\n\\]\nwith ties broken toward the higher impact. Probability and impact then always describe the same event, “an \\(h\\) incident at least as severe as \\(k\\)”. Tiers that never occurred are not extrapolated (Table 9).\n\n\n\nTable 9: Risk-curve candidates: each observed impact tier with its own frequency and risk level.\n\n\n\n\n\n\n\n\n\n\n\n\n\nHazard\nImpact tier k\nn with impact &gt;= k\nP(&gt;=1 in 30 d)\nProbability\nRisk level\n\n\n\n\nH1\n1 Insignificant\n6\n0.625\nLikely\nMedium\n\n\nH1\n2 Minor\n6\n0.625\nLikely\nMedium\n\n\nH1\n3 Significant\n6\n0.625\nLikely\nHigh\n\n\nH1\n4 Major\n6\n0.625\nLikely\nVery high\n\n\nH2\n1 Insignificant\n6\n0.625\nLikely\nMedium\n\n\nH2\n2 Minor\n6\n0.625\nLikely\nMedium\n\n\nH2\n3 Significant\n6\n0.625\nLikely\nHigh\n\n\nH2\n4 Major\n6\n0.625\nLikely\nVery high\n\n\nH2\n5 Severe\n3\n0.411\nModerate\nVery high\n\n\nH3\n1 Insignificant\n8\n0.723\nLikely\nMedium\n\n\nH3\n2 Minor\n8\n0.723\nLikely\nMedium\n\n\nH3\n3 Significant\n8\n0.723\nLikely\nHigh\n\n\nH4\n1 Insignificant\n4\n0.493\nModerate\nLow\n\n\nH4\n2 Minor\n4\n0.493\nModerate\nMedium\n\n\nH4\n3 Significant\n4\n0.493\nModerate\nMedium\n\n\nH5\n1 Insignificant\n9\n0.762\nLikely\nMedium\n\n\nH5\n2 Minor\n9\n0.762\nLikely\nMedium\n\n\nH5\n3 Significant\n3\n0.411\nModerate\nMedium\n\n\nH6\n1 Insignificant\n17\n0.929\nAlmost certain\nMedium\n\n\nH6\n2 Minor\n17\n0.929\nAlmost certain\nHigh\n\n\nH6\n3 Significant\n10\n0.795\nLikely\nHigh\n\n\nH7\n1 Insignificant\n70\n1\nAlmost certain\nMedium\n\n\nH7\n2 Minor\n48\n0.999\nAlmost certain\nHigh\n\n\nH7\n3 Significant\n17\n0.929\nAlmost certain\nVery high\n\n\n\n\n\n\n\n\n\n\n\n\nFigure 7: 5×5 risk matrix of AV blocking hazards. Probability is the Jeffreys posterior-predictive probability of at least one qualifying incident in the next 30 days. Impact is the governing tier of each hazard’s risk curve.\n\n\n\n\n\n\nTable 10: Risk-matrix placement of each hazard (Bayesian predictive probability, 30-day horizon).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCode\nHazard\nn\nn at governing impact\nP(&gt;=1 in 30 d)\nProbability\nImpact\nRisk level (score)\n\n\n\n\nH1\nAV-involved collision\n6\n6\n0.63\n4 Likely\n4 Major\nVery high (16)\n\n\nH2\nEmergency-response obstruction\n6\n3\n0.41\n3 Moderate\n5 Severe\nVery high (15)\n\n\nH3\nTransit / rail obstruction\n8\n8\n0.72\n4 Likely\n3 Significant\nHigh (12)\n\n\nH4\nPedestrian / accessibility obstruction\n4\n4\n0.49\n3 Moderate\n3 Significant\nMedium (9)\n\n\nH5\nOccupant-related immobilization\n9\n3\n0.41\n3 Moderate\n3 Significant\nMedium (9)\n\n\nH6\nMulti-AV clustering / gridlock\n17\n10\n0.8\n4 Likely\n3 Significant\nHigh (12)\n\n\nH7\nSingle-AV traffic obstruction\n70\n17\n0.93\n5 Almost certain\n3 Significant\nVery high (15)"
+  },
+  {
+    "objectID": "paper.html#why-each-hazard-sits-where-it-does",
+    "href": "paper.html#why-each-hazard-sits-where-it-does",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "7.3 Why each hazard sits where it does",
+    "text": "7.3 Why each hazard sits where it does\n\nH1 AV-involved collision: Very high. None of the 6 collisions in the window reported a human injury; one struck a dog. All score Major. Six such events in 184 days give \\(p\\) = 0.63 (Likely), so the cell is Likely × Major.\nH2 Emergency-response obstruction: Very high. Six obstructions, of which 3 occurred during life-threatening incidents: a working fire with people trapped, a garage fire, and a shots-fired investigation. The life-threatening tier alone has \\(p\\) = 0.41 (Moderate × Severe). The Likely × Major cell from all six ranks the same (Very high), so the tie goes to the higher impact. A February incident (a medic delayed to an unconscious patient) is also Severe but lies outside the covered window.\nH3 Transit / rail obstruction: High. All eight are Significant by rubric, with \\(p\\) = 0.72: Likely × Significant.\nH4 Pedestrian / accessibility: Medium. Four events, \\(p\\) = 0.49: Moderate × Significant.\nH5 Occupant-related: Medium. Most are Minor (an asleep rider, a door left open). 3 reach Significant: an unconscious rider, an occupant texting 911, and a door-left-open blockage lasting over an hour. That gives Moderate × Significant.\nH6 Multi-AV gridlock: High. 10 of 17 clusters were Significant (5+ AVs or 60+ minutes), giving \\(p\\) = 0.8: Likely × Significant.\nH7 Single-AV obstruction: Very high. Individually mundane, but 17 single-AV blockages lasted an hour or more, about one every 11 days. That makes a Significant blockage Almost certain within any 30-day window."
+  },
+  {
+    "objectID": "paper-slides.html#motivation-and-questions",
+    "href": "paper-slides.html#motivation-and-questions",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "Motivation and questions",
+    "text": "Motivation and questions\n\nDriverless robotaxis that cannot resolve a situation stop and wait. That is safe for occupants, but the stopped AV can block lanes, transit, crosswalks, and emergency vehicles.\nSan Francisco DEM logged 123 blocking incidents, February 1, 2025 – October 31, 2025.\nQuestions:\n\nHow often do incidents, and each hazard type, occur?\nWhat hazards do they create, and how can narratives be classified defensibly?\nWhere does each hazard sit on a 5×5 risk matrix, and is anything changing?\n\n\nData credit: SF DEM; original cleaning by Dr. Missy Cummings."
+  },
+  {
+    "objectID": "paper-slides.html#data-at-a-glance",
+    "href": "paper-slides.html#data-at-a-glance",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "Data at a glance",
+    "text": "Data at a glance\n\n\n\n123 incidents; 120 in the 6 fully covered months (184 days).\nFeb (3 incidents, days 1–3) and Apr–May (absent) are coverage gaps, not zeros, so they are excluded from rates.\n67% of narratives are truncated at about 50 characters.\nDurations: median 23 min (95% CI 17–36), 90th percentile 125 min, max 603 min.\nSecondary sheets add ETA, neighborhood, and responder/transit flags, plus 8 extra incidents without times."
+  },
+  {
+    "objectID": "paper-slides.html#hazard-taxonomy",
+    "href": "paper-slides.html#hazard-taxonomy",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "Hazard taxonomy",
+    "text": "Hazard taxonomy\n\n\n\n\n\n\n\n\nCode\nHazard\nWhat the stopped AV obstructed / caused\n\n\n\n\nH1\nAV-involved collision\ncontact with a vehicle, person, or animal\n\n\nH2\nEmergency-response obstruction\nmedics, fire, police, or an active emergency scene\n\n\nH3\nTransit / rail obstruction\nMuni bus/rail, cable car, tracks\n\n\nH4\nPedestrian / accessibility\ncrosswalk, curb ramp, bike lane\n\n\nH5\nOccupant-related\nasleep/unresponsive rider, door left open, trapped occupant\n\n\nH6\nMulti-AV gridlock\n2+ AVs stuck together (common-mode failure)\n\n\nH7\nSingle-AV obstruction\ngeneral traffic only (default)\n\n\n\n\nConsequence, not cause. The cause (fault, dark signal, passenger, …) is coded on a separate axis.\nSeverity-first precedence (H1 &gt; … &gt; H7) makes the classes mutually exclusive, so frequencies add up."
+  },
+  {
+    "objectID": "paper-slides.html#why-rules-instead-of-xgboost-or-a-transformer",
+    "href": "paper-slides.html#why-rules-instead-of-xgboost-or-a-transformer",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "Why rules instead of XGBoost or a transformer?",
+    "text": "Why rules instead of XGBoost or a transformer?\n\n\n\n\n\n123 short, truncated narratives in dispatcher shorthand; rare classes have 4–9 examples.\nLearned models (cross-validated) barely beat the majority baseline. Logistic regression has F1 = 0 on emergency obstruction.\nZero-shot BART-MNLI calls about a third of incidents “collision”.\nRules agree with the hand-coded audit at \\(\\kappa\\) = 0.99. This is a consistency check: the same analyst wrote both.\nSelected: transparent, auditable rules."
+  },
+  {
+    "objectID": "paper-slides.html#scoring-the-impact-of-each-incident",
+    "href": "paper-slides.html#scoring-the-impact-of-each-incident",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "Scoring the impact of each incident",
+    "text": "Scoring the impact of each incident\n\n\nFigure 1: Number of incidents by hazard and incident-level impact (all 123 incidents).\nImpact = max(hazard consequence, duration band, cluster size). 1 Insignificant (&lt;10 min) · 2 Minor (10–60 min, 2–4 AVs) · 3 Significant (≥60 min, transit, pedestrian path, 5+ AVs) · 4 Major (emergency obstruction, collision without injury) · 5 Severe (life-threatening emergency obstructed, injury)."
+  },
+  {
+    "objectID": "paper-slides.html#how-often-does-each-hazard-occur",
+    "href": "paper-slides.html#how-often-does-each-hazard-occur",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "How often does each hazard occur?",
+    "text": "How often does each hazard occur?\n\n\nFigure 2: Posterior mean frequency per 30 days with 95% Jeffreys credible intervals (log scale).\nPoisson rate \\(\\lambda\\) over \\(T\\) = 184 days; Jeffreys posterior \\(\\lambda\\mid n \\sim \\text{Gamma}(n+\\tfrac12, T)\\); \\(P(N_{30}\\ge 1) = 1-\\big(\\tfrac{T}{T+30}\\big)^{n+1/2}\\). All incidents: 19.6 per 30 days (16.2–23.4), one every 1.5 days."
+  },
+  {
+    "objectID": "paper-slides.html#no-detectable-trend-in-rate-or-duration",
+    "href": "paper-slides.html#no-detectable-trend-in-rate-or-duration",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "No detectable trend in rate or duration",
+    "text": "No detectable trend in rate or duration\n\n\nFigure 3: Monthly incident rate per 30 days with exact 95% Poisson intervals. Gray bands mark months absent from (or only partially present in) the log.\nNo detectable trend. Mann–Kendall exact p = 0.86 · Poisson GLM rate ratio 0.983/month (p = 0.67) · durations: Kruskal–Wallis p = 0.23, Jonckheere–Terpstra p = 0.19. The class Mar-vs-Oct Mann–Whitney replicates: W = 377.5, p = 0.064."
+  },
+  {
+    "objectID": "paper-slides.html#sec-mix",
+    "href": "paper-slides.html#sec-mix",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "The hazard mix shift is a reporting artifact",
+    "text": "The hazard mix shift is a reporting artifact\n\n\nFigure 4: Share of each period’s incidents by hazard class.\nThe mix differs (p = 0.007), but narratives went from 98% truncated to 41% truncated at the same time. The combined H1–H5 share is unchanged (p = 0.22), and the multi-AV share (a structured field) has no trend (p = 0.17). The shift is not evidence of changed AV behavior."
+  },
+  {
+    "objectID": "paper-slides.html#risk-matrix",
+    "href": "paper-slides.html#risk-matrix",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "5×5 risk matrix",
+    "text": "5×5 risk matrix\n\n\nFigure 5: 5×5 risk matrix of AV blocking hazards. Probability is the Jeffreys posterior-predictive probability of at least one qualifying incident in the next 30 days. Impact is the governing tier of each hazard’s risk curve."
+  },
+  {
+    "objectID": "paper-slides.html#placement-rationale",
+    "href": "paper-slides.html#placement-rationale",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "Placement rationale",
+    "text": "Placement rationale\n\n\n\n\n\n\n\n\n\n\n\nHazard\nGoverning event\nn\nP(≥1 in 30 d)\nCell\nLevel\n\n\n\n\nH1 Collision\nany collision (no human injury)\n6\n0.63\nLikely × Major\nVery high\n\n\nH2 Emergency\nlife-threatening emergency obstructed\n3\n0.41\nModerate × Severe\nVery high\n\n\nH3 Transit\ntransit/rail blocked\n8\n0.72\nLikely × Significant\nHigh\n\n\nH4 Ped/access\ncrosswalk/ramp/bike lane\n4\n0.49\nModerate × Significant\nMedium\n\n\nH5 Occupant\nmedical case or 60+ min\n3\n0.41\nModerate × Significant\nMedium\n\n\nH6 Multi-AV\n5+ AVs or 60+ min\n10\n0.8\nLikely × Significant\nHigh\n\n\nH7 Single-AV\nblockage of 60+ min\n17\n0.93\nAlmost certain × Significant\nVery high\n\n\n\nRisk curve: for each observed impact tier \\(k\\), use the frequency of incidents with impact \\(\\ge k\\), and place the hazard at the tier with the highest risk level. Probability and impact then refer to the same event."
+  },
+  {
+    "objectID": "paper-slides.html#sensitivity-robust-to-data-choices-horizon-sets-the-level",
+    "href": "paper-slides.html#sensitivity-robust-to-data-choices-horizon-sets-the-level",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "Sensitivity: robust to data choices, horizon sets the level",
+    "text": "Sensitivity: robust to data choices, horizon sets the level\n\n\n\nTable 1: Sensitivity of risk-matrix placement (cell shown as probability x impact and level).\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nHazard\nBase (Bayesian, 30 d, covered months)\nPlug-in MLE\n7-day horizon\n90-day horizon\nInclude February (212 d)\n+ supplementary incidents\nTotal freq x P90 impact\n\n\n\n\nH1 Collision\n4x4 Very high\n4x4 Very high\n2x4 Medium\n5x4 Extreme\n4x4 Very high\n4x4 Very high\n4x4 Very high\n\n\nH2 Emergency obstruction\n3x5 Very high\n3x5 Very high\n2x5 High\n4x5 Extreme\n3x5 Very high\n3x5 Very high\n4x5 Extreme\n\n\nH3 Transit obstruction\n4x3 High\n4x3 High\n3x3 Medium\n5x3 Very high\n4x3 High\n4x3 High\n4x3 High\n\n\nH4 Ped/accessibility\n3x3 Medium\n3x3 Medium\n2x3 Medium\n4x3 High\n3x3 Medium\n3x3 Medium\n3x3 Medium\n\n\nH5 Occupant-related\n3x3 Medium\n3x3 Medium\n2x3 Medium\n4x3 High\n3x3 Medium\n3x3 Medium\n4x3 High\n\n\nH6 Multi-AV gridlock\n4x3 High\n4x3 High\n3x3 Medium\n5x3 Very high\n4x3 High\n4x3 High\n5x3 Very high\n\n\nH7 Single-AV obstruction\n5x3 Very high\n5x3 Very high\n3x3 Medium\n5x3 Very high\n5x3 Very high\n5x3 Very high\n5x3 Very high"
+  },
+  {
+    "objectID": "paper-slides.html#limitations",
+    "href": "paper-slides.html#limitations",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "Limitations",
+    "text": "Limitations\n\nNo exposure (miles/trips): rates are per calendar day. A growing fleet with a flat rate means a falling per-mile rate.\nUnder-recording: only incidents that reached DEM appear, so frequencies are lower bounds.\nTruncated narratives push incidents into the H7 default, so H1–H5 are likely undercounted.\nOne analyst built the taxonomy, rules, and audit labels; a second coder would allow a true reliability estimate.\nRisk matrices are coarse (Cox 2008), so the rates, intervals, and risk curves are published alongside each cell."
+  },
+  {
+    "objectID": "paper-slides.html#take-aways",
+    "href": "paper-slides.html#take-aways",
+    "title": "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco",
+    "section": "Take-aways",
+    "text": "Take-aways\n\nBlocking is routine: about 4.6 incidents per week; median 23 min; 28% last 60+ minutes.\nThe highest risks are H1 collisions, H2 emergency obstruction, and H7 routine blockage (all Very high).\nNo detectable trend in rate, duration, or multi-AV share. The hazard-mix shift is a recording artifact.\nLevers: better data (full narratives, exposure) and faster recovery, especially near emergency scenes.\n\nData: SF DEM. Original data cleaning: Dr. Missy Cummings."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "AV Blocking Incidents in San Francisco",
+    "section": "",
+    "text": "When an autonomous vehicle (AV) becomes immobilized in a travel lane, intersection, transit lane, or emergency scene, it can obstruct traffic and first responders until a remote operator or a field technician recovers it. This project analyzes the San Francisco Department of Emergency Management (DEM) log of such AV blocking incidents for 2025.\nOver 184 covered days the DEM log records 120 AV blocking incidents, about 19.6 per 30 days (one every 1.5 days). Neither the incident rate nor incident duration shows a statistically significant trend. On the risk matrix, H1 (AV-involved collision) is Very high; H2 (Emergency-response obstruction) is Very high; H3 (Transit / rail obstruction) is High; H4 (Pedestrian / accessibility obstruction) is Medium; H5 (Occupant-related immobilization) is Medium; H6 (Multi-AV clustering / gridlock) is High; H7 (Single-AV traffic obstruction) is Very high."
+  },
+  {
+    "objectID": "index.html#read-the-analysis",
+    "href": "index.html#read-the-analysis",
+    "title": "AV Blocking Incidents in San Francisco",
+    "section": "Read the analysis",
+    "text": "Read the analysis\n\nPaper: arguments, methods, mathematics, statistical tests, and results.\nSlides: the key findings as a presentation, rendered from the same source.\nNotebook: the executed analysis notebook that produces every figure and table."
+  },
+  {
+    "objectID": "index.html#acknowledgment",
+    "href": "index.html#acknowledgment",
+    "title": "AV Blocking Incidents in San Francisco",
+    "section": "Acknowledgment",
+    "text": "Acknowledgment\nThe incident records come from the San Francisco DEM. Most of the difficult original cleaning and coding of these records was done by Dr. Missy Cummings, on which this analysis builds.\nSource code and reproduction instructions: github.com/jonathanwilsonami/av-blocking-analysis."
+  }
+]
