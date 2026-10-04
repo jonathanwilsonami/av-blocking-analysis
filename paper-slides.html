@@ -335,7 +335,8 @@ Figure&nbsp;4: Share of each period’s incidents by hazard class.
 
 <img data-src="assets/figures/fig-risk-matrix.png" class="r-stretch quarto-figure-center" id="fig-risk-matrix"><p class="caption">
 Figure&nbsp;5: 5×5 risk matrix of AV blocking hazards. Probability is the Jeffreys posterior-predictive probability of at least one qualifying incident in the next 30 days. Impact is the governing tier of each hazard’s risk curve.
-</p></section>
+</p><p><strong>Two kinds of red:</strong> H1 and H2 are <em>consequence-driven</em> (safety problems). H7 is <em>volume-driven</em>: its worst outcome is a traffic delay, but it happens every ~11 days (an operational problem).</p>
+</section>
 <section id="placement-rationale" class="slide level2">
 <h2>Placement rationale</h2>
 <table class="caption-top" style="width:100%;">
@@ -548,13 +549,110 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 </div>
 </figure>
 </div>
+</section>
+<section id="sensitivity-the-60-minute-cutoff-drives-h7" class="slide level2">
+<h2>Sensitivity: the 60-minute cutoff drives H7</h2>
+<p>H7 is <em>Very high</em> only at the 60-minute cutoff for <em>Significant</em>. At 90 minutes or more it is <em>High</em>. Nothing else moves.</p>
+<div id="tbl-threshold-sensitivity" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-threshold-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Risk-matrix placement when the duration threshold for a Significant impact is raised (all incidents re-scored; base case 60 minutes).
+</figcaption>
+<div aria-describedby="tbl-threshold-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Hazard</th>
+<th style="text-align: left;">Significant at &gt;= 60 min</th>
+<th style="text-align: left;">Significant at &gt;= 90 min</th>
+<th style="text-align: left;">Significant at &gt;= 120 min</th>
+<th style="text-align: left;">Significant at &gt;= 180 min</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">H1 Collision</td>
+<td style="text-align: left;">4x4 Very high</td>
+<td style="text-align: left;">4x4 Very high</td>
+<td style="text-align: left;">4x4 Very high</td>
+<td style="text-align: left;">4x4 Very high</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H2 Emergency obstruction</td>
+<td style="text-align: left;">3x5 Very high</td>
+<td style="text-align: left;">3x5 Very high</td>
+<td style="text-align: left;">3x5 Very high</td>
+<td style="text-align: left;">3x5 Very high</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H3 Transit obstruction</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H4 Ped/accessibility</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H5 Occupant-related</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H6 Multi-AV gridlock</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H7 Single-AV obstruction</td>
+<td style="text-align: left;">5x3 Very high</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">5x2 High</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H7 incidents at/above threshold</td>
+<td style="text-align: left;">17</td>
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
 </section></section>
 <section>
 <section id="discussion-and-limitations" class="title-slide slide level1 center">
 <h1>Discussion and limitations</h1>
 
 </section>
-<section id="limitations" class="slide level2">
+<section id="measured-vs-judged" class="slide level2">
+<h2>Measured vs judged</h2>
+<ul>
+<li><strong>Measured:</strong> counts, durations, rates and intervals, trend tests, agreement scores.</li>
+<li><strong>Judged:</strong> the taxonomy, the impact rubric (60 min = <em>Significant</em>), the 30-day horizon, the template’s bands, and the placement rule. All were fixed before the matrix was drawn and are written in code.</li>
+<li>The colors are a <strong>transparent, structured opinion built on measured rates</strong>; the sensitivity tables show how far each choice moves them.</li>
+</ul>
+</section>
+<section id="limitations-1" class="slide level2">
 <h2>Limitations</h2>
 <ul>
 <li><strong>No exposure (miles/trips):</strong> rates are per calendar day. A growing fleet with a flat rate means a falling per-mile rate.</li>
