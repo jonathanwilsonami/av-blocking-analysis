@@ -13,6 +13,7 @@ from av_blocking import data, frequency, risk_matrix, severity, taxonomy, trends
         ("WAYMO blocking MUNI track. WAYMO tech en route", 1, "H3"),
         ("Waymo blkng handicap ramp..Waymo ntfyd", 1, "H4"),
         ("Unoccupyd AV is stalled right off of Bayshore off ramp", 1, "H7"),
+        ("removing disabled Waymo AV that is completely blocking the ramp", 1, "H7"),
         ("Rider asleep in the back of Waymo..reqs PD wake up", 1, "H5"),
         ("On Brannan Waymo stalled..no driver unk if pssngrs", 1, "H7"),
         ("5 Waymo Av's blocking traffic", 5, "H6"),
@@ -108,3 +109,20 @@ def test_scores_to_frame_picks_argmax():
 def test_duration_edges_parameter():
     assert severity.duration_score(75) == 3
     assert severity.duration_score(75, edges=(10, 90)) == 2
+
+
+def test_scope_and_evidence_flags():
+    from av_blocking import analysis
+
+    df = analysis.prepare()
+    assert not df["incident_id"].isin(["INC-016", "INC-017", "INC-033"]).any()
+    assert len(analysis.prepare(include_out_of_scope=True)) == len(df) + 3
+    assert df["weak_av_evidence"].sum() >= 1
+    flagged = df[df["hazard_evidence"] == "inferred"]
+    assert set(flagged["hazard"]) <= {"H1", "H2"}
+    assert (flagged["strict_hazard"] != flagged["hazard"]).all()
+
+
+def test_supplementary_excludes_out_of_scope():
+    sup = data.supplementary_incidents()
+    assert not sup["narrative"].str.contains("Zoox AV driving erratically").any()

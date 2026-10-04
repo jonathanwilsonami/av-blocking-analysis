@@ -1,0 +1,10 @@
+incident_id,hazard_evidence,strict_hazard,note
+INC-064,inferred,H7,"AV blocked a lane at a shots-fired scene under police investigation; obstruction of responders not stated."
+INC-066,inferred,H7,"Crash scene needing traffic control; the AV's role in the crash and in obstructing responders is unclear."
+INC-089,inferred,H6,"Garage fire; two AVs 'stuck on O'Farrell'; obstruction of fire response not stated."
+INC-102,inferred,H6,"Working fire with persons trapped; 'two WAYMO vehicles stuck on...' (truncated); obstruction not stated."
+INC-103,inferred,H6,"Overturned-vehicle crash; six AVs blocking westbound traffic; responders not mentioned."
+INC-108,inferred,H3,"'Waymo vs Muni, unclear if contact was actually [made]'; contact not established."
+INC-003,effect unknown,H7,"Narrative missing; emergency-responder flag is Y, but the specific effect cannot be determined."
+INC-050,effect unknown,H5,"Two passengers in a stuck AV; text ends at 'unable to', so the exact restriction is unknown."
+"2025-10-22|MARKET ST/CORBETT AV,",inferred,H7,"Supplementary record: injury accident, 'Waymo AV drove into the scene'; obstruction of responders and AV-caused injury not established."

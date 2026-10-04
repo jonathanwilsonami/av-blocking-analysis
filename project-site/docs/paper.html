@@ -257,7 +257,7 @@ window.Quarto = {
 <div>
   <div class="abstract">
     <div class="block-title">Abstract</div>
-    <p>Robotaxis that become immobilized in the roadway can obstruct general traffic, public transit, pedestrians, and emergency responders. We analyze the 123 AV blocking incidents recorded by the San Francisco Department of Emergency Management (DEM) between February 1, 2025 and October 31, 2025. We design a consequence-based hazard taxonomy and classify each narrative with a transparent rule set, which we compare against supervised models, two zero-shot transformers, and an embedding-similarity baseline. A blind LLM second coder serves as a cross-check (Cohen’s <span class="math inline">\(\kappa\)</span> = 0.95 with the manual audit). Frequencies are estimated with Poisson and Jeffreys-Bayesian models. Change over time is tested with non-parametric methods suited to six monthly counts and heavily skewed durations. Each hazard is placed on a 5×5 likelihood–consequence matrix with a “risk-curve” rule that pairs each consequence level with its own frequency. Blocking incidents occur about 19.6 times per 30 days, with no statistically detectable trend in rate or duration. AV-involved collisions, emergency-response obstruction, and routine single-AV lane blockages rank highest (<em>Very high</em>). Transit obstruction and multi-AV gridlock are <em>High</em>. Pedestrian/accessibility and occupant-related hazards are <em>Medium</em>.</p>
+    <p>Robotaxis that become immobilized in the roadway can obstruct general traffic, public transit, pedestrians, and emergency responders. We analyze the 120 AV blocking incidents (after excluding 3 reports of moving AVs) recorded by the San Francisco Department of Emergency Management (DEM) between February 1, 2025 and October 31, 2025. We design a consequence-based hazard taxonomy and classify each narrative with a transparent rule set, which we compare against supervised models, two zero-shot transformers, and an embedding-similarity baseline. A blind LLM second coder serves as a cross-check (Cohen’s <span class="math inline">\(\kappa\)</span> = 0.95 with the manual audit). Frequencies are estimated with Poisson and Jeffreys-Bayesian models. Change over time is tested with non-parametric methods suited to six monthly counts and heavily skewed durations. Each hazard is placed on a 5×5 likelihood–consequence matrix with a “risk-curve” rule that pairs each consequence level with its own frequency. Blocking incidents occur about 19.1 times per 30 days, with no statistically detectable trend in rate or duration. AV-involved collisions, emergency-response obstruction, and routine single-AV lane blockages rank highest (<em>Very high</em>), although the emergency-obstruction rating rests on AVs stuck at emergency scenes; counting only explicitly stated obstructions, it falls to <em>Medium</em>. Transit obstruction and multi-AV gridlock are <em>High</em>. Pedestrian/accessibility and occupant-related hazards are <em>Medium</em>.</p>
   </div>
 </div>
 
@@ -294,7 +294,7 @@ window.Quarto = {
 <section id="source-and-cleaning" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="source-and-cleaning"><span class="header-section-number">2.1</span> Source and cleaning</h2>
 <p>The primary source is the <code>DEM Incidents</code> sheet of <code>AV-Brick-Report.xlsx</code>. Each record has a date, location, free-text dispatcher narrative, number of AVs involved, and the times the event started and cleared. The records originate with the San Francisco Department of Emergency Management. Dr.&nbsp;Missy Cummings compiled and cleaned them from raw dispatch records, which was the hard part.</p>
-<p>We apply light, documented cleaning (<a href="#tbl-data-quality" class="quarto-xref">Table&nbsp;1</a>):</p>
+<p>We apply light, documented cleaning (<a href="#tbl-data-quality" class="quarto-xref">Table&nbsp;2</a>):</p>
 <ul>
 <li>parse the mixed time formats;</li>
 <li>compute duration as clear minus start, modulo 1,440 minutes, so events crossing midnight are handled;</li>
@@ -302,10 +302,58 @@ window.Quarto = {
 <li>extract the operator;</li>
 <li>treat a missing AV count as at least one.</li>
 </ul>
+<p>Duration is the <strong>logged event time</strong>, from when dispatch opened the incident to when it was cleared. It is not a measured delay to responders or to anyone else. A 176-minute incident, for example, does not mean medics were delayed 176 minutes.</p>
+<p><strong>Scope.</strong> This is an analysis of <em>blocking</em> incidents, meaning immobilized AVs. Two kinds of record are excluded from every count and test (<a href="#tbl-scope" class="quarto-xref">Table&nbsp;1</a>): - reports of a <em>moving</em> AV behaving badly, with no immobilization; - one record whose narrative names no AV and that has no AV count, so AV involvement is not confirmed.</p>
+<p>That removes 3 of the 123 primary records, leaving 120, plus one supplementary record. The moving-AV reports remain relevant to AV safety, just not to this question.</p>
+<div id="tbl-scope" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-scope-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Records excluded from the blocking analysis as out of scope.
+</figcaption>
+<div aria-describedby="tbl-scope-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 8%">
+<col style="width: 72%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Record</th>
+<th style="text-align: left;">Source</th>
+<th style="text-align: left;">Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">INC-016</td>
+<td style="text-align: left;">primary</td>
+<td style="text-align: left;">Moving-violation report (AV changed lanes mid-intersection); no immobilization described.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-017</td>
+<td style="text-align: left;">primary</td>
+<td style="text-align: left;">Moving-violation report (AV went through a stop light); no immobilization described.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2025-08-15</td>
+<td style="text-align: left;">7TH ST/BRYANT ST, SF</td>
+<td style="text-align: left;">supplementary</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-033</td>
+<td style="text-align: left;">primary</td>
+<td style="text-align: left;">AV involvement not confirmed: narrative mentions only a signal outage and multiple vehicles; no AV named and AV count missing.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
 <div id="tbl-data-quality" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-data-quality-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1: Data inventory and quality checks for the primary DEM sheet.
+Table&nbsp;2: Data inventory and quality checks for the primary DEM sheet.
 </figcaption>
 <div aria-describedby="tbl-data-quality-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -321,8 +369,16 @@ Table&nbsp;1: Data inventory and quality checks for the primary DEM sheet.
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Incidents (primary sheet)</td>
+<td style="text-align: left;">Records in primary sheet</td>
 <td style="text-align: left;">123</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Out of scope (moving-AV reports)</td>
+<td style="text-align: left;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Blocking incidents analyzed</td>
+<td style="text-align: left;">120</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Date range</td>
@@ -342,7 +398,7 @@ Table&nbsp;1: Data inventory and quality checks for the primary DEM sheet.
 </tr>
 <tr class="even">
 <td style="text-align: left;">Incidents in covered months</td>
-<td style="text-align: left;">120</td>
+<td style="text-align: left;">117</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Narrative missing</td>
@@ -350,11 +406,11 @@ Table&nbsp;1: Data inventory and quality checks for the primary DEM sheet.
 </tr>
 <tr class="even">
 <td style="text-align: left;">Narrative likely truncated</td>
-<td style="text-align: left;">83 (67%)</td>
+<td style="text-align: left;">80 (67%)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">AV count missing</td>
-<td style="text-align: left;">3</td>
+<td style="text-align: left;">2</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Durations crossing midnight</td>
@@ -362,23 +418,23 @@ Table&nbsp;1: Data inventory and quality checks for the primary DEM sheet.
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Operator = Waymo / Zoox / unstated</td>
-<td style="text-align: left;">110 / 1 / 12</td>
+<td style="text-align: left;">108 / 1 / 11</td>
 </tr>
 </tbody>
 </table>
 </div>
 </figure>
 </div>
-<p><strong>Narrative truncation.</strong> 67% of narratives (83 of 123) appear to have been cut at about 45–60 characters by the export. This limits what any text classifier can recover, and it turns out to matter for the trend analysis (<a href="#sec-mix" class="quarto-xref">Section&nbsp;6.3</a>).</p>
-<p><strong>Coverage.</strong> The log is not continuous. February holds only three incidents, all on its first three days, and April and May are absent. Treating absent months as zero-incident months would bias every rate and trend estimate. All rates and trend tests therefore use the 6 fully covered months (March and June–October: 184 days, 120 incidents). The February incidents still count toward hazard classification and impact scoring. <a href="#sec-sensitivity" class="quarto-xref">Section&nbsp;8</a> shows that the conclusions do not change if February is included.</p>
+<p><strong>Narrative truncation.</strong> 67% of narratives (80 of 120) appear to have been cut at about 45–60 characters by the export. This limits what any text classifier can recover, and it turns out to matter for the trend analysis (<a href="#sec-mix" class="quarto-xref">Section&nbsp;6.3</a>).</p>
+<p><strong>Coverage.</strong> The log is not continuous. February holds only three incidents, all on its first three days, and April and May are absent. Treating absent months as zero-incident months would bias every rate and trend estimate. All rates and trend tests therefore use the 6 fully covered months (March and June–October: 184 days, 117 incidents). The February incidents still count toward hazard classification and impact scoring. <a href="#sec-sensitivity" class="quarto-xref">Section&nbsp;8</a> shows that the conclusions do not change if February is included.</p>
 </section>
 <section id="secondary-sheets-and-data-engineering" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="secondary-sheets-and-data-engineering"><span class="header-section-number">2.2</span> Secondary sheets and data engineering</h2>
 <p>The analyzed workbook (<code>AV-Brick-Report-analyzed.xlsx</code>) contributes four things:</p>
 <ul>
-<li><strong>Extra fields.</strong> The AV company’s ETA (given for 22 incidents; median 14.5 minutes), other parties involved, and emergency-responder and transit-impact flags. These are joined on date and location, and all 123 primary rows match.</li>
-<li><strong>A neighborhood zone (1–10)</strong> hand-coded in <code>DEM Incidents Quant</code> (119 of 123 match). The same sheet’s derived flags (multi-AV, 4-hour time-of-day bin, &gt;20 / &gt;40-minute durations) are recomputed from source fields.</li>
-<li><strong>8 additional incidents</strong> that have narratives but no times. They are excluded from duration analysis but used in a frequency sensitivity check.</li>
+<li><strong>Extra fields.</strong> The AV company’s ETA (given for 22 incidents; median 14.5 minutes), other parties involved, and emergency-responder and transit-impact flags. These are joined on date and location, and all 123 primary records match.</li>
+<li><strong>A neighborhood zone (1–10)</strong> hand-coded in <code>DEM Incidents Quant</code> (all but three in-scope incidents match). The same sheet’s derived flags (multi-AV, 4-hour time-of-day bin, &gt;20 / &gt;40-minute durations) are recomputed from source fields.</li>
+<li><strong>7 additional incidents</strong> that have narratives but no times. They are excluded from duration analysis but used in a frequency sensitivity check.</li>
 <li><strong>The <code>plots and stats</code> sheet.</strong> Monthly duration summaries, a six-group normality/rank-sum table, and a March-vs-October Mann–Whitney test (W = 377, p = 0.063). We replicate this result and extend it in <a href="#sec-trends" class="quarto-xref">Section&nbsp;6</a>.</li>
 </ul>
 <p>The analyzed sheet’s emergency-responder flag marks <em>responder involvement</em>, for example police called to direct traffic around a stalled AV. It does not mark obstruction of an emergency, so it is kept as a feature and does not define a hazard.</p>
@@ -397,7 +453,7 @@ Table&nbsp;1: Data inventory and quality checks for the primary DEM sheet.
 <div id="tbl-taxonomy" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-taxonomy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;2: Consequence-based hazard taxonomy (assigned by severity-first precedence).
+Table&nbsp;3: Consequence-based hazard taxonomy (assigned by severity-first precedence).
 </figcaption>
 <div aria-describedby="tbl-taxonomy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -457,7 +513,7 @@ Table&nbsp;2: Consequence-based hazard taxonomy (assigned by severity-first prec
 </section>
 <section id="sec-classification" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="sec-classification"><span class="header-section-number">3.2</span> Classification method</h2>
-<p>Choosing a classifier is a question of fit to the data. The data here are 123 short, often truncated narratives written in dispatcher shorthand (<code>blkng</code>, <code>ntfyd</code>, <code>LP</code>). There are no gold-standard labels, and the safety-relevant classes have only 4–9 examples. We compared five families of approach:</p>
+<p>Choosing a classifier is a question of fit to the data. The data here are 120 short, often truncated narratives written in dispatcher shorthand (<code>blkng</code>, <code>ntfyd</code>, <code>LP</code>). There are no gold-standard labels, and the safety-relevant classes have only 4–9 examples. We compared five families of approach:</p>
 <ul>
 <li><strong>Transparent rules</strong>: keyword and regular-expression patterns plus the AV-count field, implemented in <code>av_blocking.taxonomy</code>.</li>
 <li><strong>Supervised TF-IDF models</strong>: word and character n-grams with multinomial logistic regression, and with XGBoost <span class="citation" data-cites="chen2016">(<a href="#ref-chen2016" role="doc-biblioref">Chen and Guestrin 2016</a>)</span>.</li>
@@ -471,13 +527,13 @@ Table&nbsp;2: Consequence-based hazard taxonomy (assigned by severity-first prec
 <p><span class="math display">\[
 \kappa = \frac{p_o - p_e}{1 - p_e},
 \]</span></p>
-<p><span class="math inline">\(p_o\)</span> is the observed agreement and <span class="math inline">\(p_e\)</span> the agreement expected by chance from the label margins. The rules were written by the same analyst who made the reference labels, so this figure is an internal-consistency check, not an independent validation. The one remaining disagreement is a genuinely ambiguous crash scene (<a href="#tbl-disagreements" class="quarto-xref">Table&nbsp;9</a>).</p>
-<p><strong>Blind second coder.</strong> To address the single-analyst problem, a second coder from a different model family labeled all 123 incidents <em>blind</em>: OpenAI’s Codex (based on GPT-6; the exact build is not exposed). It received only a label-free packet (<code>data/labels/blind_audit/</code>): the narratives and AV counts, plus a coding guide with the seven definitions, the precedence and AV-count rules, and a glossary of dispatcher shorthand. The guide contained no worked examples. Codex reported opening no other file, and the repository confirms it modified nothing else. It was told to judge each narrative itself rather than use keyword scripts, and to give a confidence level and rationale per incident.</p>
-<p>It agreed with the manual audit on 119 of 123 incidents (<span class="math inline">\(\kappa\)</span> = 0.95) and with the rules on 120 (<span class="math inline">\(\kappa\)</span> = 0.96). Fleiss’ <span class="math inline">\(\kappa\)</span> across all three coders is 0.965 (<a href="#tbl-coder-agreement" class="quarto-xref">Table&nbsp;3</a>). The 4 disagreements share one pattern: Codex read truncated narratives more literally, declining to infer a transit or occupant consequence that the visible text does not state. It flagged 3 of them as low confidence itself (<a href="#tbl-coder-disagreements" class="quarto-xref">Table&nbsp;4</a>). On review, every disagreement is a defensible judgment call either way, so the labels and rules were kept unchanged. Because this is a <em>language-model</em> second coder, the agreement is evidence that the taxonomy can be applied consistently from its written definitions. It is not a substitute for human inter-rater reliability: two language models may share biases from training.</p>
+<p><span class="math inline">\(p_o\)</span> is the observed agreement and <span class="math inline">\(p_e\)</span> the agreement expected by chance from the label margins. The rules were written by the same analyst who made the reference labels, so this figure is an internal-consistency check, not an independent validation. The one remaining disagreement is a genuinely ambiguous crash scene (<a href="#tbl-disagreements" class="quarto-xref">Table&nbsp;12</a>).</p>
+<p><strong>Blind second coder.</strong> To address the single-analyst problem, a second coder from a different model family labeled all 123 records <em>blind</em>: OpenAI’s Codex (based on GPT-6; the exact build is not exposed). It received only a label-free packet (<code>data/labels/blind_audit/</code>): the narratives and AV counts, plus a coding guide with the seven definitions, the precedence and AV-count rules, and a glossary of dispatcher shorthand. The guide contained no worked examples. Codex reported opening no other file, and the repository confirms it modified nothing else. It was told to judge each narrative itself rather than use keyword scripts, and to give a confidence level and rationale per incident.</p>
+<p>On the 120 in-scope incidents, it agreed with the manual audit on 116 (<span class="math inline">\(\kappa\)</span> = 0.95) and with the rules on 117 (<span class="math inline">\(\kappa\)</span> = 0.96). Fleiss’ <span class="math inline">\(\kappa\)</span> across all three coders is 0.964 (<a href="#tbl-coder-agreement" class="quarto-xref">Table&nbsp;4</a>). The 4 disagreements share one pattern: Codex read truncated narratives more literally, declining to infer a transit or occupant consequence that the visible text does not state. It flagged 3 of them as low confidence itself (<a href="#tbl-coder-disagreements" class="quarto-xref">Table&nbsp;5</a>). On review, every disagreement is a defensible judgment call either way, so the labels and rules were kept unchanged. Because this is a <em>language-model</em> second coder, the agreement is evidence that the taxonomy can be applied consistently from its written definitions. It is not a substitute for human inter-rater reliability: two language models may share biases from training.</p>
 <div id="tbl-coder-agreement" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-coder-agreement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3: Inter-coder agreement on hazard labels (n = 123).
+Table&nbsp;4: Inter-coder agreement on hazard labels (n = 120 in-scope incidents).
 </figcaption>
 <div aria-describedby="tbl-coder-agreement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -501,21 +557,21 @@ Table&nbsp;3: Inter-coder agreement on hazard labels (n = 123).
 <tr class="odd">
 <td style="text-align: left;">LLM second coder (Codex)</td>
 <td style="text-align: left;">Manual audit</td>
-<td style="text-align: left;">119/123</td>
+<td style="text-align: left;">116/120</td>
 <td style="text-align: left;">96.7%</td>
-<td style="text-align: right;">0.947</td>
+<td style="text-align: right;">0.946</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">LLM second coder (Codex)</td>
 <td style="text-align: left;">Rules</td>
-<td style="text-align: left;">120/123</td>
-<td style="text-align: left;">97.6%</td>
+<td style="text-align: left;">117/120</td>
+<td style="text-align: left;">97.5%</td>
 <td style="text-align: right;">0.96</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Manual audit</td>
 <td style="text-align: left;">Rules</td>
-<td style="text-align: left;">122/123</td>
+<td style="text-align: left;">119/120</td>
 <td style="text-align: left;">99.2%</td>
 <td style="text-align: right;">0.987</td>
 </tr>
@@ -524,7 +580,7 @@ Table&nbsp;3: Inter-coder agreement on hazard labels (n = 123).
 <td style="text-align: left;">(Fleiss)</td>
 <td style="text-align: left;"></td>
 <td style="text-align: left;"></td>
-<td style="text-align: right;">0.965</td>
+<td style="text-align: right;">0.964</td>
 </tr>
 </tbody>
 </table>
@@ -534,7 +590,7 @@ Table&nbsp;3: Inter-coder agreement on hazard labels (n = 123).
 <div id="tbl-coder-disagreements" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-coder-disagreements-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4: Incidents where the LLM second coder disagrees with the manual audit, with its rationale and the resolution.
+Table&nbsp;5: Incidents where the LLM second coder disagrees with the manual audit, with its rationale and the resolution.
 </figcaption>
 <div aria-describedby="tbl-coder-disagreements-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -606,14 +662,316 @@ Table&nbsp;4: Incidents where the LLM second coder disagrees with the manual aud
 </div>
 </figure>
 </div>
-<p>The learned models are scored out-of-sample, by 4-fold × 5-repeat stratified cross-validation (<a href="#tbl-classifiers" class="quarto-xref">Table&nbsp;5</a>, <a href="#fig-classifiers" class="quarto-xref">Figure&nbsp;1</a>). They improve only modestly on the majority baseline: macro-F1 0.47 for logistic regression and 0.32 for XGBoost, against 0.25 for the baseline. Logistic regression’s F1 on emergency obstruction is 0, and the rare, high-consequence classes are precisely the ones that drive the risk matrix.</p>
-<p>The pretrained models split into two groups (<a href="#tbl-classifiers" class="quarto-xref">Table&nbsp;5</a>, <a href="#tbl-pretrained-counts" class="quarto-xref">Table&nbsp;7</a>):</p>
+<p><strong>Evidence strength of collision and emergency labels.</strong> The H2 definition covers both obstructing a response <em>and</em> becoming stuck inside an active emergency scene. A review by the project team found that 6 collision or emergency labels rest on inference: the narrative places the AV at a fire, crash, or shots-fired scene, or reports a possible collision, without saying it blocked responders or made contact (<a href="#tbl-evidence" class="quarto-xref">Table&nbsp;6</a>). In the covered window only 1 of 6 H2 incidents states the obstruction outright, and none of its 3 <em>Severe</em> cases does. Collisions are firmer: 5 of 6 state the contact. The base case keeps the inclusive labels, because they follow the written definition. Each inferred case is flagged with the class it would take under a strict reading, and <a href="#sec-sensitivity" class="quarto-xref">Section&nbsp;8</a> shows the consequence.</p>
+<div id="tbl-evidence" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-evidence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6: Evidence review: every collision (H1) and emergency-obstruction (H2) label, plus other team-flagged records.
+</figcaption>
+<div aria-describedby="tbl-evidence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 2%">
+<col style="width: 1%">
+<col style="width: 3%">
+<col style="width: 3%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 43%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Incident</th>
+<th style="text-align: left;">Date</th>
+<th style="text-align: left;">Label</th>
+<th style="text-align: left;">Evidence</th>
+<th style="text-align: left;">Strict label</th>
+<th style="text-align: right;">Impact</th>
+<th style="text-align: left;">In window</th>
+<th style="text-align: left;">Narrative</th>
+<th style="text-align: left;">Review note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">INC-002</td>
+<td style="text-align: left;">2025-02-02</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: left;">explicit</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">PD on scene first for report of unconcious male..medic requested and had to respond from east or west bound on eddy SB Jones due to traffic blocked by Waymo AV//M566 Ack Waymo AV moved</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-003</td>
+<td style="text-align: left;">2025-02-03</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: left;">effect unknown</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Narrative missing; emergency-responder flag is Y, but the specific effect cannot be determined.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-042</td>
+<td style="text-align: left;">2025-06-24</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: left;">explicit</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Passing Muni hit the door of Waymo AV now stuck and</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-050</td>
+<td style="text-align: left;">2025-07-09</td>
+<td style="text-align: left;">H5</td>
+<td style="text-align: left;">effect unknown</td>
+<td style="text-align: left;">H5</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">2 passengers in the Waymo AV stuck unable to</td>
+<td style="text-align: left;">Two passengers in a stuck AV; text ends at ‘unable to’, so the exact restriction is unknown.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-051</td>
+<td style="text-align: left;">2025-07-11</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: left;">explicit</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Muni vs Waymo non inj accident Muni insp and</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-064</td>
+<td style="text-align: left;">2025-08-01</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: left;">inferred</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Zoox blkng lane of traffic where poss shots heard coming from a building and PD actively investigating..another call AV disabled far right lane blkng traffic prior to Howard St called Zoox at 4155009354</td>
+<td style="text-align: left;">AV blocked a lane at a shots-fired scene under police investigation; obstruction of responders not stated.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-066</td>
+<td style="text-align: left;">2025-08-06</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: left;">inferred</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Traffic hazard due to a veh accident..need PD for traffic control..tow truck en route no eta..PD resp..Waymo able to move AV..no need for PD</td>
+<td style="text-align: left;">Crash scene needing traffic control; the AV’s role in the crash and in obstructing responders is unclear.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-079</td>
+<td style="text-align: left;">2025-08-19</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: left;">explicit</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Waymo was blkng medics way</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-089</td>
+<td style="text-align: left;">2025-09-16</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: left;">inferred</td>
+<td style="text-align: left;">H6</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">There was a fire inside a parking garage on O’Farrell and 2 WAYMO’s were stuck on O’Farrell. No resolution</td>
+<td style="text-align: left;">Garage fire; two AVs ‘stuck on O’Farrell’; obstruction of fire response not stated.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-091</td>
+<td style="text-align: left;">2025-09-18</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: left;">explicit</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">WAYMO vs.&nbsp;Motorcycle vehicle accident. No reported injuries</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-099</td>
+<td style="text-align: left;">2025-10-05</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: left;">explicit</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">WAYMO involved in a no injury accident with SFFDmedic.</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-102</td>
+<td style="text-align: left;">2025-10-07</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: left;">inferred</td>
+<td style="text-align: left;">H6</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Working fire with reports of a and trappedin building on 2nd floor. 2 WAYMO vehicles stuck on</td>
+<td style="text-align: left;">Working fire with persons trapped; ‘two WAYMO vehicles stuck on…’ (truncated); obstruction not stated.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-103</td>
+<td style="text-align: left;">2025-10-08</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: left;">inferred</td>
+<td style="text-align: left;">H6</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Vehicle accident involving a vehicle on it’s side. 6 WAYMO’s blocking westbound traffic on Duboce an</td>
+<td style="text-align: left;">Overturned-vehicle crash; six AVs blocking westbound traffic; responders not mentioned.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-108</td>
+<td style="text-align: left;">2025-10-17</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: left;">inferred</td>
+<td style="text-align: left;">H3</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">SWaymo vs Muni, unclear if contact was actually</td>
+<td style="text-align: left;">‘Waymo vs Muni, unclear if contact was actually [made]’; contact not established.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-114</td>
+<td style="text-align: left;">2025-10-24</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: left;">explicit</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Waymo hit RP’s dog..Emer Vet and Waymo contact</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Supplementary: 2025-10-22</td>
+<td style="text-align: left;">MARKET ST/CORBETT AV,</td>
+<td style="text-align: left;">2025-10-22</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: left;">inferred</td>
+<td style="text-align: right;">H7</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Multi veh inj accident Waymo AV drove into the scen</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The same review flagged two other kinds of record. INC-003 (no narrative) and INC-050 (text cut off at “unable to”) keep their labels, with the effect marked <em>unknown</em>. And 7 in-scope incidents never name an AV in their narrative, mostly signal outages or truncated text (<a href="#tbl-weak-av" class="quarto-xref">Table&nbsp;7</a>). They stay in the analysis because they come from the curated AV incident log, but <a href="#sec-sensitivity" class="quarto-xref">Section&nbsp;8</a> re-runs the matrix without them.</p>
+<div id="tbl-weak-av" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-weak-av-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;7: In-scope incidents whose narrative never names an AV (kept in the analysis; excluded in a sensitivity check).
+</figcaption>
+<div aria-describedby="tbl-weak-av-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 4%">
+<col style="width: 8%">
+<col style="width: 6%">
+<col style="width: 28%">
+<col style="width: 46%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Incident</th>
+<th style="text-align: left;">Label</th>
+<th style="text-align: right;">Duration (min)</th>
+<th style="text-align: left;">In window</th>
+<th style="text-align: left;">Narrative</th>
+<th style="text-align: left;">Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">INC-003</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Narrative missing; AV involvement rests on inclusion in the DEM AV log and the AV-count field.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-005</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: right;">272</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Per SFPD all traffic signals are Red..Signal Repair ntfyd.</td>
+<td style="text-align: left;">Signal outage only (‘all traffic signals are Red’); no AV named in the narrative.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-034</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: right;">211</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">On Powell btw Broadway/Pacific completely disabled</td>
+<td style="text-align: left;">Truncated (‘completely disabled’); no AV named in the narrative.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-040</td>
+<td style="text-align: left;">H3</td>
+<td style="text-align: right;">125</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Traffic lights are out..hazard for Muni trains..DPT trying</td>
+<td style="text-align: left;">Signal outage affecting Muni; no AV named in the narrative.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-043</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Rp in veh for past 20 mins multi vehs stuck behind</td>
+<td style="text-align: left;">Caller stuck behind ‘multi vehs’; no AV named in the narrative.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-058</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Admiral betwn Mission and Alemany facing SB twd</td>
+<td style="text-align: left;">Truncated location description; no AV named in the narrative.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-062</td>
+<td style="text-align: left;">H6</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">Traffic signals malfunctioningon 34th not allowing cars</td>
+<td style="text-align: left;">Traffic-signal malfunction; no AV named in the narrative (AV count 3).</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The learned models are scored out-of-sample, by 4-fold × 5-repeat stratified cross-validation (<a href="#tbl-classifiers" class="quarto-xref">Table&nbsp;8</a>, <a href="#fig-classifiers" class="quarto-xref">Figure&nbsp;1</a>). They improve only modestly on the majority baseline: macro-F1 0.45 for logistic regression and 0.3 for XGBoost, against 0.25 for the baseline. Logistic regression’s F1 on emergency obstruction is 0, and the rare, high-consequence classes are precisely the ones that drive the risk matrix.</p>
+<p>The pretrained models split into two groups (<a href="#tbl-classifiers" class="quarto-xref">Table&nbsp;8</a>, <a href="#tbl-pretrained-counts" class="quarto-xref">Table&nbsp;10</a>):</p>
 <ul>
-<li><strong>Zero-shot NLI does not help, and a bigger model does not fix it.</strong> BART-large-MNLI reaches macro-F1 0.4. The larger, newer DeBERTa-v3 model does slightly <em>worse</em>, at 0.32, with F1 = 0 on emergency obstruction. The difference from BART is not significant (paired bootstrap ΔF1 = -0.07 (-0.20 to +0.05); McNemar p = 0.064). Both NLI models label about a third of all narratives “collision” (38 and 39 incidents, against 7 in the audit). General-purpose NLI models do not read dispatcher shorthand well, regardless of size.</li>
-<li><strong>Embedding similarity is the strongest label-free method.</strong> It reaches macro-F1 0.62, significantly better than BART-MNLI (ΔF1 = +0.22 (+0.08 to +0.36)). It is the only non-rule method with real skill on emergency obstruction (F1 = 0.67). It edges out cross-validated logistic regression, though not significantly (ΔF1 = +0.09 (-0.06 to +0.23); McNemar p = 0.119). Its errors run the other way from NLI: it assigns too many incidents to transit and to pedestrian/accessibility.</li>
+<li><strong>Zero-shot NLI does not help, and a bigger model does not fix it.</strong> BART-large-MNLI reaches macro-F1 0.4. The larger, newer DeBERTa-v3 model does slightly <em>worse</em>, at 0.33, with F1 = 0 on emergency obstruction. The difference from BART is not significant (paired bootstrap ΔF1 = -0.07 (-0.20 to +0.05); McNemar p = 0.093). Both NLI models label about a third of all narratives “collision” (36 and 37 incidents, against 7 in the audit). General-purpose NLI models do not read dispatcher shorthand well, regardless of size.</li>
+<li><strong>Embedding similarity is the strongest label-free method.</strong> It reaches macro-F1 0.63, significantly better than BART-MNLI (ΔF1 = +0.23 (+0.09 to +0.37)). It is the only non-rule method with real skill on emergency obstruction (F1 = 0.67). It also edges out cross-validated logistic regression, but the evidence is weak. The bootstrap interval for the F1 difference only just excludes zero (ΔF1 = +0.16 (+0.01 to +0.31)), and the McNemar test on accuracy does not reject (p = 0.322). Its errors run the other way from NLI: it assigns too many incidents to transit and to pedestrian/accessibility.</li>
 <li><strong>A frontier LLM given the written coding guide</strong> is in a different league. Scored the same way, the blind Codex second coder reaches macro-F1 0.95 (<span class="math inline">\(\kappa\)</span> = 0.95), with F1 = 0.92 on emergency obstruction. The deciding factor is the guide (definitions, precedence, shorthand glossary), which the zero-shot models never see, as much as raw model size.</li>
 </ul>
-<p>The significance tests are paired, because every classifier labels the same incidents (<a href="#tbl-classifier-tests" class="quarto-xref">Table&nbsp;8</a>). The exact McNemar test <span class="citation" data-cites="mcnemar1947">(<a href="#ref-mcnemar1947" role="doc-biblioref">McNemar 1947</a>)</span> uses only the discordant incidents, those one model gets right and the other wrong. With <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> such incidents, under <span class="math inline">\(H_0\)</span>, <span class="math inline">\(b \sim \operatorname{Bin}(b + c, \tfrac12)\)</span>. The macro-F1 difference gets a paired percentile-bootstrap 95% interval <span class="citation" data-cites="efron1993">(<a href="#ref-efron1993" role="doc-biblioref">Efron and Tibshirani 1993</a>)</span> from 5,000 resamples of incidents. Supervised models enter with their out-of-fold predictions.</p>
+<p>The significance tests are paired, because every classifier labels the same incidents (<a href="#tbl-classifier-tests" class="quarto-xref">Table&nbsp;11</a>). The exact McNemar test <span class="citation" data-cites="mcnemar1947">(<a href="#ref-mcnemar1947" role="doc-biblioref">McNemar 1947</a>)</span> uses only the discordant incidents, those one model gets right and the other wrong. With <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> such incidents, under <span class="math inline">\(H_0\)</span>, <span class="math inline">\(b \sim \operatorname{Bin}(b + c, \tfrac12)\)</span>. The macro-F1 difference gets a paired percentile-bootstrap 95% interval <span class="citation" data-cites="efron1993">(<a href="#ref-efron1993" role="doc-biblioref">Efron and Tibshirani 1993</a>)</span> from 5,000 resamples of incidents. Supervised models enter with their out-of-fold predictions.</p>
 <p><strong>Choice: the rule set, with the LLM as a cross-check.</strong> A guided frontier LLM labels almost as well as the rules, so the choice is not about raw accuracy. It rests on four properties a hazard classification feeding a risk matrix needs:</p>
 <ol type="1">
 <li><strong>Auditable.</strong> Every label traces to a named pattern that a reviewer can read and challenge. An LLM’s rationale is a post-hoc explanation, not the mechanism.</li>
@@ -625,7 +983,7 @@ Table&nbsp;4: Incidents where the LLM second coder disagrees with the manual aud
 <div id="tbl-classifiers" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-classifiers-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;5: Narrative classifiers scored against the manual audit labels (supervised models: mean and SD over 4-fold x 5 repeated stratified CV; pretrained models and the LLM use no training data; the LLM was given the written coding guide).
+Table&nbsp;8: Narrative classifiers scored against the manual audit labels (supervised models: mean and SD over 4-fold x 5 repeated stratified CV; pretrained models and the LLM use no training data; the LLM was given the written coding guide).
 </figcaption>
 <div aria-describedby="tbl-classifiers-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -651,50 +1009,50 @@ Table&nbsp;5: Narrative classifiers scored against the manual audit labels (supe
 <tr class="odd">
 <td style="text-align: left;">Majority class + count rule</td>
 <td style="text-align: left;">Baseline</td>
-<td style="text-align: right;">0.249</td>
+<td style="text-align: right;">0.248</td>
 <td style="text-align: left;">—</td>
-<td style="text-align: right;">0.724</td>
-<td style="text-align: right;">0.433</td>
+<td style="text-align: right;">0.717</td>
+<td style="text-align: right;">0.43</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">TF-IDF + XGBoost (CV)</td>
 <td style="text-align: left;">Supervised (cross-validated)</td>
-<td style="text-align: right;">0.32</td>
-<td style="text-align: left;">0.074</td>
-<td style="text-align: right;">0.735</td>
-<td style="text-align: right;">0.477</td>
+<td style="text-align: right;">0.301</td>
+<td style="text-align: left;">0.061</td>
+<td style="text-align: right;">0.718</td>
+<td style="text-align: right;">0.46</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">TF-IDF + logistic regression (CV)</td>
 <td style="text-align: left;">Supervised (cross-validated)</td>
-<td style="text-align: right;">0.47</td>
-<td style="text-align: left;">0.085</td>
-<td style="text-align: right;">0.774</td>
-<td style="text-align: right;">0.582</td>
+<td style="text-align: right;">0.451</td>
+<td style="text-align: left;">0.103</td>
+<td style="text-align: right;">0.767</td>
+<td style="text-align: right;">0.579</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Zero-shot BART-large-MNLI</td>
 <td style="text-align: left;">Pretrained, no training</td>
-<td style="text-align: right;">0.396</td>
+<td style="text-align: right;">0.399</td>
 <td style="text-align: left;">—</td>
-<td style="text-align: right;">0.585</td>
-<td style="text-align: right;">0.378</td>
+<td style="text-align: right;">0.592</td>
+<td style="text-align: right;">0.389</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Zero-shot DeBERTa-v3-large NLI</td>
 <td style="text-align: left;">Pretrained, no training</td>
-<td style="text-align: right;">0.323</td>
+<td style="text-align: right;">0.327</td>
 <td style="text-align: left;">—</td>
-<td style="text-align: right;">0.504</td>
-<td style="text-align: right;">0.279</td>
+<td style="text-align: right;">0.517</td>
+<td style="text-align: right;">0.295</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Embedding similarity (mxbai-embed-large)</td>
 <td style="text-align: left;">Pretrained, no training</td>
-<td style="text-align: right;">0.62</td>
+<td style="text-align: right;">0.628</td>
 <td style="text-align: left;">—</td>
-<td style="text-align: right;">0.691</td>
-<td style="text-align: right;">0.563</td>
+<td style="text-align: right;">0.692</td>
+<td style="text-align: right;">0.568</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">LLM + coding guide (Codex, GPT-6-based)</td>
@@ -702,7 +1060,7 @@ Table&nbsp;5: Narrative classifiers scored against the manual audit labels (supe
 <td style="text-align: right;">0.946</td>
 <td style="text-align: left;">—</td>
 <td style="text-align: right;">0.967</td>
-<td style="text-align: right;">0.947</td>
+<td style="text-align: right;">0.946</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Rule-based (selected; in-sample)</td>
@@ -720,7 +1078,7 @@ Table&nbsp;5: Narrative classifiers scored against the manual audit labels (supe
 <div id="tbl-per-class-f1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-per-class-f1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;6: Per-class F1 by method.
+Table&nbsp;9: Per-class F1 by method.
 </figcaption>
 <div aria-describedby="tbl-per-class-f1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -752,11 +1110,11 @@ Table&nbsp;6: Per-class F1 by method.
 <tr class="odd">
 <td style="text-align: left;">H1 Collision</td>
 <td style="text-align: right;">7</td>
+<td style="text-align: right;">0.44</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">0.27</td>
 <td style="text-align: right;">0.67</td>
-<td style="text-align: right;">0.4</td>
-<td style="text-align: right;">0.31</td>
-<td style="text-align: right;">0.26</td>
-<td style="text-align: right;">0.62</td>
 <td style="text-align: right;">0.92</td>
 <td style="text-align: right;">0.92</td>
 </tr>
@@ -785,7 +1143,7 @@ Table&nbsp;6: Per-class F1 by method.
 <tr class="even">
 <td style="text-align: left;">H4 Ped/accessibility</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0.4</td>
@@ -796,7 +1154,7 @@ Table&nbsp;6: Per-class F1 by method.
 <tr class="odd">
 <td style="text-align: left;">H5 Occupant-related</td>
 <td style="text-align: right;">9</td>
-<td style="text-align: right;">0.46</td>
+<td style="text-align: right;">0.57</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">0.5</td>
 <td style="text-align: right;">0.2</td>
@@ -807,8 +1165,8 @@ Table&nbsp;6: Per-class F1 by method.
 <tr class="even">
 <td style="text-align: left;">H6 Multi-AV gridlock</td>
 <td style="text-align: right;">17</td>
-<td style="text-align: right;">0.94</td>
-<td style="text-align: right;">0.94</td>
+<td style="text-align: right;">0.92</td>
+<td style="text-align: right;">0.92</td>
 <td style="text-align: right;">0.67</td>
 <td style="text-align: right;">0.48</td>
 <td style="text-align: right;">0.71</td>
@@ -817,11 +1175,11 @@ Table&nbsp;6: Per-class F1 by method.
 </tr>
 <tr class="odd">
 <td style="text-align: left;">H7 Single-AV obstruction</td>
-<td style="text-align: right;">72</td>
-<td style="text-align: right;">0.86</td>
-<td style="text-align: right;">0.83</td>
-<td style="text-align: right;">0.74</td>
-<td style="text-align: right;">0.71</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">0.84</td>
+<td style="text-align: right;">0.82</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.72</td>
 <td style="text-align: right;">0.78</td>
 <td style="text-align: right;">0.98</td>
 <td style="text-align: right;">1</td>
@@ -834,7 +1192,7 @@ Table&nbsp;6: Per-class F1 by method.
 <div id="tbl-pretrained-counts" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pretrained-counts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;7: Number of incidents assigned to each hazard by the manual audit and by each pretrained model.
+Table&nbsp;10: Number of incidents assigned to each hazard by the manual audit and by each pretrained model.
 </figcaption>
 <div aria-describedby="tbl-pretrained-counts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -858,15 +1216,15 @@ Table&nbsp;7: Number of incidents assigned to each hazard by the manual audit an
 <tr class="odd">
 <td style="text-align: left;">H1 Collision</td>
 <td style="text-align: right;">7</td>
-<td style="text-align: right;">38</td>
-<td style="text-align: right;">39</td>
-<td style="text-align: right;">6</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">5</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">H2 Emergency obstruction</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">6</td>
-<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">9</td>
 </tr>
 <tr class="odd">
@@ -899,10 +1257,10 @@ Table&nbsp;7: Number of incidents assigned to each hazard by the manual audit an
 </tr>
 <tr class="odd">
 <td style="text-align: left;">H7 Single-AV obstruction</td>
-<td style="text-align: right;">72</td>
-<td style="text-align: right;">63</td>
+<td style="text-align: right;">69</td>
+<td style="text-align: right;">62</td>
 <td style="text-align: right;">58</td>
-<td style="text-align: right;">53</td>
+<td style="text-align: right;">51</td>
 </tr>
 </tbody>
 </table>
@@ -912,7 +1270,7 @@ Table&nbsp;7: Number of incidents assigned to each hazard by the manual audit an
 <div id="tbl-classifier-tests" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-classifier-tests-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;8: Paired comparisons of classifiers on the same incidents: exact McNemar test on correctness and paired-bootstrap 95% CI for the macro-F1 difference.
+Table&nbsp;11: Paired comparisons of classifiers on the same incidents: exact McNemar test on correctness and paired-bootstrap 95% CI for the macro-F1 difference.
 </figcaption>
 <div aria-describedby="tbl-classifier-tests-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -941,46 +1299,46 @@ Table&nbsp;8: Paired comparisons of classifiers on the same incidents: exact McN
 <td style="text-align: left;">Zero-shot DeBERTa-v3-large NLI</td>
 <td style="text-align: left;">Zero-shot BART-large-MNLI</td>
 <td style="text-align: right;">7</td>
-<td style="text-align: right;">17</td>
-<td style="text-align: left;">0.064</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: left;">0.093</td>
 <td style="text-align: left;">-0.07 (-0.20 to +0.05)</td>
 <td style="text-align: left;">No</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Embedding similarity (mxbai-embed-large)</td>
 <td style="text-align: left;">Zero-shot BART-large-MNLI</td>
-<td style="text-align: right;">28</td>
+<td style="text-align: right;">27</td>
 <td style="text-align: right;">15</td>
-<td style="text-align: left;">0.066</td>
-<td style="text-align: left;">+0.22 (+0.08 to +0.36)</td>
+<td style="text-align: left;">0.088</td>
+<td style="text-align: left;">+0.23 (+0.09 to +0.37)</td>
 <td style="text-align: left;">Yes</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Zero-shot BART-large-MNLI</td>
 <td style="text-align: left;">TF-IDF + logistic regression (CV)</td>
-<td style="text-align: right;">10</td>
-<td style="text-align: right;">35</td>
-<td style="text-align: left;">&lt; 0.001</td>
-<td style="text-align: left;">-0.14 (-0.29 to +0.02)</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: left;">0.003</td>
+<td style="text-align: left;">-0.06 (-0.20 to +0.07)</td>
 <td style="text-align: left;">No</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Zero-shot DeBERTa-v3-large NLI</td>
 <td style="text-align: left;">TF-IDF + logistic regression (CV)</td>
-<td style="text-align: right;">7</td>
-<td style="text-align: right;">42</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">38</td>
 <td style="text-align: left;">&lt; 0.001</td>
-<td style="text-align: left;">-0.21 (-0.39 to -0.03)</td>
-<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">-0.14 (-0.28 to +0.01)</td>
+<td style="text-align: left;">No</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Embedding similarity (mxbai-embed-large)</td>
 <td style="text-align: left;">TF-IDF + logistic regression (CV)</td>
-<td style="text-align: right;">19</td>
-<td style="text-align: right;">31</td>
-<td style="text-align: left;">0.119</td>
-<td style="text-align: left;">+0.09 (-0.06 to +0.23)</td>
-<td style="text-align: left;">No</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: left;">0.322</td>
+<td style="text-align: left;">+0.16 (+0.01 to +0.31)</td>
+<td style="text-align: left;">Yes</td>
 </tr>
 </tbody>
 </table>
@@ -990,7 +1348,7 @@ Table&nbsp;8: Paired comparisons of classifiers on the same incidents: exact McN
 <div id="tbl-disagreements" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-disagreements-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;9: Incidents where the rule classifier and the manual audit disagree.
+Table&nbsp;12: Incidents where the rule classifier and the manual audit disagree.
 </figcaption>
 <div aria-describedby="tbl-disagreements-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1036,11 +1394,11 @@ Figure&nbsp;1: Macro-F1 of each classifier against the manual audit labels. Supe
 </section>
 <section id="contributing-causes" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="contributing-causes"><span class="header-section-number">3.3</span> Contributing causes</h2>
-<p><a href="#tbl-hazard-cause" class="quarto-xref">Table&nbsp;10</a> cross-tabulates hazard against contributing cause. Most narratives give no cause at all (“stalled”, “stuck”). That reflects the terse, truncated dispatcher text, and it is why cause is reported descriptively rather than used to define hazards.</p>
+<p><a href="#tbl-hazard-cause" class="quarto-xref">Table&nbsp;13</a> cross-tabulates hazard against contributing cause. Most narratives give no cause at all (“stalled”, “stuck”). That reflects the terse, truncated dispatcher text, and it is why cause is reported descriptively rather than used to define hazards.</p>
 <div id="tbl-hazard-cause" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-hazard-cause-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;10: Hazard (consequence) by contributing cause (mechanism), all 123 incidents.
+Table&nbsp;13: Hazard (consequence) by contributing cause (mechanism), all 123 incidents.
 </figcaption>
 <div aria-describedby="tbl-hazard-cause-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1139,8 +1497,8 @@ Table&nbsp;10: Hazard (consequence) by contributing cause (mechanism), all 123 i
 <td style="text-align: left;">Single-AV traffic obstruction</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">2</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">6</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">47</td>
@@ -1155,11 +1513,11 @@ Table&nbsp;10: Hazard (consequence) by contributing cause (mechanism), all 123 i
 </section>
 <section id="sec-impact" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Impact scoring</h1>
-<p>Each incident receives an impact level on the matrix’s 1–5 scale. The level is the <em>maximum</em> of three component scores: a hazard-specific consequence, a duration band, and an AV-cluster size. Taking the maximum means one serious attribute, such as a delayed ambulance, is never averaged away by benign ones. The rubric (<a href="#tbl-impact-rubric" class="quarto-xref">Table&nbsp;11</a>) is an explicit ordinal judgment, written down so that it can be challenged. Its anchors follow common practice: <em>Major</em> means interference with emergency services or a damaging collision, and <em>Severe</em> means a life-safety consequence.</p>
+<p>Each incident receives an impact level on the matrix’s 1–5 scale. The level is the <em>maximum</em> of three component scores: a hazard-specific consequence, a duration band, and an AV-cluster size. Taking the maximum means one serious attribute, such as a delayed ambulance, is never averaged away by benign ones. The rubric (<a href="#tbl-impact-rubric" class="quarto-xref">Table&nbsp;14</a>) is an explicit ordinal judgment, written down so that it can be challenged. Its anchors follow common practice: <em>Major</em> means interference with emergency services or a damaging collision, and <em>Severe</em> means a life-safety consequence.</p>
 <div id="tbl-impact-rubric" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-impact-rubric-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;11: Incident-level impact rubric (the highest criterion met sets the level).
+Table&nbsp;14: Incident-level impact rubric (the highest criterion met sets the level).
 </figcaption>
 <div aria-describedby="tbl-impact-rubric-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1206,14 +1564,14 @@ Table&nbsp;11: Incident-level impact rubric (the highest criterion met sets the 
 </div>
 </figure>
 </div>
-<p><a href="#fig-hazard-impact" class="quarto-xref">Figure&nbsp;2</a> shows the resulting impact profile of each hazard. Duration drives the score for most H7 incidents. The hazard component drives it for H1–H5. Durations do not differ significantly across hazard classes (Kruskal–Wallis p = 0.302).</p>
+<p><a href="#fig-hazard-impact" class="quarto-xref">Figure&nbsp;2</a> shows the resulting impact profile of each hazard. Duration drives the score for most H7 incidents. The hazard component drives it for H1–H5. Durations do not differ significantly across hazard classes (Kruskal–Wallis p = 0.343).</p>
 <div id="fig-hazard-impact" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-hazard-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="assets/figures/fig-hazard-impact.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hazard-impact-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Number of incidents by hazard and incident-level impact (all 123 incidents).
+Figure&nbsp;2: Number of incidents by hazard and incident-level impact (all in-scope incidents).
 </figcaption>
 </figure>
 </div>
@@ -1241,16 +1599,16 @@ P(N_h \ge 1 \mid n) = 1 - \left(\frac{T}{T + h}\right)^{n + 1/2}.
 <li><strong>It behaves sensibly with few or zero events.</strong> A plug-in estimate gives a hazard never yet observed a probability of exactly zero. The Jeffreys predictive gives a small non-zero probability, and it tempers over-confidence when <span class="math inline">\(n\)</span> is 3 or 4.</li>
 <li><strong>It supports direct probability statements.</strong> “A 41% chance of at least one life-threatening emergency obstruction in the next 30 days” is a valid Bayesian statement. A confidence interval does not license that reading.</li>
 </ol>
-<p>The Jeffreys prior is a standard reference prior: it encodes no opinion about AVs, so the data drive the result. The framework also extends naturally. Fleet mileage can enter as exposure, and evidence from other cities as an informative prior. The reference risk-matrix template offered a Bayesian basis as one of its options. In this data the choice is principled rather than decisive: the plug-in probability places every hazard in the same cell (<a href="#tbl-sensitivity" class="quarto-xref">Table&nbsp;16</a>, “Plug-in MLE”).</p>
+<p>The Jeffreys prior is a standard reference prior: it encodes no opinion about AVs, so the data drive the result. The framework also extends naturally. Fleet mileage can enter as exposure, and evidence from other cities as an informative prior. The reference risk-matrix template offered a Bayesian basis as one of its options. In this data the choice is principled rather than decisive: the plug-in probability places every hazard in the same cell (<a href="#tbl-sensitivity" class="quarto-xref">Table&nbsp;19</a>, “Plug-in MLE”).</p>
 <p>The log has no exposure denominator, such as AV trips or vehicle-miles. Rates are therefore <strong>per calendar day</strong>. They describe the system as operated in San Francisco in 2025, not per-mile safety.</p>
 </section>
 <section id="results" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="results"><span class="header-section-number">5.2</span> Results</h2>
-<p>Blocking incidents occur at 19.6 per 30 days (95% CI 16.2–23.4), about 4.6 per week, or one every 1.5 days. Single-AV traffic obstruction (H7) accounts for most of them, at about 11.41 per 30 days. Even the rarest hazards recur on a monthly timescale: collisions (H1) and emergency-response obstruction (H2) each average one every 31 days (<a href="#tbl-frequency" class="quarto-xref">Table&nbsp;12</a>, <a href="#fig-hazard-rates" class="quarto-xref">Figure&nbsp;3</a>).</p>
+<p>Blocking incidents occur at 19.1 per 30 days (95% CI 15.8–22.9), about 4.5 per week, or one every 1.6 days. Single-AV traffic obstruction (H7) accounts for most of them, at about 10.92 per 30 days. Even the rarest hazards recur on a monthly timescale: collisions (H1) and emergency-response obstruction (H2) each average one every 31 days (<a href="#tbl-frequency" class="quarto-xref">Table&nbsp;15</a>, <a href="#fig-hazard-rates" class="quarto-xref">Figure&nbsp;3</a>).</p>
 <div id="tbl-frequency" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-frequency-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;12: Hazard frequencies over the 184 covered days (Mar, Jun-Oct 2025).
+Table&nbsp;15: Hazard frequencies over the 184 covered days (Mar, Jun-Oct 2025).
 </figcaption>
 <div aria-describedby="tbl-frequency-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1338,7 +1696,7 @@ Table&nbsp;12: Hazard frequencies over the 184 covered days (Mar, Jun-Oct 2025).
 <td style="text-align: left;">H6</td>
 <td style="text-align: left;">Multi-AV clustering / gridlock</td>
 <td style="text-align: right;">17</td>
-<td style="text-align: left;">14%</td>
+<td style="text-align: left;">15%</td>
 <td style="text-align: left;">2.77 (1.61-4.44)</td>
 <td style="text-align: left;">2.85 (1.68-4.34)</td>
 <td style="text-align: right;">10.8</td>
@@ -1348,22 +1706,22 @@ Table&nbsp;12: Hazard frequencies over the 184 covered days (Mar, Jun-Oct 2025).
 <tr class="odd">
 <td style="text-align: left;">H7</td>
 <td style="text-align: left;">Single-AV traffic obstruction</td>
-<td style="text-align: right;">70</td>
-<td style="text-align: left;">58%</td>
-<td style="text-align: left;">11.41 (8.90-14.42)</td>
-<td style="text-align: left;">11.49 (8.97-14.33)</td>
-<td style="text-align: right;">2.6</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: left;">57%</td>
+<td style="text-align: left;">10.92 (8.47-13.87)</td>
+<td style="text-align: left;">11.01 (8.54-13.78)</td>
+<td style="text-align: right;">2.7</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">Almost certain</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">All</td>
 <td style="text-align: left;">All blocking incidents</td>
-<td style="text-align: right;">120</td>
+<td style="text-align: right;">117</td>
 <td style="text-align: left;">100%</td>
-<td style="text-align: left;">19.57 (16.22-23.40)</td>
-<td style="text-align: left;">19.65 (16.30-23.31)</td>
-<td style="text-align: right;">1.5</td>
+<td style="text-align: left;">19.08 (15.78-22.86)</td>
+<td style="text-align: left;">19.16 (15.85-22.77)</td>
+<td style="text-align: right;">1.6</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">Almost certain</td>
 </tr>
@@ -1388,7 +1746,7 @@ Figure&nbsp;3: Posterior mean frequency per 30 days with 95% Jeffreys credible i
 <h1 data-number="6"><span class="header-section-number">6</span> Is anything changing over time?</h1>
 <section id="choosing-the-tests" class="level2" data-number="6.1">
 <h2 data-number="6.1" class="anchored" data-anchor-id="choosing-the-tests"><span class="header-section-number">6.1</span> Choosing the tests</h2>
-<p>Two features of the data rule out normal-theory methods. There are only six monthly counts, and durations are strongly right-skewed: skewness ≈ 3.9, excess kurtosis ≈ 22, Shapiro–Wilk <span class="math inline">\(p &lt; 10^{-15}\)</span> <span class="citation" data-cites="shapiro1965">(<a href="#ref-shapiro1965" role="doc-biblioref">Shapiro and Wilk 1965</a>)</span>. Log-durations, by contrast, are approximately normal (Shapiro–Wilk p ≈ 0.38). Each question is therefore matched to a test whose assumptions hold:</p>
+<p>Two features of the data rule out normal-theory methods. There are only six monthly counts, and durations are strongly right-skewed: skewness ≈ 3.9, excess kurtosis ≈ 22, Shapiro–Wilk <span class="math inline">\(p &lt; 10^{-15}\)</span> <span class="citation" data-cites="shapiro1965">(<a href="#ref-shapiro1965" role="doc-biblioref">Shapiro and Wilk 1965</a>)</span>. Log-durations, by contrast, are approximately normal (Shapiro–Wilk p ≈ 0.36). Each question is therefore matched to a test whose assumptions hold:</p>
 <ul>
 <li><strong>Monotone trend in monthly rates: Mann–Kendall</strong> <span class="citation" data-cites="mann1945 kendall1975">(<a href="#ref-mann1945" role="doc-biblioref">Mann 1945</a>; <a href="#ref-kendall1975" role="doc-biblioref">Kendall 1975</a>)</span>. The statistic is <span class="math display">\[S = \sum_{i&lt;j} \operatorname{sgn}(x_j - x_i).\]</span> With <span class="math inline">\(n = 6\)</span>, its null distribution is computed <em>exactly</em> by enumerating all <span class="math inline">\(6! = 720\)</span> orderings, so no normal approximation is needed. Sen’s slope <span class="citation" data-cites="sen1968">(<a href="#ref-sen1968" role="doc-biblioref">Sen 1968</a>)</span> gives the magnitude.</li>
 <li><strong>Equal rates across months:</strong> the Poisson homogeneity chi-square, <span class="math inline">\(\sum_m (n_m - E_m)^2/E_m\)</span> with <span class="math inline">\(E_m \propto\)</span> days in month <span class="math inline">\(m\)</span>.</li>
@@ -1405,19 +1763,19 @@ Figure&nbsp;3: Posterior mean frequency per 30 days with 95% Jeffreys credible i
 <h2 data-number="6.2" class="anchored" data-anchor-id="incident-counts-and-durations"><span class="header-section-number">6.2</span> Incident counts and durations</h2>
 <p>The monthly rate fluctuates between about 11 and 24 per 30 days (<a href="#fig-monthly-rate" class="quarto-xref">Figure&nbsp;4</a>). Every fluctuation is consistent with a constant underlying rate:</p>
 <ul>
-<li>Poisson homogeneity: p = 0.2.</li>
+<li>Poisson homogeneity: p = 0.21.</li>
 <li>Mann–Kendall: <span class="math inline">\(\tau\)</span> = 0.13, exact p = 0.86.</li>
-<li>March versus October rate ratio: 1.04 (95% CI 0.57–1.9), p = 1.</li>
-<li>Poisson GLM rate ratio: 0.983 per month (0.91–1.063), p = 0.67.</li>
+<li>March versus October rate ratio: 1.14 (95% CI 0.61–2.11), p = 0.77.</li>
+<li>Poisson GLM rate ratio: 0.998 per month (0.922–1.081), p = 0.97.</li>
 </ul>
 <p>Durations also show no significant change (<a href="#fig-duration-month" class="quarto-xref">Figure&nbsp;5</a>):</p>
 <ul>
-<li>Kruskal–Wallis: H = 6.88, p = 0.23.</li>
-<li>Jonckheere–Terpstra: p = 0.19.</li>
-<li>Spearman: <span class="math inline">\(\rho\)</span> = 0.1, p = 0.29.</li>
-<li>The Theil–Sen slope of log-duration is 5.3% per 30 days, with a 95% interval of -5.1% to +16.8% that comfortably includes zero.</li>
+<li>Kruskal–Wallis: H = 6.45, p = 0.27.</li>
+<li>Jonckheere–Terpstra: p = 0.29.</li>
+<li>Spearman: <span class="math inline">\(\rho\)</span> = 0.07, p = 0.43.</li>
+<li>The Theil–Sen slope of log-duration is 3.9% per 30 days, with a 95% interval of -6.5% to +15.5% that comfortably includes zero.</li>
 </ul>
-<p><strong>Replicating the class result.</strong> The class worksheet’s March-vs-October Mann–Whitney test reproduces exactly (W = 377.5, p = 0.064) once the 603-minute March 12 record is dropped, as the worksheet did. With that record included, p = 0.123. Either way, the October median is longer than March’s, but the difference is not significant at the 5% level.</p>
+<p><strong>Replicating the class result.</strong> The class worksheet’s March-vs-October Mann–Whitney test reproduces exactly (W = 377.5, p = 0.064) on the worksheet’s own sample: the full primary sheet, minus the 603-minute March 12 record. On this paper’s in-scope incidents, with that record included, p = 0.204. Either way, the October median is longer than March’s, but the difference is not significant at the 5% level.</p>
 <p>Absence of evidence is not evidence of absence. With six months of data, these tests can detect only large trends. The defensible statement is that the data show <strong>no detectable change</strong>, not that nothing is changing.</p>
 <div id="fig-monthly-rate" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -1442,23 +1800,23 @@ Figure&nbsp;5: Incident duration by month (log scale). Box plots show medians an
 </section>
 <section id="sec-mix" class="level2" data-number="6.3">
 <h2 data-number="6.3" class="anchored" data-anchor-id="sec-mix"><span class="header-section-number">6.3</span> The hazard mix shift is a reporting artifact</h2>
-<p>One test does reject. The hazard mix differs between March–July and August–October (permutation p = 0.007; <a href="#fig-hazard-period" class="quarto-xref">Figure&nbsp;6</a>). Taken at face value, this would suggest emergency and transit obstructions are new. But the composition of the <em>narratives</em> changed at the same moment. 98% of March–July narratives are truncated fragments, against 41% in August–October (Fisher p &lt; 0.001). Context such as “fire”, “medic”, or “Muni” is exactly what a 50-character fragment loses. Two further checks support this reading:</p>
+<p>One test does reject. The hazard mix differs between March–July and August–October (permutation p = 0.008; <a href="#fig-hazard-period" class="quarto-xref">Figure&nbsp;6</a>). Taken at face value, this would suggest emergency and transit obstructions are new. But the composition of the <em>narratives</em> changed at the same moment. 98% of March–July narratives are truncated fragments, against 41% in August–October (Fisher p &lt; 0.001). Context such as “fire”, “medic”, or “Muni” is exactly what a 50-character fragment loses. Two further checks support this reading:</p>
 <ul>
-<li>The shift is a reshuffle among the text-dependent classes H1–H5. Their <em>combined</em> share does not differ between periods (Fisher p = 0.22).</li>
-<li>The one composition measure taken from a structured field, the multi-AV share, shows no trend (Cochran–Armitage p = 0.17).</li>
+<li>The shift is a reshuffle among the text-dependent classes H1–H5. Their <em>combined</em> share does not differ between periods (Fisher p = 0.31).</li>
+<li>The one composition measure taken from a structured field, the multi-AV share, shows no trend (Cochran–Armitage p = 0.22).</li>
 </ul>
 <p>The defensible conclusion is that the shift is <strong>not attributable to a change in AV behavior</strong>. It is most plausibly a recording artifact.</p>
 <div id="tbl-tests" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-tests-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;13: Statistical tests for change over time (covered months).
+Table&nbsp;16: Statistical tests for change over time (covered months).
 </figcaption>
 <div aria-describedby="tbl-tests-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
 <col style="width: 18%">
-<col style="width: 29%">
-<col style="width: 18%">
+<col style="width: 31%">
+<col style="width: 17%">
 <col style="width: 19%">
 <col style="width: 4%">
 <col style="width: 9%">
@@ -1478,8 +1836,8 @@ Table&nbsp;13: Statistical tests for change over time (covered months).
 <td style="text-align: left;">Monthly incident rate</td>
 <td style="text-align: left;">Equal rate across months</td>
 <td style="text-align: left;">Poisson homogeneity chi-square</td>
-<td style="text-align: left;">chi2(5) = 7.30</td>
-<td style="text-align: left;">0.199</td>
+<td style="text-align: left;">chi2(5) = 7.17</td>
+<td style="text-align: left;">0.209</td>
 <td style="text-align: left;">No</td>
 </tr>
 <tr class="even">
@@ -1494,37 +1852,37 @@ Table&nbsp;13: Statistical tests for change over time (covered months).
 <td style="text-align: left;">Monthly incident rate</td>
 <td style="text-align: left;">Mar rate = Oct rate</td>
 <td style="text-align: left;">Exact conditional binomial</td>
-<td style="text-align: left;">RR = 1.04 (0.57-1.90)</td>
-<td style="text-align: left;">1.000</td>
+<td style="text-align: left;">RR = 1.14 (0.61-2.11)</td>
+<td style="text-align: left;">0.771</td>
 <td style="text-align: left;">No</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Monthly incident rate</td>
 <td style="text-align: left;">No log-linear trend</td>
 <td style="text-align: left;">Poisson GLM, log(days) offset</td>
-<td style="text-align: left;">RR/month = 0.983 (0.910-1.063)</td>
-<td style="text-align: left;">0.671</td>
+<td style="text-align: left;">RR/month = 0.998 (0.922-1.081)</td>
+<td style="text-align: left;">0.965</td>
 <td style="text-align: left;">No</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Duration</td>
 <td style="text-align: left;">Same distribution in all months</td>
 <td style="text-align: left;">Kruskal-Wallis</td>
-<td style="text-align: left;">H(5) = 6.88, eps2 = 0.017</td>
-<td style="text-align: left;">0.229</td>
+<td style="text-align: left;">H(5) = 6.45, eps2 = 0.013</td>
+<td style="text-align: left;">0.265</td>
 <td style="text-align: left;">No</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Duration</td>
 <td style="text-align: left;">Mar = Oct</td>
 <td style="text-align: left;">Mann-Whitney U</td>
-<td style="text-align: left;">U = 222.5, r_rb = 0.26</td>
-<td style="text-align: left;">0.123</td>
+<td style="text-align: left;">U = 215.0, r_rb = 0.22</td>
+<td style="text-align: left;">0.204</td>
 <td style="text-align: left;">No</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Duration</td>
-<td style="text-align: left;">Mar = Oct (603-min record dropped, replicates class sheet)</td>
+<td style="text-align: left;">Mar = Oct (class-sheet sample: full log, 603-min record dropped)</td>
 <td style="text-align: left;">Mann-Whitney U</td>
 <td style="text-align: left;">W = 377.5</td>
 <td style="text-align: left;">0.064</td>
@@ -1534,24 +1892,24 @@ Table&nbsp;13: Statistical tests for change over time (covered months).
 <td style="text-align: left;">Duration</td>
 <td style="text-align: left;">No ordered shift across months</td>
 <td style="text-align: left;">Jonckheere-Terpstra (permutation)</td>
-<td style="text-align: left;">JT = 3248, z = 1.32</td>
-<td style="text-align: left;">0.186</td>
+<td style="text-align: left;">JT = 3032, z = 1.05</td>
+<td style="text-align: left;">0.290</td>
 <td style="text-align: left;">No</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Duration</td>
 <td style="text-align: left;">No association with date</td>
 <td style="text-align: left;">Spearman; Theil-Sen on log duration</td>
-<td style="text-align: left;">rho = 0.10; +5.3%/30 d (-5.1 to +16.8)</td>
-<td style="text-align: left;">0.291</td>
+<td style="text-align: left;">rho = 0.07; +3.9%/30 d (-6.5 to +15.5)</td>
+<td style="text-align: left;">0.435</td>
 <td style="text-align: left;">No</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Hazard mix</td>
 <td style="text-align: left;">Independent of period</td>
 <td style="text-align: left;">Permutation chi-square</td>
-<td style="text-align: left;">chi2 = 16.43</td>
-<td style="text-align: left;">0.007</td>
+<td style="text-align: left;">chi2 = 16.06</td>
+<td style="text-align: left;">0.008</td>
 <td style="text-align: left;">Yes</td>
 </tr>
 <tr class="odd">
@@ -1566,16 +1924,16 @@ Table&nbsp;13: Statistical tests for change over time (covered months).
 <td style="text-align: left;">Text-dependent hazards (H1-H5) share</td>
 <td style="text-align: left;">Independent of period</td>
 <td style="text-align: left;">Fisher exact</td>
-<td style="text-align: left;">22% vs 33%</td>
-<td style="text-align: left;">0.223</td>
+<td style="text-align: left;">23% vs 33%</td>
+<td style="text-align: left;">0.306</td>
 <td style="text-align: left;">No</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Multi-AV share</td>
 <td style="text-align: left;">No monotone trend</td>
 <td style="text-align: left;">Cochran-Armitage</td>
-<td style="text-align: left;">z = 1.37</td>
-<td style="text-align: left;">0.169</td>
+<td style="text-align: left;">z = 1.23</td>
+<td style="text-align: left;">0.217</td>
 <td style="text-align: left;">No</td>
 </tr>
 </tbody>
@@ -1616,11 +1974,11 @@ p_{h,k} = 1 - \left(\frac{T}{T+30}\right)^{n_{h,\ge k} + 1/2}.
 <p><span class="math display">\[
 k^*_h = \arg\max_{k \le k^{\max}_h} \; \mathrm{Level}\!\big(\mathrm{band}(p_{h,k}),\, k\big),
 \]</span></p>
-<p>with ties broken toward the higher impact. Probability and impact then always describe <strong>the same event</strong>, “an <span class="math inline">\(h\)</span> incident at least as severe as <span class="math inline">\(k\)</span>”. Tiers that never occurred are not extrapolated (<a href="#tbl-risk-curves" class="quarto-xref">Table&nbsp;14</a>).</p>
+<p>with ties broken toward the higher impact. Probability and impact then always describe <strong>the same event</strong>, “an <span class="math inline">\(h\)</span> incident at least as severe as <span class="math inline">\(k\)</span>”. Tiers that never occurred are not extrapolated (<a href="#tbl-risk-curves" class="quarto-xref">Table&nbsp;17</a>).</p>
 <div id="tbl-risk-curves" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-risk-curves-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;14: Risk-curve candidates: each observed impact tier with its own frequency and risk level.
+Table&nbsp;17: Risk-curve candidates: each observed impact tier with its own frequency and risk level.
 </figcaption>
 <div aria-describedby="tbl-risk-curves-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1814,7 +2172,7 @@ Table&nbsp;14: Risk-curve candidates: each observed impact tier with its own fre
 <tr class="even">
 <td style="text-align: left;">H7</td>
 <td style="text-align: left;">1 Insignificant</td>
-<td style="text-align: right;">70</td>
+<td style="text-align: right;">67</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: left;">Almost certain</td>
 <td style="text-align: left;">Medium</td>
@@ -1822,7 +2180,7 @@ Table&nbsp;14: Risk-curve candidates: each observed impact tier with its own fre
 <tr class="odd">
 <td style="text-align: left;">H7</td>
 <td style="text-align: left;">2 Minor</td>
-<td style="text-align: right;">48</td>
+<td style="text-align: right;">46</td>
 <td style="text-align: right;">0.999</td>
 <td style="text-align: left;">Almost certain</td>
 <td style="text-align: left;">High</td>
@@ -1853,7 +2211,7 @@ Figure&nbsp;7: 5×5 risk matrix of AV blocking hazards. Probability is the Jeffr
 <div id="tbl-risk-placement" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-risk-placement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;15: Risk-matrix placement of each hazard (Bayesian predictive probability, 30-day horizon).
+Table&nbsp;18: Risk-matrix placement of each hazard (Bayesian predictive probability, 30-day horizon).
 </figcaption>
 <div aria-describedby="tbl-risk-placement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1943,7 +2301,7 @@ Table&nbsp;15: Risk-matrix placement of each hazard (Bayesian predictive probabi
 <tr class="odd">
 <td style="text-align: left;">H7</td>
 <td style="text-align: left;">Single-AV traffic obstruction</td>
-<td style="text-align: right;">70</td>
+<td style="text-align: right;">67</td>
 <td style="text-align: right;">17</td>
 <td style="text-align: right;">0.93</td>
 <td style="text-align: left;">5 Almost certain</td>
@@ -1960,44 +2318,48 @@ Table&nbsp;15: Risk-matrix placement of each hazard (Bayesian predictive probabi
 <h2 data-number="7.3" class="anchored" data-anchor-id="why-each-hazard-sits-where-it-does"><span class="header-section-number">7.3</span> Why each hazard sits where it does</h2>
 <ul>
 <li><strong>H1 AV-involved collision: Very high.</strong> None of the 6 collisions in the window reported a human injury; one struck a dog. All score <em>Major</em>. Six such events in 184 days give <span class="math inline">\(p\)</span> = 0.63 (Likely), so the cell is Likely × Major.</li>
-<li><strong>H2 Emergency-response obstruction: Very high.</strong> Six obstructions, of which 3 occurred during life-threatening incidents: a working fire with people trapped, a garage fire, and a shots-fired investigation. The life-threatening tier alone has <span class="math inline">\(p\)</span> = 0.41 (Moderate × Severe). The Likely × Major cell from all six ranks the same (<em>Very high</em>), so the tie goes to the higher impact. A February incident (a medic delayed to an unconscious patient) is also Severe but lies outside the covered window.</li>
+<li><strong>H2 Emergency-response obstruction: Very high.</strong> Six obstructions, of which 3 occurred during life-threatening incidents: a working fire with people trapped, a garage fire, and a shots-fired investigation. The life-threatening tier alone has <span class="math inline">\(p\)</span> = 0.41 (Moderate × Severe). The Likely × Major cell from all six ranks the same (<em>Very high</em>), so the tie goes to the higher impact. <strong>Caveat:</strong> all three <em>Severe</em> cases, and five of the six overall, place the AV at the emergency scene without stating that it blocked responders. Counting only explicit obstructions, H2 is <em>Medium</em> (Unlikely × Major). A February incident (medics forced to reroute to an unconscious patient) is also Severe but lies outside the covered window.</li>
 <li><strong>H3 Transit / rail obstruction: High.</strong> All eight are <em>Significant</em> by rubric, with <span class="math inline">\(p\)</span> = 0.72: Likely × Significant.</li>
 <li><strong>H4 Pedestrian / accessibility: Medium.</strong> Four events, <span class="math inline">\(p\)</span> = 0.49: Moderate × Significant.</li>
 <li><strong>H5 Occupant-related: Medium.</strong> Most are <em>Minor</em> (an asleep rider, a door left open). 3 reach <em>Significant</em>: an unconscious rider, an occupant texting 911, and a door-left-open blockage lasting over an hour. That gives Moderate × Significant.</li>
 <li><strong>H6 Multi-AV gridlock: High.</strong> 10 of 17 clusters were <em>Significant</em> (5+ AVs or 60+ minutes), giving <span class="math inline">\(p\)</span> = 0.8: Likely × Significant.</li>
 <li><strong>H7 Single-AV obstruction: Very high.</strong> Individually mundane: no single-AV incident did worse than delay traffic. But 17 of them lasted an hour or more, about one every 11 days, so a <em>Significant</em> blockage is Almost certain within any 30-day window. This rating depends on the rubric’s 60-minute cutoff for <em>Significant</em>. At a 90-minute or higher cutoff, H7 is <em>High</em> (<a href="#sec-sensitivity" class="quarto-xref">Section&nbsp;8</a>).</li>
 </ul>
-<p><strong>Two kinds of red.</strong> H1, H2, and H7 share the <em>Very high</em> band for different reasons. H1 and H2 are <strong>consequence-driven</strong>: they occur about monthly, but each can injure someone or delay emergency care, so they are <em>safety</em> problems. H7 is <strong>volume-driven</strong>: its worst outcome is a traffic delay, but it happens so often that the delay is a near-certainty, so it is an <em>operational</em> problem whose lever is faster recovery. A risk matrix collapses frequency and consequence into one color, and is known to blur exactly this distinction <span class="citation" data-cites="cox2008">(<a href="#ref-cox2008" role="doc-biblioref">Cox 2008</a>)</span>. Read the H7 rating as “routine and costly”, not “dangerous”.</p>
+<p><strong>Two kinds of red.</strong> H1, H2, and H7 share the <em>Very high</em> band for different reasons. H1 and H2 are <strong>consequence-driven</strong>: they occur about monthly, but each can injure someone or delay emergency care, so they are <em>safety</em> problems. H2’s place in this group depends on evidence strength, discussed below. H7 is <strong>volume-driven</strong>: its worst outcome is a traffic delay, but it happens so often that the delay is a near-certainty, so it is an <em>operational</em> problem whose lever is faster recovery. A risk matrix collapses frequency and consequence into one color, and is known to blur exactly this distinction <span class="citation" data-cites="cox2008">(<a href="#ref-cox2008" role="doc-biblioref">Cox 2008</a>)</span>. Read the H7 rating as “routine and costly”, not “dangerous”.</p>
 </section>
 </section>
 <section id="sec-sensitivity" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> Sensitivity analysis</h1>
-<p><a href="#tbl-sensitivity" class="quarto-xref">Table&nbsp;16</a> re-places every hazard under alternative choices: a plug-in MLE probability, 7- and 90-day horizons, February included (212 exposure days, all 123 incidents), the supplementary incidents added, the conventional “total frequency × 90th-percentile impact” rule, and two alternative <em>labelers</em>: the manual audit and the best pretrained model (embedding similarity). For the labeler columns, impact is re-scored because it depends on the hazard.</p>
+<p><a href="#tbl-sensitivity" class="quarto-xref">Table&nbsp;19</a> re-places every hazard under alternative choices: a plug-in MLE probability, 7- and 90-day horizons, February included (212 exposure days, all in-scope incidents), the supplementary incidents added, the conventional “total frequency × 90th-percentile impact” rule, and two alternative <em>labelers</em>: the manual audit and the best pretrained model (embedding similarity). A <em>strict evidence</em> column applies a reading in which collision and emergency labels count only where the narrative states the contact or obstruction outright, and a final column drops incidents whose narrative never names an AV. For the labeler and evidence columns, impact is re-scored, because it depends on the hazard.</p>
 <ul>
 <li><strong>Robust to data choices.</strong> No placement changes under the MLE basis, when February is included, or when the supplementary incidents are added.</li>
-<li><strong>Robust to the labeler.</strong> Labeling hazards with the manual audit instead of the rules gives <em>identical</em> placements, so the matrix does not hinge on rule errors. Labeling with the embedding model moves transit (H3) and pedestrian/accessibility (H4) up one band and H7 down one band. Those are exactly the classes it over-predicts (<a href="#tbl-pretrained-counts" class="quarto-xref">Table&nbsp;7</a>), so this reflects the labeler’s error, not a fragile matrix.</li>
+<li><strong>Evidence strictness is the most important caveat.</strong> Under the strict reading, H2 drops from <em>Very high</em> to <em>Medium</em> (Unlikely × Major). Only 1 in-window H2 incident (INC-079, “blocking medics’ way”) states the obstruction outright, and all its <em>Severe</em> cases rest on AVs stuck at a fire or shots-fired scene. H1 keeps its cell with 5 explicit collisions, and no other hazard moves. H2’s red rating therefore depends on counting “AV stuck inside an active emergency scene” as an emergency obstruction, as the taxonomy defines it. Whether being stuck at such a scene actually hindered responders is exactly what the narratives do not record.</li>
+<li><strong>Robust to weak AV evidence, but H7 is at the edge.</strong> Dropping the incidents whose narrative never names an AV changes no placement. H7 loses two long blockages, so its 30-day probability falls to about 0.90, right at the Almost-certain cutoff.</li>
+<li><strong>Robust to the labeler.</strong> Labeling hazards with the manual audit instead of the rules gives <em>identical</em> placements, so the matrix does not hinge on rule errors. Labeling with the embedding model moves transit (H3) and pedestrian/accessibility (H4) up one band and H7 down one band. Those are exactly the classes it over-predicts (<a href="#tbl-pretrained-counts" class="quarto-xref">Table&nbsp;10</a>), so this reflects the labeler’s error, not a fragile matrix.</li>
 <li><strong>The horizon sets the absolute level.</strong> A 7-day horizon lowers every hazard one or two bands, and a 90-day horizon raises them. Choosing the horizon is a policy decision, not something the data can settle. The <em>ranking</em> is stable: in every column, H2 is at (or tied for) the highest level and H5 at (or tied for) the lowest. H4 is also at or tied for the lowest everywhere except the embedding-label column.</li>
-<li><strong>The duration cutoff matters for H7.</strong> H7 is <em>Very high</em> only because the rubric counts a 60-minute blockage as <em>Significant</em> (<a href="#tbl-threshold-sensitivity" class="quarto-xref">Table&nbsp;17</a>). At a cutoff of 90 minutes or more it drops to <em>High</em>, and it stays <em>High</em> even at 180 minutes, because routine 10-minute-plus blockages keep it Almost certain × Minor. No other hazard moves: H1–H5 take their impact from the consequence type, and H6 mostly from clusters of 5+ AVs. We keep 60 minutes as the base case because it was fixed before placement; raising it after seeing the result would tune the rubric to the answer.</li>
+<li><strong>The duration cutoff matters for H7.</strong> H7 is <em>Very high</em> only because the rubric counts a 60-minute blockage as <em>Significant</em> (<a href="#tbl-threshold-sensitivity" class="quarto-xref">Table&nbsp;20</a>). At a cutoff of 90 minutes or more it drops to <em>High</em>, and it stays <em>High</em> even at 180 minutes, because routine 10-minute-plus blockages keep it Almost certain × Minor. No other hazard moves: H1–H5 take their impact from the consequence type, and H6 mostly from clusters of 5+ AVs. We keep 60 minutes as the base case because it was fixed before placement; raising it after seeing the result would tune the rubric to the answer.</li>
 <li><strong>The placement rule matters for H2.</strong> The conventional rule puts H2 at <em>Extreme</em>. It pairs H2’s overall frequency (six events) with its rarer life-threatening tier (three events), overstating the probability of the Severe outcome. Avoiding exactly that inconsistency is why the risk-curve method is the base case.</li>
 </ul>
 <div id="tbl-sensitivity" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x impact and level).
+Table&nbsp;19: Sensitivity of risk-matrix placement (cell shown as probability x impact and level).
 </figcaption>
 <div aria-describedby="tbl-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
-<col style="width: 10%">
-<col style="width: 16%">
-<col style="width: 6%">
-<col style="width: 6%">
-<col style="width: 7%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 4%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
 <col style="width: 9%">
-<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 8%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -2010,6 +2372,8 @@ Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x
 <th style="text-align: left;">+ supplementary incidents</th>
 <th style="text-align: left;">Total freq x P90 impact</th>
 <th style="text-align: left;">Manual audit labels</th>
+<th style="text-align: left;">Strict evidence (explicit H1/H2 only)</th>
+<th style="text-align: left;">Exclude weak AV evidence</th>
 <th style="text-align: left;">Embedding-model labels</th>
 </tr>
 </thead>
@@ -2020,6 +2384,8 @@ Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">2x4 Medium</td>
 <td style="text-align: left;">5x4 Extreme</td>
+<td style="text-align: left;">4x4 Very high</td>
+<td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
@@ -2036,6 +2402,8 @@ Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">3x5 Very high</td>
 <td style="text-align: left;">4x5 Extreme</td>
 <td style="text-align: left;">3x5 Very high</td>
+<td style="text-align: left;">2x4 Medium</td>
+<td style="text-align: left;">3x5 Very high</td>
 <td style="text-align: left;">3x5 Very high</td>
 </tr>
 <tr class="odd">
@@ -2048,6 +2416,8 @@ Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">5x3 Very high</td>
 </tr>
 <tr class="even">
@@ -2056,6 +2426,8 @@ Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">2x3 Medium</td>
 <td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
@@ -2073,6 +2445,8 @@ Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">H6 Multi-AV gridlock</td>
@@ -2085,12 +2459,16 @@ Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">H7 Single-AV obstruction</td>
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">5x3 Very high</td>
+<td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
@@ -2106,7 +2484,7 @@ Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x
 <div id="tbl-threshold-sensitivity" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-threshold-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;17: Risk-matrix placement when the duration threshold for a Significant impact is raised (all incidents re-scored; base case 60 minutes).
+Table&nbsp;20: Risk-matrix placement when the duration threshold for a Significant impact is raised (all incidents re-scored; base case 60 minutes).
 </figcaption>
 <div aria-describedby="tbl-threshold-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -2231,11 +2609,26 @@ Table&nbsp;17: Risk-matrix placement when the duration threshold for a Significa
 <td>Fixed by the course template, not tuned to this data</td>
 </tr>
 <tr class="odd">
+<td>Counting “AV stuck at an emergency scene” as emergency obstruction (inferred evidence)</td>
+<td>Which incidents count as H1/H2</td>
+<td><strong>High for H2</strong> (<em>Very high</em> inclusive, <em>Medium</em> explicit-only); none for other hazards</td>
+</tr>
+<tr class="even">
 <td>Risk-curve placement over “total frequency × worst impact”</td>
 <td>Pairing probability with impact</td>
 <td>Matters for H2 only (<em>Very high</em> vs <em>Extreme</em>)</td>
 </tr>
+<tr class="odd">
+<td>Scope: excluding moving-AV reports and one record with no confirmed AV</td>
+<td>Which records count as blocking incidents</td>
+<td>None: the excluded primary records were short and change no placement</td>
+</tr>
 <tr class="even">
+<td>Keeping incidents whose narrative never names an AV (they are in the curated AV log)</td>
+<td>Which records count as AV incidents</td>
+<td>Low: excluding them changes no placement, though H7 then sits at the Almost-certain cutoff (P ≈ 0.90)</td>
+</tr>
+<tr class="odd">
 <td>Treating February and April–May as coverage gaps</td>
 <td>The exposure window</td>
 <td>None: including February changes no placement</td>
@@ -2251,20 +2644,21 @@ Table&nbsp;17: Risk-matrix placement when the duration threshold for a Significa
 <li><strong>Under-recording and selection.</strong> The DEM log captures incidents that reached dispatchers. Brief blockages cleared before anyone called are missing, so all frequencies are lower bounds.</li>
 <li><strong>Narrative quality.</strong> Truncation limits classification. Truncated incidents fall to the default H7, so the frequencies of H1–H5 are, if anything, <em>under</em>-estimated, especially before August.</li>
 <li><strong>Single-analyst labels, partly mitigated.</strong> The taxonomy, rules, and audit labels come from one analyst. A blind LLM second coder agreed closely (<span class="math inline">\(\kappa\)</span> = 0.95), but agreement between language models is weaker evidence than agreement between independent human coders, which remains the gold standard.</li>
+<li><strong>Emergency obstruction is mostly inferred.</strong> Five of the six in-window H2 labels place the AV at an emergency scene without stating that it impeded responders. Logged durations are event times, not measured response delays. The data cannot say how much AVs actually slowed emergency response, only how often they were stuck where a response was under way.</li>
 <li><strong>Risk matrices are coarse.</strong> Banding discards information and can rank risks inconsistently <span class="citation" data-cites="cox2008">(<a href="#ref-cox2008" role="doc-biblioref">Cox 2008</a>)</span>. We mitigate this by publishing the underlying rates, intervals, and risk curves alongside each cell, and by showing the sensitivity of each placement.</li>
 </ul>
 </section>
 </section>
 <section id="conclusions" class="level1" data-number="10">
 <h1 data-number="10"><span class="header-section-number">10</span> Conclusions</h1>
-<p>Over 184 covered days the DEM log records 120 AV blocking incidents, about 19.6 per 30 days (one every 1.5 days). Neither the incident rate nor incident duration shows a statistically significant trend. On the risk matrix, H1 (AV-involved collision) is <strong>Very high</strong>; H2 (Emergency-response obstruction) is <strong>Very high</strong>; H3 (Transit / rail obstruction) is <strong>High</strong>; H4 (Pedestrian / accessibility obstruction) is <strong>Medium</strong>; H5 (Occupant-related immobilization) is <strong>Medium</strong>; H6 (Multi-AV clustering / gridlock) is <strong>High</strong>; H7 (Single-AV traffic obstruction) is <strong>Very high</strong>.</p>
+<p>Over 184 covered days the DEM log records 117 AV blocking incidents, about 19.1 per 30 days (one every 1.6 days). Neither the incident rate nor incident duration shows a statistically significant trend. On the risk matrix, H1 (AV-involved collision) is <strong>Very high</strong>; H2 (Emergency-response obstruction) is <strong>Very high</strong>; H3 (Transit / rail obstruction) is <strong>High</strong>; H4 (Pedestrian / accessibility obstruction) is <strong>Medium</strong>; H5 (Occupant-related immobilization) is <strong>Medium</strong>; H6 (Multi-AV clustering / gridlock) is <strong>High</strong>; H7 (Single-AV traffic obstruction) is <strong>Very high</strong>. The emergency-obstruction rating rests on incidents where the AV was stuck at an emergency scene; counting only explicitly stated obstructions, H2 would be <strong>Medium</strong>.</p>
 <p>Three conclusions are well supported by the data:</p>
 <ol type="1">
-<li><strong>Blocking is routine, not rare.</strong> About 4.6 logged incidents per week, with a median duration of 23 minutes and 28% lasting an hour or more.</li>
-<li><strong>The highest risks come from consequence, not volume.</strong> Collisions and emergency-response obstruction occur about monthly but carry Major-to-Severe impacts. The sheer volume of routine single-AV blockages also earns a <em>Very high</em> rating.</li>
+<li><strong>Blocking is routine, not rare.</strong> About 4.5 logged incidents per week, with a median duration of 24 minutes and 29% lasting an hour or more.</li>
+<li><strong>The highest risks come from consequence, not volume.</strong> Collisions and emergency-response obstruction occur about monthly but carry Major-to-Severe impacts. The sheer volume of routine single-AV blockages also earns a <em>Very high</em> rating. The emergency rating comes with a firm caveat. It rests on AVs stuck at emergency scenes; counting only explicitly stated obstructions, it is <em>Medium</em>.</li>
 <li><strong>There is no statistically detectable trend</strong> in incident rate, duration, or multi-AV share over the covered months. The one apparent change, in hazard mix, coincides with a change in narrative recording.</li>
 </ol>
-<p>The analysis points to two practical levers. The first is <strong>better data</strong>: untruncated narratives, structured fields for what was obstructed, and fleet exposure. The second is <strong>faster recovery</strong> for long single-AV blockages and for any AV near an emergency scene, where minutes matter most.</p>
+<p>The analysis points to two practical levers. The first is <strong>better data</strong>: untruncated narratives, structured fields for what was obstructed, and fleet exposure. The second is <strong>faster recovery</strong> for long single-AV blockages and for any AV near an emergency scene, where minutes matter most. Recording whether an AV actually impeded responders would settle the largest open question in this analysis.</p>
 </section>
 <section id="acknowledgments" class="level1 unnumbered">
 <h1 class="unnumbered">Acknowledgments</h1>

@@ -1,26 +1,41 @@
 data:
   first_date: February 1, 2025
   last_date: October 31, 2025
-  n_incidents: 123
+  n_excluded: 3
+  n_incidents: 120
+  n_log: 123
   n_missing_narrative: 1
   n_months_covered: 6
-  n_supplementary: 8
-  n_truncated: 83
-  n_window: 120
+  n_supplementary: 7
+  n_truncated: 80
+  n_window: 117
   pct_truncated: 67%
   window_days: 184
 dur:
-  iqr_hi: 63
-  iqr_lo: 8
+  iqr_hi: 64
+  iqr_lo: 9
   max: 603
-  mean: '52.1'
-  median: 23
-  median_hi: 36
-  median_lo: 17
+  mean: '53.2'
+  median: 24
+  median_hi: 39
+  median_lo: 18
   n_multi: 20
-  p90: 125
-  pct_ge60: 28%
+  p90: 127
+  pct_ge60: 29%
   pct_multi: 17%
+evid:
+  h1_explicit_window: 5
+  h1_window: 6
+  h2_explicit_window: 1
+  h2_severe_explicit_window: 0
+  h2_severe_window: 3
+  h2_window: 6
+  n_inferred: 6
+  n_weak_av: 7
+  strict:
+    h2_impact: Major
+    h2_level: Medium
+    h2_prob: Unlikely
 freq:
   H1:
     every: '31'
@@ -48,57 +63,57 @@ freq:
     rate30: '2.77'
   H7:
     every: '3'
-    n: 70
-    rate30: '11.41'
-  days_between: '1.5'
-  per_week: '4.6'
-  total_hi: '23.4'
-  total_lo: '16.2'
-  total_rate30: '19.6'
+    n: 67
+    rate30: '10.92'
+  days_between: '1.6'
+  per_week: '4.5'
+  total_hi: '22.9'
+  total_lo: '15.8'
+  total_rate30: '19.1'
 ml:
   bart:
     acc: '0.59'
     f1: '0.4'
     h2_f1: '0.33'
-    kappa: '0.38'
-    n_h1: 38
+    kappa: '0.39'
+    n_h1: 36
     vs_lr:
-      delta_f1: -0.14 (-0.29 to +0.02)
-      mcnemar_p: < 0.001
+      delta_f1: -0.06 (-0.20 to +0.07)
+      mcnemar_p: '0.003'
   base_f1: '0.25'
   deberta:
-    acc: '0.5'
-    f1: '0.32'
+    acc: '0.52'
+    f1: '0.33'
     h2_f1: '0'
-    kappa: '0.28'
-    n_h1: 39
+    kappa: '0.3'
+    n_h1: 37
     vs_bart:
       delta_f1: -0.07 (-0.20 to +0.05)
-      mcnemar_p: '0.064'
+      mcnemar_p: '0.093'
     vs_lr:
-      delta_f1: -0.21 (-0.39 to -0.03)
+      delta_f1: -0.14 (-0.28 to +0.01)
       mcnemar_p: < 0.001
   embedding:
     acc: '0.69'
-    f1: '0.62'
+    f1: '0.63'
     h2_f1: '0.67'
-    kappa: '0.56'
-    n_h1: 6
+    kappa: '0.57'
+    n_h1: 5
     vs_bart:
-      delta_f1: +0.22 (+0.08 to +0.36)
-      mcnemar_p: '0.066'
+      delta_f1: +0.23 (+0.09 to +0.37)
+      mcnemar_p: '0.088'
     vs_lr:
-      delta_f1: +0.09 (-0.06 to +0.23)
-      mcnemar_p: '0.119'
+      delta_f1: +0.16 (+0.01 to +0.31)
+      mcnemar_p: '0.322'
   llm:
     acc: '0.97'
     f1: '0.95'
     h2_f1: '0.92'
     kappa: '0.95'
-  lr_f1: '0.47'
+  lr_f1: '0.45'
   lr_h2_f1: '0'
   rule_f1: '0.98'
-  xgb_f1: '0.32'
+  xgb_f1: '0.3'
 risk:
   H1:
     impact: Major
@@ -151,14 +166,15 @@ risk:
     score: 15
 taxon:
   agree: 99.2%
-  cx_manual_agree: 119
+  cx_manual_agree: 116
   cx_manual_kappa: '0.95'
+  cx_n: 120
   cx_n_disagree: 4
   cx_n_low: 7
   cx_n_low_in_dis: 3
-  cx_rules_agree: 120
+  cx_rules_agree: 117
   cx_rules_kappa: '0.96'
-  fleiss: '0.965'
+  fleiss: '0.964'
   kappa: '0.99'
   n_disagree: 1
   n_multi_match: 8
@@ -172,33 +188,33 @@ thr:
   h7_n60: 17
   h7_n90: 11
 trend:
-  ca_p: '0.17'
-  disp_p: '0.2'
-  glm_disp: '1.82'
-  glm_hi: '1.063'
-  glm_lo: '0.91'
-  glm_p: '0.67'
-  glm_rr: '0.983'
-  jt_p: '0.19'
-  kw_H: '6.88'
-  kw_hazard_p: '0.302'
-  kw_p: '0.23'
-  mix_p: '0.007'
+  ca_p: '0.22'
+  disp_p: '0.21'
+  glm_disp: '1.8'
+  glm_hi: '1.081'
+  glm_lo: '0.922'
+  glm_p: '0.97'
+  glm_rr: '0.998'
+  jt_p: '0.29'
+  kw_H: '6.45'
+  kw_hazard_p: '0.343'
+  kw_p: '0.27'
+  mix_p: '0.008'
   mk_p: '0.86'
   mk_tau: '0.13'
-  mo_hi: '1.9'
-  mo_lo: '0.57'
-  mo_p: '1'
-  mo_rr: '1.04'
-  mw_p: '0.123'
+  mo_hi: '2.11'
+  mo_lo: '0.61'
+  mo_p: '0.77'
+  mo_rr: '1.14'
+  mw_p: '0.204'
   mw_rep_W: '377.5'
   mw_rep_p: '0.064'
-  rho: '0.1'
-  rho_p: '0.29'
+  rho: '0.07'
+  rho_p: '0.43'
   trunc_early: 98%
   trunc_late: 41%
   trunc_p: < 0.001
-  ts_hi: '16.8'
-  ts_lo: '-5.1'
-  ts_pct: '5.3'
-  tx_p: '0.22'
+  ts_hi: '15.5'
+  ts_lo: '-6.5'
+  ts_pct: '3.9'
+  tx_p: '0.31'

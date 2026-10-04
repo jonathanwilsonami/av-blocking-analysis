@@ -21,8 +21,8 @@
 | H6       | 1 Insignificant |                   17 |            0.929 | Almost certain | Medium       |
 | H6       | 2 Minor         |                   17 |            0.929 | Almost certain | High         |
 | H6       | 3 Significant   |                   10 |            0.795 | Likely         | High         |
-| H7       | 1 Insignificant |                   70 |            1     | Almost certain | Medium       |
-| H7       | 2 Minor         |                   48 |            0.999 | Almost certain | High         |
+| H7       | 1 Insignificant |                   67 |            1     | Almost certain | Medium       |
+| H7       | 2 Minor         |                   46 |            0.999 | Almost certain | High         |
 | H7       | 3 Significant   |                   17 |            0.929 | Almost certain | Very high    |
 
 : Risk-curve candidates: each observed impact tier with its own frequency and risk level. {#tbl-risk-curves}

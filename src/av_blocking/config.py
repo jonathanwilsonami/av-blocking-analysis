@@ -16,6 +16,12 @@ RAW_PRIMARY = DATA_DIR / "AV-Brick-Report.xlsx"
 RAW_ANALYZED = DATA_DIR / "AV-Brick-Report-analyzed.xlsx"
 LABELS_DIR = DATA_DIR / "labels"
 MANUAL_LABELS = LABELS_DIR / "manual_hazard_labels.csv"
+# Records judged out of scope for a *blocking* analysis (moving-AV reports), with reasons
+SCOPE_EXCLUSIONS = LABELS_DIR / "scope_exclusions.csv"
+# H1/H2 labels whose consequence is inferred rather than stated, with a strict alternative
+EVIDENCE_FLAGS = LABELS_DIR / "evidence_flags.csv"
+# In-scope incidents whose narrative never names an AV (kept, flagged, sensitivity-checked)
+WEAK_AV_EVIDENCE = LABELS_DIR / "weak_av_evidence.csv"
 # Blind second-coder audit: label-free coding packet + an LLM coder's labels
 BLIND_AUDIT_DIR = LABELS_DIR / "blind_audit"
 LLM_AUDIT_LABELS = BLIND_AUDIT_DIR / "llm_labels_codex.csv"

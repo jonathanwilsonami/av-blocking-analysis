@@ -8,7 +8,7 @@ date: last-modified
 abstract: |
   Robotaxis that become immobilized in the roadway can obstruct general traffic, public
   transit, pedestrians, and emergency responders. We analyze the {{< var data.n_incidents >}}
-  AV blocking incidents recorded by the San Francisco Department of Emergency Management
+  AV blocking incidents (after excluding {{< var data.n_excluded >}} reports of moving AVs) recorded by the San Francisco Department of Emergency Management
   (DEM) between {{< var data.first_date >}} and {{< var data.last_date >}}. We design a
   consequence-based hazard taxonomy and classify each narrative with a transparent rule set,
   which we compare against supervised models, two zero-shot transformers, and an
@@ -20,7 +20,9 @@ abstract: |
   each consequence level with its own frequency. Blocking incidents occur about
   {{< var freq.total_rate30 >}} times per 30 days, with no statistically detectable trend in
   rate or duration. AV-involved collisions, emergency-response obstruction, and routine
-  single-AV lane blockages rank highest (*Very high*). Transit obstruction and multi-AV
+  single-AV lane blockages rank highest (*Very high*), although the emergency-obstruction
+  rating rests on AVs stuck at emergency scenes; counting only explicitly stated
+  obstructions, it falls to *{{< var evid.strict.h2_level >}}*. Transit obstruction and multi-AV
   gridlock are *High*. Pedestrian/accessibility and occupant-related hazards are *Medium*.
 format:
   html:
@@ -118,6 +120,22 @@ We apply light, documented cleaning (@tbl-data-quality):
 * extract the operator;
 * treat a missing AV count as at least one.
 
+Duration is the **logged event time**, from when dispatch opened the incident to when it was
+cleared. It is not a measured delay to responders or to anyone else. A 176-minute
+incident, for example, does not mean medics were delayed 176 minutes.
+
+**Scope.** This is an analysis of *blocking* incidents, meaning immobilized AVs. Two kinds
+of record are excluded from every count and test (@tbl-scope):
+- reports of a *moving* AV behaving badly, with no immobilization;
+- one record whose narrative names no AV and that has no AV count, so AV involvement is
+  not confirmed.
+
+That removes {{< var data.n_excluded >}} of the {{< var data.n_log >}} primary records,
+leaving {{< var data.n_incidents >}}, plus one supplementary record. The moving-AV reports
+remain relevant to AV safety, just not to this question.
+
+{{< include assets/tables/tbl-scope.md >}}
+
 {{< include assets/tables/tbl-data-quality.md >}}
 
 **Narrative truncation.** {{< var data.pct_truncated >}} of narratives
@@ -139,8 +157,8 @@ The analyzed workbook (`AV-Brick-Report-analyzed.xlsx`) contributes four things:
 
 * **Extra fields.** The AV company's ETA (given for 22 incidents; median 14.5 minutes),
   other parties involved, and emergency-responder and transit-impact flags. These are
-  joined on date and location, and all 123 primary rows match.
-* **A neighborhood zone (1–10)** hand-coded in `DEM Incidents Quant` (119 of 123 match).
+  joined on date and location, and all {{< var data.n_log >}} primary records match.
+* **A neighborhood zone (1–10)** hand-coded in `DEM Incidents Quant` (all but three in-scope incidents match).
   The same sheet's derived flags (multi-AV, 4-hour time-of-day bin, >20 / >40-minute
   durations) are recomputed from source fields.
 * **{{< var data.n_supplementary >}} additional incidents** that have narratives but no
@@ -166,7 +184,7 @@ emergency, so it is kept as a feature and does not define a hazard.
 - {{< var data.pct_truncated >}} of narratives are truncated at about 50 characters.
 - Durations: median **{{< var dur.median >}} min** (95% CI {{< var dur.median_lo >}}–{{< var dur.median_hi >}}),
   90th percentile {{< var dur.p90 >}} min, max {{< var dur.max >}} min.
-- Secondary sheets add ETA, neighborhood, and responder/transit flags, plus 8 extra
+- Secondary sheets add ETA, neighborhood, and responder/transit flags, plus {{< var data.n_supplementary >}} extra
   incidents without times.
 :::
 ::: {.column width="52%"}
@@ -222,7 +240,7 @@ involve up to 60 vehicles.
 ::: {.content-hidden when-format="revealjs"}
 ## Classification method {#sec-classification}
 
-Choosing a classifier is a question of fit to the data. The data here are 123 short,
+Choosing a classifier is a question of fit to the data. The data here are {{< var data.n_incidents >}} short,
 often truncated narratives written in dispatcher shorthand (`blkng`, `ntfyd`, `LP`). There
 are no gold-standard labels, and the safety-relevant classes have only 4–9 examples. We
 compared five families of approach:
@@ -261,7 +279,7 @@ figure is an internal-consistency check, not an independent validation. The one 
 disagreement is a genuinely ambiguous crash scene (@tbl-disagreements).
 
 **Blind second coder.** To address the single-analyst problem, a second coder from a
-different model family labeled all 123 incidents *blind*: OpenAI's Codex (based on GPT-6;
+different model family labeled all 123 records *blind*: OpenAI's Codex (based on GPT-6;
 the exact build is not exposed). It received only a label-free packet
 (`data/labels/blind_audit/`): the narratives and AV counts, plus a coding guide with the
 seven definitions, the precedence and AV-count rules, and a glossary of dispatcher
@@ -270,7 +288,7 @@ and the repository confirms it modified nothing else. It was told to judge each 
 itself rather than use keyword scripts, and to give a confidence level and rationale per
 incident.
 
-It agreed with the manual audit on {{< var taxon.cx_manual_agree >}} of 123 incidents
+On the {{< var taxon.cx_n >}} in-scope incidents, it agreed with the manual audit on {{< var taxon.cx_manual_agree >}}
 ($\kappa$ = {{< var taxon.cx_manual_kappa >}}) and with the rules on
 {{< var taxon.cx_rules_agree >}} ($\kappa$ = {{< var taxon.cx_rules_kappa >}}). Fleiss'
 $\kappa$ across all three coders is {{< var taxon.fleiss >}} (@tbl-coder-agreement). The
@@ -286,6 +304,29 @@ inter-rater reliability: two language models may share biases from training.
 {{< include assets/tables/tbl-coder-agreement.md >}}
 
 {{< include assets/tables/tbl-coder-disagreements.md >}}
+
+**Evidence strength of collision and emergency labels.** The H2 definition covers both
+obstructing a response *and* becoming stuck inside an active emergency scene. A review by
+the project team found that {{< var evid.n_inferred >}} collision or emergency labels rest
+on inference: the narrative places the AV at a fire, crash, or shots-fired scene, or
+reports a possible collision, without saying it blocked responders or made contact
+(@tbl-evidence). In the covered window only {{< var evid.h2_explicit_window >}} of
+{{< var evid.h2_window >}} H2 incidents states the obstruction outright, and none of its
+{{< var evid.h2_severe_window >}} *Severe* cases does. Collisions are firmer:
+{{< var evid.h1_explicit_window >}} of {{< var evid.h1_window >}} state the contact. The
+base case keeps the inclusive labels, because they follow the written definition. Each
+inferred case is flagged with the class it would take under a strict reading, and
+@sec-sensitivity shows the consequence.
+
+{{< include assets/tables/tbl-evidence.md >}}
+
+The same review flagged two other kinds of record. INC-003 (no narrative) and INC-050 (text
+cut off at "unable to") keep their labels, with the effect marked *unknown*. And
+{{< var evid.n_weak_av >}} in-scope incidents never name an AV in their narrative, mostly
+signal outages or truncated text (@tbl-weak-av). They stay in the analysis because they
+come from the curated AV incident log, but @sec-sensitivity re-runs the matrix without them.
+
+{{< include assets/tables/tbl-weak-av.md >}}
 
 The learned models are scored out-of-sample, by 4-fold × 5-repeat stratified
 cross-validation (@tbl-classifiers, @fig-classifiers). They improve only modestly on the
@@ -308,9 +349,10 @@ The pretrained models split into two groups (@tbl-classifiers, @tbl-pretrained-c
 * **Embedding similarity is the strongest label-free method.** It reaches macro-F1
   {{< var ml.embedding.f1 >}}, significantly better than BART-MNLI (ΔF1 =
   {{< var ml.embedding.vs_bart.delta_f1 >}}). It is the only non-rule method with real skill
-  on emergency obstruction (F1 = {{< var ml.embedding.h2_f1 >}}). It edges out
-  cross-validated logistic regression, though not significantly (ΔF1 =
-  {{< var ml.embedding.vs_lr.delta_f1 >}}; McNemar p =
+  on emergency obstruction (F1 = {{< var ml.embedding.h2_f1 >}}). It also edges out
+  cross-validated logistic regression, but the evidence is weak. The bootstrap interval for
+  the F1 difference only just excludes zero (ΔF1 = {{< var ml.embedding.vs_lr.delta_f1 >}}),
+  and the McNemar test on accuracy does not reject (p =
   {{< var ml.embedding.vs_lr.mcnemar_p >}}). Its errors run the other way from NLI: it
   assigns too many incidents to transit and to pedestrian/accessibility.
 * **A frontier LLM given the written coding guide** is in a different league. Scored the
@@ -369,7 +411,7 @@ supervised model.
 ![](assets/figures/fig-classifiers.png)
 :::
 ::: {.column width="45%"}
-- 123 short, truncated narratives in dispatcher shorthand; rare classes have 4–9 examples.
+- About 120 short, truncated narratives in dispatcher shorthand; rare classes have 4–9 examples.
 - Learned models (cross-validated) barely beat the majority baseline. Logistic regression
   has **F1 = {{< var ml.lr_h2_f1 >}} on emergency obstruction**.
 - Zero-shot NLI: BART-MNLI {{< var ml.bart.f1 >}}, DeBERTa-v3 {{< var ml.deberta.f1 >}}
@@ -419,7 +461,7 @@ p = {{< var trend.kw_hazard_p >}}).
 ## Scoring the impact of each incident
 :::
 
-![Number of incidents by hazard and incident-level impact (all 123 incidents).](assets/figures/fig-hazard-impact.png){#fig-hazard-impact}
+![Number of incidents by hazard and incident-level impact (all in-scope incidents).](assets/figures/fig-hazard-impact.png){#fig-hazard-impact}
 
 ::: {.content-visible when-format="revealjs"}
 **Impact = max(hazard consequence, duration band, cluster size).** 1 Insignificant (<10 min) ·
@@ -538,7 +580,7 @@ $P(N_{30}\ge 1) = 1-\big(\tfrac{T}{T+30}\big)^{n+1/2}$.
 Two features of the data rule out normal-theory methods. There are only six monthly counts,
 and durations are strongly right-skewed: skewness ≈ 3.9, excess kurtosis ≈ 22,
 Shapiro–Wilk $p < 10^{-15}$ [@shapiro1965]. Log-durations, by contrast, are approximately
-normal (Shapiro–Wilk p ≈ 0.38). Each question is therefore matched to a test whose
+normal (Shapiro–Wilk p ≈ 0.36). Each question is therefore matched to a test whose
 assumptions hold:
 
 * **Monotone trend in monthly rates: Mann–Kendall** [@mann1945; @kendall1975]. The
@@ -587,9 +629,9 @@ Durations also show no significant change (@fig-duration-month):
   includes zero.
 
 **Replicating the class result.** The class worksheet's March-vs-October Mann–Whitney test
-reproduces exactly (W = {{< var trend.mw_rep_W >}}, p = {{< var trend.mw_rep_p >}}) once
-the 603-minute March 12 record is dropped, as the worksheet did. With that record included,
-p = {{< var trend.mw_p >}}. Either way, the October median is longer than March's, but the
+reproduces exactly (W = {{< var trend.mw_rep_W >}}, p = {{< var trend.mw_rep_p >}}) on the
+worksheet's own sample: the full primary sheet, minus the 603-minute March 12 record. On
+this paper's in-scope incidents, with that record included, p = {{< var trend.mw_p >}}. Either way, the October median is longer than March's, but the
 difference is not significant at the 5% level.
 
 Absence of evidence is not evidence of absence. With six months of data, these tests can
@@ -715,7 +757,11 @@ are not extrapolated (@tbl-risk-curves).
   with people trapped, a garage fire, and a shots-fired investigation. The life-threatening
   tier alone has $p$ = {{< var risk.H2.p >}} ({{< var risk.H2.prob >}} × Severe). The
   Likely × Major cell from all six ranks the same (*Very high*), so the tie goes to the
-  higher impact. A February incident (a medic delayed to an unconscious patient) is also
+  higher impact. **Caveat:** all three *Severe* cases, and five of the six overall, place
+  the AV at the emergency scene without stating that it blocked responders. Counting only
+  explicit obstructions, H2 is *{{< var evid.strict.h2_level >}}*
+  ({{< var evid.strict.h2_prob >}} × {{< var evid.strict.h2_impact >}}). A February
+  incident (medics forced to reroute to an unconscious patient) is also
   Severe but lies outside the covered window.
 * **H3 Transit / rail obstruction: {{< var risk.H3.level >}}.** All eight are
   *Significant* by rubric, with $p$ = {{< var risk.H3.p >}}: Likely × Significant.
@@ -736,7 +782,8 @@ are not extrapolated (@tbl-risk-curves).
 
 **Two kinds of red.** H1, H2, and H7 share the *Very high* band for different reasons. H1
 and H2 are **consequence-driven**: they occur about monthly, but each can injure someone or
-delay emergency care, so they are *safety* problems. H7 is **volume-driven**: its worst
+delay emergency care, so they are *safety* problems. H2's place in this group depends on
+evidence strength, discussed below. H7 is **volume-driven**: its worst
 outcome is a traffic delay, but it happens so often that the delay is a near-certainty, so
 it is an *operational* problem whose lever is faster recovery. A risk matrix collapses
 frequency and consequence into one color, and is known to blur exactly this distinction
@@ -749,12 +796,14 @@ frequency and consequence into one color, and is known to blur exactly this dist
 | Hazard | Governing event | n | P(≥1 in 30 d) | Cell | Level |
 |---|---|---|---|---|---|
 | H1 Collision | any collision (no human injury) | {{< var risk.H1.n_ge >}} | {{< var risk.H1.p >}} | {{< var risk.H1.prob >}} × {{< var risk.H1.impact >}} | **{{< var risk.H1.level >}}** |
-| H2 Emergency | life-threatening emergency obstructed | {{< var risk.H2.n_ge >}} | {{< var risk.H2.p >}} | {{< var risk.H2.prob >}} × {{< var risk.H2.impact >}} | **{{< var risk.H2.level >}}** |
+| H2 Emergency | AV stuck at a life-threatening scene (inferred)\* | {{< var risk.H2.n_ge >}} | {{< var risk.H2.p >}} | {{< var risk.H2.prob >}} × {{< var risk.H2.impact >}} | **{{< var risk.H2.level >}}** |
 | H3 Transit | transit/rail blocked | {{< var risk.H3.n_ge >}} | {{< var risk.H3.p >}} | {{< var risk.H3.prob >}} × {{< var risk.H3.impact >}} | **{{< var risk.H3.level >}}** |
 | H4 Ped/access | crosswalk/ramp/bike lane | {{< var risk.H4.n_ge >}} | {{< var risk.H4.p >}} | {{< var risk.H4.prob >}} × {{< var risk.H4.impact >}} | **{{< var risk.H4.level >}}** |
 | H5 Occupant | medical case or 60+ min | {{< var risk.H5.n_ge >}} | {{< var risk.H5.p >}} | {{< var risk.H5.prob >}} × {{< var risk.H5.impact >}} | **{{< var risk.H5.level >}}** |
 | H6 Multi-AV | 5+ AVs or 60+ min | {{< var risk.H6.n_ge >}} | {{< var risk.H6.p >}} | {{< var risk.H6.prob >}} × {{< var risk.H6.impact >}} | **{{< var risk.H6.level >}}** |
 | H7 Single-AV | blockage of 60+ min | {{< var risk.H7.n_ge >}} | {{< var risk.H7.p >}} | {{< var risk.H7.prob >}} × {{< var risk.H7.impact >}} | **{{< var risk.H7.level >}}** |
+
+\*Counting only explicitly stated obstructions, H2 is *{{< var evid.strict.h2_level >}}*.
 
 **Risk curve:** for each observed impact tier $k$, use the frequency of incidents with
 impact $\ge k$, and place the hazard at the tier with the highest risk level. Probability
@@ -765,14 +814,29 @@ and impact then refer to the *same* event.
 
 ::: {.content-hidden when-format="revealjs"}
 @tbl-sensitivity re-places every hazard under alternative choices: a plug-in MLE
-probability, 7- and 90-day horizons, February included (212 exposure days, all 123
+probability, 7- and 90-day horizons, February included (212 exposure days, all in-scope
 incidents), the supplementary incidents added, the conventional "total frequency ×
 90th-percentile impact" rule, and two alternative *labelers*: the manual audit and the best
-pretrained model (embedding similarity). For the labeler columns, impact is re-scored
+pretrained model (embedding similarity). A *strict evidence* column applies a reading in which collision and emergency labels count only where the narrative states the
+contact or obstruction outright, and a final column drops incidents whose narrative never
+names an AV. For the labeler and evidence columns, impact is re-scored,
 because it depends on the hazard.
 
 * **Robust to data choices.** No placement changes under the MLE basis, when February is
   included, or when the supplementary incidents are added.
+* **Evidence strictness is the most important caveat.** Under the strict reading, H2
+  drops from *Very high* to *{{< var evid.strict.h2_level >}}*
+  ({{< var evid.strict.h2_prob >}} × {{< var evid.strict.h2_impact >}}). Only
+  {{< var evid.h2_explicit_window >}} in-window H2 incident (INC-079, "blocking medics' way")
+  states the obstruction outright, and all its *Severe* cases rest on AVs stuck at a fire
+  or shots-fired scene. H1 keeps its cell with {{< var evid.h1_explicit_window >}} explicit
+  collisions, and no other hazard moves. H2's red rating therefore depends on counting "AV
+  stuck inside an active emergency scene" as an emergency obstruction, as the taxonomy
+  defines it. Whether being stuck at such a scene actually hindered responders is exactly
+  what the narratives do not record.
+* **Robust to weak AV evidence, but H7 is at the edge.** Dropping the incidents whose
+  narrative never names an AV changes no placement. H7 loses two long blockages, so its
+  30-day probability falls to about 0.90, right at the Almost-certain cutoff.
 * **Robust to the labeler.** Labeling hazards with the manual audit instead of the rules
   gives *identical* placements, so the matrix does not hinge on rule errors. Labeling with
   the embedding model moves transit (H3) and pedestrian/accessibility (H4) up one band and
@@ -831,7 +895,10 @@ over time; and the classifier and inter-coder agreement scores.
 | The impact rubric, e.g. 60 minutes = *Significant*, emergency obstruction = *Major* | The impact axis | High for H7 (*Very high* at 60 minutes, *High* at 90+); none for H1–H5 |
 | The 30-day planning horizon | The probability axis | High for absolute levels (a 7-day horizon lowers every hazard); low for the ranking |
 | The template's probability bands and cell colors | Converting numbers into bands | Fixed by the course template, not tuned to this data |
+| Counting "AV stuck at an emergency scene" as emergency obstruction (inferred evidence) | Which incidents count as H1/H2 | **High for H2** (*Very high* inclusive, *Medium* explicit-only); none for other hazards |
 | Risk-curve placement over "total frequency × worst impact" | Pairing probability with impact | Matters for H2 only (*Very high* vs *Extreme*) |
+| Scope: excluding moving-AV reports and one record with no confirmed AV | Which records count as blocking incidents | None: the excluded primary records were short and change no placement |
+| Keeping incidents whose narrative never names an AV (they are in the curated AV log) | Which records count as AV incidents | Low: excluding them changes no placement, though H7 then sits at the Almost-certain cutoff (P ≈ 0.90) |
 | Treating February and April–May as coverage gaps | The exposure window | None: including February changes no placement |
 
 Every judgment was fixed before the risk matrix was drawn, and each is written down in code
@@ -846,8 +913,9 @@ measured part.
 ## Measured vs judged
 
 - **Measured:** counts, durations, rates and intervals, trend tests, agreement scores.
-- **Judged:** the taxonomy, the impact rubric (60 min = *Significant*), the 30-day
-  horizon, the template's bands, and the placement rule. All were fixed before the matrix
+- **Judged:** the taxonomy, the impact rubric (60 min = *Significant*), whether an AV stuck
+  at an emergency scene counts as obstructing it, the 30-day horizon, the template's bands,
+  and the placement rule. All were fixed before the matrix
   was drawn and are written in code.
 - The colors are a **transparent, structured opinion built on measured rates**; the
   sensitivity tables show how far each choice moves them.
@@ -870,6 +938,10 @@ measured part.
   from one analyst. A blind LLM second coder agreed closely ($\kappa$ =
   {{< var taxon.cx_manual_kappa >}}), but agreement between language models is weaker
   evidence than agreement between independent human coders, which remains the gold standard.
+* **Emergency obstruction is mostly inferred.** Five of the six in-window H2 labels place
+  the AV at an emergency scene without stating that it impeded responders. Logged durations
+  are event times, not measured response delays. The data cannot say how much AVs actually
+  slowed emergency response, only how often they were stuck where a response was under way.
 * **Risk matrices are coarse.** Banding discards information and can rank risks
   inconsistently [@cox2008]. We mitigate this by publishing the underlying rates,
   intervals, and risk curves alongside each cell, and by showing the sensitivity of each
@@ -903,6 +975,9 @@ Three conclusions are well supported by the data:
 2. **The highest risks come from consequence, not volume.** Collisions and
    emergency-response obstruction occur about monthly but carry Major-to-Severe impacts.
    The sheer volume of routine single-AV blockages also earns a *Very high* rating.
+   The emergency rating comes with a firm caveat. It rests on AVs stuck at emergency
+   scenes; counting only explicitly stated obstructions, it is
+   *{{< var evid.strict.h2_level >}}*.
 3. **There is no statistically detectable trend** in incident rate, duration, or multi-AV
    share over the covered months. The one apparent change, in hazard mix, coincides with a
    change in narrative recording.
@@ -910,7 +985,8 @@ Three conclusions are well supported by the data:
 The analysis points to two practical levers. The first is **better data**: untruncated
 narratives, structured fields for what was obstructed, and fleet exposure. The second is
 **faster recovery** for long single-AV blockages and for any AV near an emergency scene,
-where minutes matter most.
+where minutes matter most. Recording whether an AV actually impeded responders would
+settle the largest open question in this analysis.
 :::
 
 ::: {.content-visible when-format="revealjs"}
@@ -919,7 +995,8 @@ where minutes matter most.
 1. **Blocking is routine:** about {{< var freq.per_week >}} incidents per week; median
    {{< var dur.median >}} min; {{< var dur.pct_ge60 >}} last 60+ minutes.
 2. **The highest risks are H1 collisions, H2 emergency obstruction, and H7 routine
-   blockage** (all *Very high*).
+   blockage** (all *Very high*). H2 rests on AVs stuck at emergency scenes; with
+   explicit evidence only, it is *{{< var evid.strict.h2_level >}}*.
 3. **No detectable trend** in rate, duration, or multi-AV share. The hazard-mix shift is a
    recording artifact.
 4. **Levers:** better data (full narratives, exposure) and faster recovery, especially near

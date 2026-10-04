@@ -5,4 +5,4 @@ Transit / rail obstruction,0,0,1,1,0,0,6,0
 Pedestrian / accessibility obstruction,0,0,0,0,0,0,4,0
 Occupant-related immobilization,0,0,0,0,9,0,0,0
 Multi-AV clustering / gridlock,0,1,2,6,0,0,8,0
-Single-AV traffic obstruction,0,2,3,6,0,1,47,13
+Single-AV traffic obstruction,0,2,2,4,0,1,47,13

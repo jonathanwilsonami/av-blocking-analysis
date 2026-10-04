@@ -178,7 +178,7 @@ Chujiang (CJ) Wu
 <h2>Motivation and questions</h2>
 <ul>
 <li>Driverless robotaxis that cannot resolve a situation <strong>stop and wait</strong>. That is safe for occupants, but the stopped AV can block lanes, transit, crosswalks, and emergency vehicles.</li>
-<li>San Francisco DEM logged <strong>123 blocking incidents</strong>, February 1, 2025 – October 31, 2025.</li>
+<li>San Francisco DEM logged <strong>120 blocking incidents</strong>, February 1, 2025 – October 31, 2025.</li>
 <li>Questions:
 <ol type="1">
 <li><strong>How often</strong> do incidents, and each hazard type, occur?</li>
@@ -198,11 +198,11 @@ Chujiang (CJ) Wu
 <div class="columns">
 <div class="column" style="width:48%;">
 <ul>
-<li>123 incidents; <strong>120</strong> in the 6 fully covered months (184 days).</li>
+<li>120 incidents; <strong>117</strong> in the 6 fully covered months (184 days).</li>
 <li>Feb (3 incidents, days 1–3) and Apr–May (absent) are <strong>coverage gaps, not zeros</strong>, so they are excluded from rates.</li>
 <li>67% of narratives are truncated at about 50 characters.</li>
-<li>Durations: median <strong>23 min</strong> (95% CI 17–36), 90th percentile 125 min, max 603 min.</li>
-<li>Secondary sheets add ETA, neighborhood, and responder/transit flags, plus 8 extra incidents without times.</li>
+<li>Durations: median <strong>24 min</strong> (95% CI 18–39), 90th percentile 127 min, max 603 min.</li>
+<li>Secondary sheets add ETA, neighborhood, and responder/transit flags, plus 7 extra incidents without times.</li>
 </ul>
 </div><div class="column" style="width:52%;">
 <p><img data-src="assets/figures/fig-duration-dist.png"></p>
@@ -278,10 +278,10 @@ Chujiang (CJ) Wu
 <p><img data-src="assets/figures/fig-classifiers.png"></p>
 </div><div class="column" style="width:45%;">
 <ul>
-<li>123 short, truncated narratives in dispatcher shorthand; rare classes have 4–9 examples.</li>
+<li>About 120 short, truncated narratives in dispatcher shorthand; rare classes have 4–9 examples.</li>
 <li>Learned models (cross-validated) barely beat the majority baseline. Logistic regression has <strong>F1 = 0 on emergency obstruction</strong>.</li>
-<li>Zero-shot NLI: BART-MNLI 0.4, DeBERTa-v3 0.32 (not significantly different). Both call about a third of incidents “collision”.</li>
-<li>Embedding similarity is the best label-free method (0.62; significantly better than BART), but over-predicts transit and pedestrian hazards.</li>
+<li>Zero-shot NLI: BART-MNLI 0.4, DeBERTa-v3 0.33 (not significantly different). Both call about a third of incidents “collision”.</li>
+<li>Embedding similarity is the best label-free method (0.63; significantly better than BART), but over-predicts transit and pedestrian hazards.</li>
 <li>Rules agree with the hand-coded audit at <span class="math inline">\(\kappa\)</span> = 0.99. This is a consistency check: the same analyst wrote both.</li>
 <li>A blind <strong>LLM second coder</strong> (Codex, given only a written guide) matches the audit at <span class="math inline">\(\kappa\)</span> = 0.95 (macro-F1 0.95). The taxonomy can be applied consistently.</li>
 <li><strong>Selected: transparent, auditable, reproducible rules</strong>, with the LLM as a cross-check.</li>
@@ -297,7 +297,7 @@ Chujiang (CJ) Wu
 <h2>Scoring the impact of each incident</h2>
 
 <img data-src="assets/figures/fig-hazard-impact.png" class="r-stretch quarto-figure-center" id="fig-hazard-impact"><p class="caption">
-Figure&nbsp;1: Number of incidents by hazard and incident-level impact (all 123 incidents).
+Figure&nbsp;1: Number of incidents by hazard and incident-level impact (all in-scope incidents).
 </p><p><strong>Impact = max(hazard consequence, duration band, cluster size).</strong> 1 Insignificant (&lt;10 min) · 2 Minor (10–60 min, 2–4 AVs) · 3 Significant (≥60 min, transit, pedestrian path, 5+ AVs) · 4 Major (emergency obstruction, collision without injury) · 5 Severe (life-threatening emergency obstructed, injury).</p>
 </section></section>
 <section>
@@ -310,7 +310,7 @@ Figure&nbsp;1: Number of incidents by hazard and incident-level impact (all 123 
 
 <img data-src="assets/figures/fig-hazard-rates.png" class="r-stretch quarto-figure-center" id="fig-hazard-rates"><p class="caption">
 Figure&nbsp;2: Posterior mean frequency per 30 days with 95% Jeffreys credible intervals (log scale).
-</p><p>Poisson rate <span class="math inline">\(\lambda\)</span> over <span class="math inline">\(T\)</span> = 184 days; Jeffreys posterior <span class="math inline">\(\lambda\mid n \sim \text{Gamma}(n+\tfrac12, T)\)</span>; <span class="math inline">\(P(N_{30}\ge 1) = 1-\big(\tfrac{T}{T+30}\big)^{n+1/2}\)</span>. <strong>All incidents: 19.6 per 30 days</strong> (16.2–23.4), one every 1.5 days.</p>
+</p><p>Poisson rate <span class="math inline">\(\lambda\)</span> over <span class="math inline">\(T\)</span> = 184 days; Jeffreys posterior <span class="math inline">\(\lambda\mid n \sim \text{Gamma}(n+\tfrac12, T)\)</span>; <span class="math inline">\(P(N_{30}\ge 1) = 1-\big(\tfrac{T}{T+30}\big)^{n+1/2}\)</span>. <strong>All incidents: 19.1 per 30 days</strong> (15.8–22.9), one every 1.6 days.</p>
 </section>
 <section id="why-a-bayesian-probability-for-the-matrix" class="slide level2">
 <h2>Why a Bayesian probability for the matrix?</h2>
@@ -333,14 +333,14 @@ Figure&nbsp;2: Posterior mean frequency per 30 days with 95% Jeffreys credible i
 
 <img data-src="assets/figures/fig-monthly-rate.png" class="r-stretch quarto-figure-center" id="fig-monthly-rate"><p class="caption">
 Figure&nbsp;3: Monthly incident rate per 30 days with exact 95% Poisson intervals. Gray bands mark months absent from (or only partially present in) the log.
-</p><p><strong>No detectable trend.</strong> Mann–Kendall exact p = 0.86 · Poisson GLM rate ratio 0.983/month (p = 0.67) · durations: Kruskal–Wallis p = 0.23, Jonckheere–Terpstra p = 0.19. The class Mar-vs-Oct Mann–Whitney replicates: W = 377.5, p = 0.064.</p>
+</p><p><strong>No detectable trend.</strong> Mann–Kendall exact p = 0.86 · Poisson GLM rate ratio 0.998/month (p = 0.97) · durations: Kruskal–Wallis p = 0.27, Jonckheere–Terpstra p = 0.29. The class Mar-vs-Oct Mann–Whitney replicates: W = 377.5, p = 0.064.</p>
 </section>
 <section id="sec-mix" class="slide level2">
 <h2>The hazard mix shift is a reporting artifact</h2>
 
 <img data-src="assets/figures/fig-hazard-period.png" class="r-stretch quarto-figure-center" id="fig-hazard-period"><p class="caption">
 Figure&nbsp;4: Share of each period’s incidents by hazard class.
-</p><p>The mix differs (p = 0.007), but narratives went from 98% truncated to 41% truncated at the same time. The combined H1–H5 share is unchanged (p = 0.22), and the multi-AV share (a structured field) has no trend (p = 0.17). <strong>The shift is not evidence of changed AV behavior.</strong></p>
+</p><p>The mix differs (p = 0.008), but narratives went from 98% truncated to 41% truncated at the same time. The combined H1–H5 share is unchanged (p = 0.31), and the multi-AV share (a structured field) has no trend (p = 0.22). <strong>The shift is not evidence of changed AV behavior.</strong></p>
 </section></section>
 <section>
 <section id="sec-risk" class="title-slide slide level1 center">
@@ -386,7 +386,7 @@ Figure&nbsp;5: 5×5 risk matrix of AV blocking hazards. Probability is the Jeffr
 </tr>
 <tr class="even">
 <td>H2 Emergency</td>
-<td>life-threatening emergency obstructed</td>
+<td>AV stuck at a life-threatening scene (inferred)*</td>
 <td><p>3</p></td>
 <td><p>0.41</p></td>
 <td>Moderate × Severe</td>
@@ -434,6 +434,7 @@ Figure&nbsp;5: 5×5 risk matrix of AV blocking hazards. Probability is the Jeffr
 </tr>
 </tbody>
 </table>
+<p>*Counting only explicitly stated obstructions, H2 is <em>Medium</em>.</p>
 <p><strong>Risk curve:</strong> for each observed impact tier <span class="math inline">\(k\)</span>, use the frequency of incidents with impact <span class="math inline">\(\ge k\)</span>, and place the hazard at the tier with the highest risk level. Probability and impact then refer to the <em>same</em> event.</p>
 </section></section>
 <section>
@@ -449,18 +450,20 @@ Figure&nbsp;5: 5×5 risk matrix of AV blocking hazards. Probability is the Jeffr
 Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x impact and level).
 </figcaption>
 <div aria-describedby="tbl-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<table class="caption-top">
+<table class="caption-top" style="width:100%;">
 <colgroup>
-<col style="width: 10%">
-<col style="width: 16%">
-<col style="width: 6%">
-<col style="width: 6%">
-<col style="width: 7%">
-<col style="width: 11%">
-<col style="width: 11%">
-<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 4%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
 <col style="width: 9%">
-<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 12%">
+<col style="width: 8%">
+<col style="width: 8%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -473,6 +476,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <th style="text-align: left;">+ supplementary incidents</th>
 <th style="text-align: left;">Total freq x P90 impact</th>
 <th style="text-align: left;">Manual audit labels</th>
+<th style="text-align: left;">Strict evidence (explicit H1/H2 only)</th>
+<th style="text-align: left;">Exclude weak AV evidence</th>
 <th style="text-align: left;">Embedding-model labels</th>
 </tr>
 </thead>
@@ -483,6 +488,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">2x4 Medium</td>
 <td style="text-align: left;">5x4 Extreme</td>
+<td style="text-align: left;">4x4 Very high</td>
+<td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
@@ -499,6 +506,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">3x5 Very high</td>
 <td style="text-align: left;">4x5 Extreme</td>
 <td style="text-align: left;">3x5 Very high</td>
+<td style="text-align: left;">2x4 Medium</td>
+<td style="text-align: left;">3x5 Very high</td>
 <td style="text-align: left;">3x5 Very high</td>
 </tr>
 <tr class="odd">
@@ -511,6 +520,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">5x3 Very high</td>
 </tr>
 <tr class="even">
@@ -519,6 +530,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">2x3 Medium</td>
 <td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
@@ -536,6 +549,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">H6 Multi-AV gridlock</td>
@@ -548,12 +563,16 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">H7 Single-AV obstruction</td>
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">5x3 Very high</td>
+<td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
@@ -665,7 +684,7 @@ Table&nbsp;2: Risk-matrix placement when the duration threshold for a Significan
 <h2>Measured vs judged</h2>
 <ul>
 <li><strong>Measured:</strong> counts, durations, rates and intervals, trend tests, agreement scores.</li>
-<li><strong>Judged:</strong> the taxonomy, the impact rubric (60 min = <em>Significant</em>), the 30-day horizon, the template’s bands, and the placement rule. All were fixed before the matrix was drawn and are written in code.</li>
+<li><strong>Judged:</strong> the taxonomy, the impact rubric (60 min = <em>Significant</em>), whether an AV stuck at an emergency scene counts as obstructing it, the 30-day horizon, the template’s bands, and the placement rule. All were fixed before the matrix was drawn and are written in code.</li>
 <li>The colors are a <strong>transparent, structured opinion built on measured rates</strong>; the sensitivity tables show how far each choice moves them.</li>
 </ul>
 </section>
@@ -687,8 +706,8 @@ Table&nbsp;2: Risk-matrix placement when the duration threshold for a Significan
 <section id="take-aways" class="slide level2 scrollable">
 <h2>Take-aways</h2>
 <ol type="1">
-<li><strong>Blocking is routine:</strong> about 4.6 incidents per week; median 23 min; 28% last 60+ minutes.</li>
-<li><strong>The highest risks are H1 collisions, H2 emergency obstruction, and H7 routine blockage</strong> (all <em>Very high</em>).</li>
+<li><strong>Blocking is routine:</strong> about 4.5 incidents per week; median 24 min; 29% last 60+ minutes.</li>
+<li><strong>The highest risks are H1 collisions, H2 emergency obstruction, and H7 routine blockage</strong> (all <em>Very high</em>). H2 rests on AVs stuck at emergency scenes; with explicit evidence only, it is <em>Medium</em>.</li>
 <li><strong>No detectable trend</strong> in rate, duration, or multi-AV share. The hazard-mix shift is a recording artifact.</li>
 <li><strong>Levers:</strong> better data (full narratives, exposure) and faster recovery, especially near emergency scenes.</li>
 </ol>

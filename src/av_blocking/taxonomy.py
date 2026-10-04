@@ -136,7 +136,8 @@ RULES: dict[str, re.Pattern] = {
     ),
     "H4": _rx(
         r"handicap",
-        r"(?<!off )(?<!on )(?<!freeway )\bramp\b",  # curb ramp, not a freeway on/off ramp
+        # curb/accessibility ramps only; bare "ramp" in this log usually means a freeway ramp
+        r"(?:curb|wheelchair|ada|accessib\w*) ramp",
         r"crosswalk",
         r"bike lane",
         r"pedestrian",

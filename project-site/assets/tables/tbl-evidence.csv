@@ -1,0 +1,17 @@
+Incident,Date,Label,Evidence,Strict label,Impact,In window,Narrative,Review note
+INC-002,2025-02-02,H2,explicit,H2,5,False,PD on scene first for report of unconcious male..medic requested and had to respond from east or west bound on eddy SB Jones due to traffic blocked by Waymo AV//M566 Ack Waymo AV moved,
+INC-003,2025-02-03,H7,effect unknown,H7,2,False,,"Narrative missing; emergency-responder flag is Y, but the specific effect cannot be determined."
+INC-042,2025-06-24,H1,explicit,H1,4,True,Passing Muni hit the door of Waymo AV now stuck and,
+INC-050,2025-07-09,H5,effect unknown,H5,2,True,2 passengers in the Waymo AV stuck unable to,"Two passengers in a stuck AV; text ends at 'unable to', so the exact restriction is unknown."
+INC-051,2025-07-11,H1,explicit,H1,4,True,Muni vs Waymo non inj accident Muni insp and,
+INC-064,2025-08-01,H2,inferred,H7,5,True,Zoox blkng lane of traffic where poss shots heard coming from a building and PD actively investigating..another call AV disabled far right lane blkng traffic prior to Howard St called Zoox at 4155009354,AV blocked a lane at a shots-fired scene under police investigation; obstruction of responders not stated.
+INC-066,2025-08-06,H2,inferred,H7,4,True,Traffic hazard due to a veh accident..need PD for traffic control..tow truck en route no eta..PD resp..Waymo able to move AV..no need for PD,Crash scene needing traffic control; the AV's role in the crash and in obstructing responders is unclear.
+INC-079,2025-08-19,H2,explicit,H2,4,True,Waymo was blkng medics way,
+INC-089,2025-09-16,H2,inferred,H6,5,True,There was a fire inside a parking garage on O'Farrell and 2 WAYMO's were stuck on O'Farrell. No resolution,Garage fire; two AVs 'stuck on O'Farrell'; obstruction of fire response not stated.
+INC-091,2025-09-18,H1,explicit,H1,4,True,WAYMO vs. Motorcycle vehicle accident. No reported injuries,
+INC-099,2025-10-05,H1,explicit,H1,4,True,WAYMO involved in a no injury accident with SFFDmedic.,
+INC-102,2025-10-07,H2,inferred,H6,5,True,Working fire with reports of a and trappedin building on 2nd floor. 2 WAYMO vehicles stuck on,Working fire with persons trapped; 'two WAYMO vehicles stuck on...' (truncated); obstruction not stated.
+INC-103,2025-10-08,H2,inferred,H6,4,True,Vehicle accident involving a vehicle on it's side. 6 WAYMO's blocking westbound traffic on Duboce an,Overturned-vehicle crash; six AVs blocking westbound traffic; responders not mentioned.
+INC-108,2025-10-17,H1,inferred,H3,4,True,"SWaymo vs Muni, unclear if contact was actually","'Waymo vs Muni, unclear if contact was actually [made]'; contact not established."
+INC-114,2025-10-24,H1,explicit,H1,4,True,Waymo hit RP's dog..Emer Vet and Waymo contact,
+"Supplementary: 2025-10-22|MARKET ST/CORBETT AV,",2025-10-22,H2,inferred,H7,4,True,Multi veh inj accident Waymo AV drove into the scen,"Supplementary record: injury accident, 'Waymo AV drove into the scene'; obstruction of responders and AV-caused injury not established."

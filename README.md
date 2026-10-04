@@ -56,11 +56,14 @@ is, and where it sits on a standard 5×5 risk matrix.
 
 | File | Sheet | Role |
 |---|---|---|
-| `data/AV-Brick-Report.xlsx` | `DEM Incidents` | **Primary source.** 123 incidents, Feb–Oct 2025: date, location, narrative, number of AVs, start and clear times. |
-| `data/AV-Brick-Report-analyzed.xlsx` | `DEM Incidents` | Same incidents plus AV-company ETA, other parties, emergency-responder and transit-impact flags, and 8 extra incidents with narratives but no times. |
+| `data/AV-Brick-Report.xlsx` | `DEM Incidents` | **Primary source.** 123 records, Feb–Oct 2025 (120 in-scope blocking incidents): date, location, narrative, number of AVs, start and clear times. |
+| `data/AV-Brick-Report-analyzed.xlsx` | `DEM Incidents` | Same incidents plus AV-company ETA, other parties, emergency-responder and transit-impact flags, and 8 extra records with narratives but no times (7 in scope). |
 | | `DEM Incidents Quant` | Hand-coded neighborhood zone (1–10), multi-AV flag, time-of-day bins, duration flags. |
 | | `plots and stats` | Monthly duration summaries, a six-group normality/rank-sum table, and a March-vs-October Mann–Whitney test. These are replicated and extended in the notebook. |
 | `data/labels/manual_hazard_labels.csv` | – | Hand-coded audit label for every incident, with notes on ambiguous cases. |
+| `data/labels/scope_exclusions.csv` | – | Records excluded as out of scope: reports of a *moving* AV (lane change, red light, erratic driving), and one record with no confirmed AV involvement. |
+| `data/labels/weak_av_evidence.csv` | – | In-scope incidents whose narrative never names an AV (kept, flagged, and dropped in a sensitivity check). |
+| `data/labels/evidence_flags.csv` | – | Team-reviewed evidence notes: collision/emergency labels whose consequence is inferred (each with a strict-reading alternative), and records whose effect is unknown. |
 | `data/labels/blind_audit/` | – | Label-free coding packet (`coding_sheet.csv`, `CODING_GUIDE.md`) and the blind LLM second coder's labels (`llm_labels_codex.csv`, from OpenAI Codex, GPT-6-based). |
 | `data/processed/zeroshot_{bart,deberta,embedding}.csv` | – | Cached predictions from the three pretrained models (optional methods): BART-large-MNLI, DeBERTa-v3-large NLI, mxbai embedding similarity. |
 
@@ -77,7 +80,13 @@ was performed by Dr. Missy Cummings.** This project builds directly on that work
 - **Truncation.** About two-thirds of narratives were cut at roughly 45–60 characters by
   the export, almost all of them before August.
 - **Mixed time formats** and events crossing midnight. Durations are recomputed modulo
-  24 hours.
+  24 hours. A duration is the **logged event time** (opened to cleared), not a measured
+  delay to responders.
+- **Scope.** Three records describe a moving AV behaving badly rather than an immobilized
+  one, and one names no AV and has no AV count. All four are excluded from the blocking
+  analysis and listed separately. Seven in-scope incidents never name an AV in their
+  narrative. They are kept, because they come from the curated AV log, but flagged and
+  tested in a sensitivity check.
 
 ## Methods in brief
 
@@ -104,31 +113,38 @@ decisive.
 
 ## Key results
 
-- About **20 blocking incidents per 30 days** (95% CI 16–23), roughly one every 1.5 days.
-  Median duration 23 minutes; 28% last an hour or more.
+- About **19 blocking incidents per 30 days** (95% CI 16–23), roughly one every 1.6 days.
+  Median duration 24 minutes; 29% last an hour or more.
 - **No statistically detectable trend** in incident rate (Mann–Kendall exact p = 0.86) or
-  duration (Kruskal–Wallis p = 0.23).
-- The hazard mix appears to shift after July (p = 0.007), but this coincides with
+  duration (Kruskal–Wallis p = 0.27).
+- The hazard mix appears to shift after July (p = 0.008), but this coincides with
   narratives switching from truncated fragments to full text. It is treated as a recording
   artifact, not a behavior change.
 - **Classifier comparison (macro-F1 against the manual audit):**
     - Rules: 0.98 (in-sample).
     - Frontier LLM given the coding guide (Codex): 0.95.
-    - Embedding similarity: 0.62. It is the best method that uses no labels, significantly
-      better than BART.
-    - TF-IDF + logistic regression: 0.47 (cross-validated).
+    - Embedding similarity: 0.63. It is the best method that uses no labels, significantly
+      better than BART, and only weakly better than logistic regression.
+    - TF-IDF + logistic regression: 0.45 (cross-validated).
     - Zero-shot BART-MNLI: 0.40.
-    - Zero-shot DeBERTa-v3: 0.32. It is not significantly different from BART; both NLI
+    - Zero-shot DeBERTa-v3: 0.33. It is not significantly different from BART; both NLI
       models over-predict collisions.
 - **Blind second coder:** OpenAI Codex (GPT-6-based) labeled all incidents from the
-  written guide alone. It agreed with the manual audit on 119/123 (κ = 0.95) and with the
-  rules on 120/123 (κ = 0.96); Fleiss' κ across all three coders is 0.965. All four
+  written guide alone. On the 120 in-scope incidents it agreed with the manual audit on 116
+  (κ = 0.95) and with the rules on 117 (κ = 0.96); Fleiss' κ across all three coders is
+  0.964. All four
   disagreements are defensible judgment calls on truncated narratives, so the labels were
   kept unchanged.
 - **Two kinds of red:** collisions and emergency obstruction are *Very high* because of their
   consequences (safety). Single-AV obstruction is *Very high* because of sheer volume
   (operations): an hour-long blockage happens about every 11 days. Its rating depends on
   the rubric's 60-minute cutoff for *Significant*; at 90+ minutes it is *High*.
+- **Main caveat: emergency obstruction is mostly inferred.** Five of the six in-window
+  emergency-obstruction incidents place the AV at a fire, crash, or shots-fired scene
+  without stating that it blocked responders. H2's *Very high* rating follows the
+  taxonomy's definition, under which an AV stuck inside an active emergency scene counts.
+  Counting only explicitly stated obstructions, H2 is *Medium* (Unlikely × Major). No other
+  hazard moves under that strict reading.
 - **Robust to the labeler:** relabeling hazards with the manual audit leaves every
   risk-matrix placement unchanged.
 - Risk-matrix placement (30-day horizon):
@@ -136,7 +152,7 @@ decisive.
 | Hazard | Cell | Level |
 |---|---|---|
 | H1 AV-involved collision | Likely × Major | Very high |
-| H2 Emergency-response obstruction | Moderate × Severe | Very high |
+| H2 Emergency-response obstruction | Moderate × Severe | Very high (Medium on explicit evidence only) |
 | H7 Single-AV traffic obstruction | Almost certain × Significant | Very high |
 | H3 Transit / rail obstruction | Likely × Significant | High |
 | H6 Multi-AV clustering / gridlock | Likely × Significant | High |

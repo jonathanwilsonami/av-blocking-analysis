@@ -1,11 +1,11 @@
 | Hazard                   |   Manual audit |   Zero-shot BART-large-MNLI |   Zero-shot DeBERTa-v3-large NLI |   Embedding similarity (mxbai-embed-large) |
 |:-------------------------|---------------:|----------------------------:|---------------------------------:|-------------------------------------------:|
-| H1 Collision             |              7 |                          38 |                               39 |                                          6 |
-| H2 Emergency obstruction |              6 |                           6 |                                5 |                                          9 |
+| H1 Collision             |              7 |                          36 |                               37 |                                          5 |
+| H2 Emergency obstruction |              6 |                           6 |                                4 |                                          9 |
 | H3 Transit obstruction   |              8 |                           1 |                               11 |                                         22 |
 | H4 Ped/accessibility     |              4 |                           2 |                                1 |                                         10 |
 | H5 Occupant-related      |              9 |                           3 |                                1 |                                         12 |
 | H6 Multi-AV gridlock     |             17 |                          10 |                                8 |                                         11 |
-| H7 Single-AV obstruction |             72 |                          63 |                               58 |                                         53 |
+| H7 Single-AV obstruction |             69 |                          62 |                               58 |                                         51 |
 
 : Number of incidents assigned to each hazard by the manual audit and by each pretrained model. {#tbl-pretrained-counts}

@@ -154,6 +154,13 @@ def _yes(s: pd.Series) -> pd.Series:
     return s.astype("string").str.strip().str.upper().eq("Y").fillna(False).astype(bool)
 
 
+def scope_exclusions() -> pd.DataFrame:
+    """Records excluded as out of scope (``record`` = incident_id, or date|location key)."""
+    if not config.SCOPE_EXCLUSIONS.exists():
+        return pd.DataFrame(columns=["record", "source", "reason"])
+    return pd.read_csv(config.SCOPE_EXCLUSIONS, dtype=str)
+
+
 def build_incidents() -> pd.DataFrame:
     """Primary incidents enriched with the secondary-sheet fields (left joins)."""
     df = load_primary()
@@ -170,6 +177,10 @@ def build_incidents() -> pd.DataFrame:
     zones = load_quant_neighborhoods()
     df = df.merge(zones, on="key", how="left", validate="one_to_one")
     df["neighborhood"] = df["zone"].map(NEIGHBORHOODS).fillna("Unassigned")
+
+    excl = scope_exclusions().set_index("record")["reason"]
+    df["in_scope"] = ~df["incident_id"].isin(excl.index)
+    df["scope_note"] = df["incident_id"].map(excl).astype("string")
     return df.drop(columns=["key"])
 
 
@@ -181,10 +192,15 @@ def supplementary_incidents() -> pd.DataFrame:
     """
     primary_keys = set(_join_key(load_primary(), "location"))
     a = load_analyzed()
-    out = a[~a["key"].isin(primary_keys) & a["narrative"].notna()].copy()
+    out_of_scope = set(scope_exclusions()["record"])
+    out = a[
+        ~a["key"].isin(primary_keys) & a["narrative"].notna() & ~a["key"].isin(out_of_scope)
+    ].copy()
     out["month"] = out["date"].dt.to_period("M").astype(str)
     out["n_avs_filled"] = pd.to_numeric(out["n_avs"], errors="coerce").fillna(1).astype(int)
-    return out[["date", "month", "location", "narrative", "n_avs_filled"]].reset_index(drop=True)
+    return out[["key", "date", "month", "location", "narrative", "n_avs_filled"]].reset_index(
+        drop=True
+    )
 
 
 def observation_days(months: list[str] | None = None) -> pd.Series:

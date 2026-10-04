@@ -1,0 +1,5 @@
+record,source,reason
+INC-016,primary,"Moving-violation report (AV changed lanes mid-intersection); no immobilization described."
+INC-017,primary,"Moving-violation report (AV went through a stop light); no immobilization described."
+"2025-08-15|7TH ST/BRYANT ST, SF",supplementary,"Erratic-driving report (unoccupied Zoox turning unpredictably); a moving AV, not an immobilized one."
+INC-033,primary,AV involvement not confirmed: narrative mentions only a signal outage and multiple vehicles; no AV named and AV count missing.

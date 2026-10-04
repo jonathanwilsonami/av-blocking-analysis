@@ -1,0 +1,8 @@
+Incident,Label,Duration (min),In window,Narrative,Note
+INC-003,H7,14.0,False,,Narrative missing; AV involvement rests on inclusion in the DEM AV log and the AV-count field.
+INC-005,H7,272.0,True,Per SFPD all traffic signals are Red..Signal Repair ntfyd.,Signal outage only ('all traffic signals are Red'); no AV named in the narrative.
+INC-034,H7,211.0,True,On Powell btw Broadway/Pacific completely disabled,Truncated ('completely disabled'); no AV named in the narrative.
+INC-040,H3,125.0,True,Traffic lights are out..hazard for Muni trains..DPT trying,Signal outage affecting Muni; no AV named in the narrative.
+INC-043,H7,8.0,True,Rp in veh for past 20 mins multi vehs stuck behind,Caller stuck behind 'multi vehs'; no AV named in the narrative.
+INC-058,H7,4.0,True,Admiral betwn Mission and Alemany facing SB twd,Truncated location description; no AV named in the narrative.
+INC-062,H6,120.0,True,Traffic signals malfunctioningon 34th not allowing cars,Traffic-signal malfunction; no AV named in the narrative (AV count 3).

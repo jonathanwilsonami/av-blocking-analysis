@@ -1,0 +1,8 @@
+incident_id,note
+INC-003,Narrative missing; AV involvement rests on inclusion in the DEM AV log and the AV-count field.
+INC-005,Signal outage only ('all traffic signals are Red'); no AV named in the narrative.
+INC-034,Truncated ('completely disabled'); no AV named in the narrative.
+INC-040,Signal outage affecting Muni; no AV named in the narrative.
+INC-043,Caller stuck behind 'multi vehs'; no AV named in the narrative.
+INC-058,Truncated location description; no AV named in the narrative.
+INC-062,Traffic-signal malfunction; no AV named in the narrative (AV count 3).
