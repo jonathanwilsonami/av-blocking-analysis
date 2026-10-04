@@ -10,7 +10,7 @@
   <meta name="generator" content="quarto-1.8.26">
 
   <meta name="author" content="Jonathan Wilson">
-  <meta name="dcterms.date" content="2026-10-03">
+  <meta name="dcterms.date" content="2026-10-04">
   <title>AV Blocking Incidents – Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -161,7 +161,7 @@ Jonathan Wilson
 </div>
 </div>
 
-  <p class="date">2026-10-03</p>
+  <p class="date">2026-10-04</p>
 </section>
 <section>
 <section id="introduction" class="title-slide slide level1 center">
@@ -274,9 +274,11 @@ Jonathan Wilson
 <ul>
 <li>123 short, truncated narratives in dispatcher shorthand; rare classes have 4–9 examples.</li>
 <li>Learned models (cross-validated) barely beat the majority baseline. Logistic regression has <strong>F1 = 0 on emergency obstruction</strong>.</li>
-<li>Zero-shot BART-MNLI calls about a third of incidents “collision”.</li>
+<li>Zero-shot NLI: BART-MNLI 0.4, DeBERTa-v3 0.32 (not significantly different). Both call about a third of incidents “collision”.</li>
+<li>Embedding similarity is the best label-free method (0.62; significantly better than BART), but over-predicts transit and pedestrian hazards.</li>
 <li>Rules agree with the hand-coded audit at <span class="math inline">\(\kappa\)</span> = 0.99. This is a consistency check: the same analyst wrote both.</li>
-<li><strong>Selected: transparent, auditable rules.</strong></li>
+<li>A blind <strong>LLM second coder</strong> (Codex, given only a written guide) matches the audit at <span class="math inline">\(\kappa\)</span> = 0.95 (macro-F1 0.95). The taxonomy can be applied consistently.</li>
+<li><strong>Selected: transparent, auditable, reproducible rules</strong>, with the LLM as a cross-check.</li>
 </ul>
 </div></div>
 </section></section>
@@ -421,8 +423,8 @@ Figure&nbsp;5: 5×5 risk matrix of AV blocking hazards. Probability is the Jeffr
 <h1>Sensitivity analysis</h1>
 
 </section>
-<section id="sensitivity-robust-to-data-choices-horizon-sets-the-level" class="slide level2">
-<h2>Sensitivity: robust to data choices, horizon sets the level</h2>
+<section id="sensitivity-robust-to-data-and-labeler-horizon-sets-the-level" class="slide level2">
+<h2>Sensitivity: robust to data and labeler, horizon sets the level</h2>
 <div id="tbl-sensitivity" class="quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-tbl">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -431,14 +433,16 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <div aria-describedby="tbl-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top">
 <colgroup>
-<col style="width: 12%">
-<col style="width: 20%">
+<col style="width: 10%">
+<col style="width: 16%">
+<col style="width: 6%">
+<col style="width: 6%">
 <col style="width: 7%">
-<col style="width: 8%">
-<col style="width: 8%">
-<col style="width: 13%">
-<col style="width: 14%">
-<col style="width: 13%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 10%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -450,6 +454,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <th style="text-align: left;">Include February (212 d)</th>
 <th style="text-align: left;">+ supplementary incidents</th>
 <th style="text-align: left;">Total freq x P90 impact</th>
+<th style="text-align: left;">Manual audit labels</th>
+<th style="text-align: left;">Embedding-model labels</th>
 </tr>
 </thead>
 <tbody>
@@ -459,6 +465,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">2x4 Medium</td>
 <td style="text-align: left;">5x4 Extreme</td>
+<td style="text-align: left;">4x4 Very high</td>
+<td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
@@ -472,6 +480,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">3x5 Very high</td>
 <td style="text-align: left;">3x5 Very high</td>
 <td style="text-align: left;">4x5 Extreme</td>
+<td style="text-align: left;">3x5 Very high</td>
+<td style="text-align: left;">3x5 Very high</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">H3 Transit obstruction</td>
@@ -482,6 +492,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">5x3 Very high</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">H4 Ped/accessibility</td>
@@ -492,6 +504,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">4x3 High</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">H5 Occupant-related</td>
@@ -502,6 +516,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">H6 Multi-AV gridlock</td>
@@ -512,6 +528,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">5x3 Very high</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">H7 Single-AV obstruction</td>
@@ -522,6 +540,8 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
+<td style="text-align: left;">5x3 Very high</td>
+<td style="text-align: left;">4x3 High</td>
 </tr>
 </tbody>
 </table>
@@ -540,7 +560,7 @@ Table&nbsp;1: Sensitivity of risk-matrix placement (cell shown as probability x 
 <li><strong>No exposure (miles/trips):</strong> rates are per calendar day. A growing fleet with a flat rate means a falling per-mile rate.</li>
 <li><strong>Under-recording:</strong> only incidents that reached DEM appear, so frequencies are lower bounds.</li>
 <li><strong>Truncated narratives</strong> push incidents into the H7 default, so H1–H5 are likely undercounted.</li>
-<li><strong>One analyst</strong> built the taxonomy, rules, and audit labels; a second coder would allow a true reliability estimate.</li>
+<li><strong>One analyst</strong> built the taxonomy, rules, and audit labels. A blind LLM second coder agreed at <span class="math inline">\(\kappa\)</span> = 0.95; a human second coder would be stronger evidence.</li>
 <li><strong>Risk matrices are coarse</strong> <span class="citation" data-cites="cox2008">(<a href="#/references" role="doc-biblioref" onclick="">Cox 2008</a>)</span>, so the rates, intervals, and risk curves are published alongside each cell.</li>
 </ul>
 </section></section>
