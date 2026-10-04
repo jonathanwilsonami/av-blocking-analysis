@@ -88,10 +88,19 @@ was performed by Dr. Missy Cummings.** This project builds directly on that work
 | Classifier selection | Transparent regex rules, compared with TF-IDF + logistic regression and TF-IDF + XGBoost (repeated stratified CV), zero-shot NLI (BART-large-MNLI, DeBERTa-v3-large), and embedding similarity (mxbai-embed-large), all against the manual audit labels; paired McNemar and bootstrap tests between methods | `av_blocking.nlp` |
 | Label validation | Blind LLM second coder (Codex) given only the narratives and a written coding guide; Cohen's and Fleiss' κ; every disagreement reviewed | notebook §4.1, `data/labels/blind_audit/` |
 | Impact | Incident-level 1–5 score = max(hazard consequence, duration band, cluster size) | `av_blocking.severity` |
-| Frequency | Poisson rate with exact Garwood CI; Jeffreys Gamma posterior; posterior-predictive P(≥1 in 30 days) | `av_blocking.frequency` |
+| Frequency | Poisson rate with exact Garwood CI; Jeffreys Gamma posterior; posterior-predictive P(≥1 in 30 days) for the risk matrix (see note below) | `av_blocking.frequency` |
 | Trends | Exact Mann–Kendall, Poisson homogeneity, exact conditional rate test, Poisson/NB GLM; Kruskal–Wallis, Mann–Whitney, Jonckheere–Terpstra, Spearman/Theil–Sen; permutation chi-square, Cochran–Armitage | `av_blocking.trends` |
 | Risk matrix | Reference 5×5 template (bands, cell levels, colors); **risk-curve placement**: each observed impact tier is paired with its own frequency | `av_blocking.risk_matrix`, `av_blocking.frequency` |
 | Export | Figures, captioned tables, text snippets, and inline variables for Quarto | `av_blocking.export` |
+
+**Why a Bayesian probability for the risk matrix?** The matrix asks how likely at least
+one incident is in the next 30 days. The Bayesian posterior predictive answers that
+directly, and carries the uncertainty in rates estimated from only 3–6 incidents into the
+probability. A frequentist plug-in instead treats the estimated rate as exact, and assigns
+probability zero to hazards not yet observed. The Jeffreys prior keeps the result
+data-driven. Classical exact intervals are still reported for every rate. In this data the
+plug-in version gives the same placements, so the choice is principled rather than
+decisive.
 
 ## Key results
 

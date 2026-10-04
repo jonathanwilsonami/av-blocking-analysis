@@ -456,6 +456,33 @@ $$
 P(N_h \ge 1 \mid n) = 1 - \left(\frac{T}{T + h}\right)^{n + 1/2}.
 $$
 
+**Why Bayesian for the risk matrix.** We report both frameworks. The classical estimate
+and exact interval describe each rate, and the Bayesian predictive probability sets the
+matrix's probability axis, for four reasons:
+
+1. **It answers the matrix's question.** The probability axis asks how likely at least one
+   qualifying incident is in the next 30 days, a statement about *future events*. The
+   posterior predictive answers that directly. The usual frequentist shortcut,
+   $1 - e^{-h\hat\lambda}$, plugs in $\hat\lambda = n/T$ as if the rate were known
+   exactly.
+2. **It carries rate uncertainty into the probability.** The consequential hazards rest on
+   3–6 incidents, and their rates are uncertain by a factor of about five
+   (@fig-hazard-rates). The predictive probability averages over that uncertainty instead
+   of ignoring it.
+3. **It behaves sensibly with few or zero events.** A plug-in estimate gives a hazard never
+   yet observed a probability of exactly zero. The Jeffreys predictive gives a small
+   non-zero probability, and it tempers over-confidence when $n$ is 3 or 4.
+4. **It supports direct probability statements.** "A 41% chance of at least one
+   life-threatening emergency obstruction in the next 30 days" is a valid Bayesian
+   statement. A confidence interval does not license that reading.
+
+The Jeffreys prior is a standard reference prior: it encodes no opinion about AVs, so the
+data drive the result. The framework also extends naturally. Fleet mileage can enter as
+exposure, and evidence from other cities as an informative prior. The reference
+risk-matrix template offered a Bayesian basis as one of its options. In this data the
+choice is principled rather than decisive: the plug-in probability places every hazard in
+the same cell (@tbl-sensitivity, "Plug-in MLE").
+
 The log has no exposure denominator, such as AV trips or vehicle-miles. Rates are
 therefore **per calendar day**. They describe the system as operated in San Francisco in
 2025, not per-mile safety.
@@ -485,6 +512,22 @@ $\lambda\mid n \sim \text{Gamma}(n+\tfrac12, T)$;
 $P(N_{30}\ge 1) = 1-\big(\tfrac{T}{T+30}\big)^{n+1/2}$.
 **All incidents: {{< var freq.total_rate30 >}} per 30 days**
 ({{< var freq.total_lo >}}–{{< var freq.total_hi >}}), one every {{< var freq.days_between >}} days.
+:::
+
+::: {.content-visible when-format="revealjs"}
+## Why a Bayesian probability for the matrix?
+
+- **Answers the matrix's question:** the chance of ≥1 incident in the next 30 days, a
+  statement about future events. Plugging in the estimate $n/T$ treats the rate as known.
+- **Carries uncertainty:** the key hazards rest on 3–6 incidents, with rates uncertain by
+  about a factor of five.
+- **Sensible with few or zero events:** never "probability 0" just because a hazard hasn't
+  been seen yet.
+- **Direct statements:** "41% chance of a life-threatening emergency obstruction within
+  30 days."
+- **Objective prior** (Jeffreys) and **extensible** (mileage, other cities).
+- **Honest caveat:** the plug-in version gives the *same* placements here. The choice is
+  principled, not decisive.
 :::
 
 # Is anything changing over time? {#sec-trends}
