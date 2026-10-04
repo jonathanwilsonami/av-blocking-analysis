@@ -10210,6 +10210,14 @@ $P(N_h \ge 1) = 1 - \left(\frac{T}{T+h}\right)^{n + 1/2}$.</li>
 </ul>
 <p>The log has no exposure denominator (AV trips or miles), so rates are <strong>per calendar
 day</strong>. They describe the San Francisco system as operated in 2025, not per-mile safety.</p>
+<p><strong>Why Bayesian for the risk matrix?</strong> The matrix's probability axis is a statement about
+<em>future</em> events: the chance of at least one in the next 30 days. The posterior predictive
+answers that directly, and carries the large rate uncertainty of hazards with 3–6
+incidents into the probability. A frequentist plug-in, $1-e^{-30\hat\lambda}$, treats the
+estimated rate as exact and gives unseen hazards a probability of zero. The Jeffreys prior
+encodes no opinion about AVs. The classical exact intervals are still reported, and
+Section 9 shows the plug-in version yields the same placements, so the choice is
+principled rather than decisive.</p>
 </div>
 </div>
 </div>

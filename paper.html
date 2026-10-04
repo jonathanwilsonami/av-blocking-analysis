@@ -1234,6 +1234,14 @@ Figure&nbsp;2: Number of incidents by hazard and incident-level impact (all 123 
 <p><span class="math display">\[
 P(N_h \ge 1 \mid n) = 1 - \left(\frac{T}{T + h}\right)^{n + 1/2}.
 \]</span></p>
+<p><strong>Why Bayesian for the risk matrix.</strong> We report both frameworks. The classical estimate and exact interval describe each rate, and the Bayesian predictive probability sets the matrix’s probability axis, for four reasons:</p>
+<ol type="1">
+<li><strong>It answers the matrix’s question.</strong> The probability axis asks how likely at least one qualifying incident is in the next 30 days, a statement about <em>future events</em>. The posterior predictive answers that directly. The usual frequentist shortcut, <span class="math inline">\(1 - e^{-h\hat\lambda}\)</span>, plugs in <span class="math inline">\(\hat\lambda = n/T\)</span> as if the rate were known exactly.</li>
+<li><strong>It carries rate uncertainty into the probability.</strong> The consequential hazards rest on 3–6 incidents, and their rates are uncertain by a factor of about five (<a href="#fig-hazard-rates" class="quarto-xref">Figure&nbsp;3</a>). The predictive probability averages over that uncertainty instead of ignoring it.</li>
+<li><strong>It behaves sensibly with few or zero events.</strong> A plug-in estimate gives a hazard never yet observed a probability of exactly zero. The Jeffreys predictive gives a small non-zero probability, and it tempers over-confidence when <span class="math inline">\(n\)</span> is 3 or 4.</li>
+<li><strong>It supports direct probability statements.</strong> “A 41% chance of at least one life-threatening emergency obstruction in the next 30 days” is a valid Bayesian statement. A confidence interval does not license that reading.</li>
+</ol>
+<p>The Jeffreys prior is a standard reference prior: it encodes no opinion about AVs, so the data drive the result. The framework also extends naturally. Fleet mileage can enter as exposure, and evidence from other cities as an informative prior. The reference risk-matrix template offered a Bayesian basis as one of its options. In this data the choice is principled rather than decisive: the plug-in probability places every hazard in the same cell (<a href="#tbl-sensitivity" class="quarto-xref">Table&nbsp;16</a>, “Plug-in MLE”).</p>
 <p>The log has no exposure denominator, such as AV trips or vehicle-miles. Rates are therefore <strong>per calendar day</strong>. They describe the system as operated in San Francisco in 2025, not per-mile safety.</p>
 </section>
 <section id="results" class="level2" data-number="5.2">

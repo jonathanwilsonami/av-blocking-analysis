@@ -311,6 +311,17 @@ Figure&nbsp;1: Number of incidents by hazard and incident-level impact (all 123 
 <img data-src="assets/figures/fig-hazard-rates.png" class="r-stretch quarto-figure-center" id="fig-hazard-rates"><p class="caption">
 Figure&nbsp;2: Posterior mean frequency per 30 days with 95% Jeffreys credible intervals (log scale).
 </p><p>Poisson rate <span class="math inline">\(\lambda\)</span> over <span class="math inline">\(T\)</span> = 184 days; Jeffreys posterior <span class="math inline">\(\lambda\mid n \sim \text{Gamma}(n+\tfrac12, T)\)</span>; <span class="math inline">\(P(N_{30}\ge 1) = 1-\big(\tfrac{T}{T+30}\big)^{n+1/2}\)</span>. <strong>All incidents: 19.6 per 30 days</strong> (16.2–23.4), one every 1.5 days.</p>
+</section>
+<section id="why-a-bayesian-probability-for-the-matrix" class="slide level2">
+<h2>Why a Bayesian probability for the matrix?</h2>
+<ul>
+<li><strong>Answers the matrix’s question:</strong> the chance of ≥1 incident in the next 30 days, a statement about future events. Plugging in the estimate <span class="math inline">\(n/T\)</span> treats the rate as known.</li>
+<li><strong>Carries uncertainty:</strong> the key hazards rest on 3–6 incidents, with rates uncertain by about a factor of five.</li>
+<li><strong>Sensible with few or zero events:</strong> never “probability 0” just because a hazard hasn’t been seen yet.</li>
+<li><strong>Direct statements:</strong> “41% chance of a life-threatening emergency obstruction within 30 days.”</li>
+<li><strong>Objective prior</strong> (Jeffreys) and <strong>extensible</strong> (mileage, other cities).</li>
+<li><strong>Honest caveat:</strong> the plug-in version gives the <em>same</em> placements here. The choice is principled, not decisive.</li>
+</ul>
 </section></section>
 <section>
 <section id="sec-trends" class="title-slide slide level1 center">
