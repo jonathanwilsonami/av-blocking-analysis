@@ -1,0 +1,124 @@
+incident_id,hazard,confidence,rationale
+INC-001,H7,high,The Waymo stopped in a northbound traffic lane on Van Ness.
+INC-002,H2,high,Medics had to approach from another direction because the Waymo blocked traffic on their response route.
+INC-003,H7,high,"No narrative is provided, so the guide requires the default code."
+INC-004,H6,high,Two Waymos were stuck and blocking traffic on Pacific.
+INC-005,H7,medium,All traffic signals were red; the visible text states no consequence qualifying for a higher code.
+INC-006,H7,high,The Waymo was stuck behind another occupied stationary vehicle.
+INC-007,H4,high,The Waymo blocked a handicap ramp.
+INC-008,H4,high,The Waymo reportedly blocked a handicapped ramp.
+INC-009,H7,medium,The visible text reports an unsignaled right turn but no collision or other higher-priority consequence.
+INC-010,H7,high,The Waymo blocked traffic.
+INC-011,H7,high,The Waymo was stuck in a cul-de-sac for thirty minutes.
+INC-012,H7,high,One AV stalled at the intersection.
+INC-013,H7,high,The Waymo was temporarily disabled in the intersection.
+INC-014,H7,high,The Waymo stalled in the northbound left lane on 19th Avenue.
+INC-015,H6,high,Police reported three Waymo AVs stuck together.
+INC-016,H7,medium,The visible text reports a lane change mid-intersection but no higher-priority consequence.
+INC-017,H7,medium,The Waymo went through a stop light; the truncated text states no higher-priority consequence.
+INC-018,H7,high,One Waymo blocked all lanes for more than ten minutes.
+INC-019,H7,high,"The Waymo appeared stuck and blocking, with no hazards on."
+INC-020,H7,high,The Waymo was stuck at a red light and blocking traffic.
+INC-021,H7,high,One AV stalled in the right lane and blocked traffic.
+INC-022,H7,medium,The fragment places one Waymo on Powell and states no higher-priority consequence.
+INC-023,H6,high,Three Waymo AVs were stuck in the alley for over half an hour.
+INC-024,H7,high,One Waymo AV was stuck at the intersection.
+INC-025,H7,high,One Waymo was stuck in Stockton Tunnel.
+INC-026,H7,high,The Waymo blocked the intersection.
+INC-027,H7,high,One Waymo had stalled for a while.
+INC-028,H7,high,The Waymo stopped in a traffic lane for several minutes.
+INC-029,H6,high,"The narrative reports an AV not moving in a traffic lane, and n_avs specifies three AVs."
+INC-030,H4,high,The stopped Waymo blocked the entire bike lane.
+INC-031,H4,high,The Waymo was stuck in the crosswalk on Ellis for five minutes.
+INC-032,H6,medium,"Two Waymos were trying to turn right onto 19th Avenue, with no higher-priority consequence stated."
+INC-033,H7,high,"Stop lights were out and multiple vehicles were mentioned, but unknown n_avs must be treated as one AV."
+INC-034,H7,high,One Waymo was completely disabled on Powell.
+INC-035,H6,medium,"Four Waymo AVs were trying to enter the parking lot together, with no higher-priority consequence stated."
+INC-036,H7,high,One Waymo stopped on Jones between Filbert and Greenwich.
+INC-037,H5,high,A passenger was asleep in the back seat of the Waymo.
+INC-038,H6,high,Five Waymos were causing a traffic jam.
+INC-039,H7,high,One Waymo was disabled in the intersection.
+INC-040,H7,low,"Traffic lights were out and Muni trains faced a hazard, but AV obstruction of transit is not stated."
+INC-041,H7,medium,"A subject was inside a stationary Waymo, but no occupant condition or action causing immobilization is stated."
+INC-042,H1,high,"A passing Muni vehicle hit the Waymo door, leaving the AV stuck."
+INC-043,H7,low,The caller had been in a vehicle for twenty minutes with traffic stuck behind; occupant entrapment is possible but unstated.
+INC-044,H7,medium,"One Waymo stopped in the middle of Folsom, with no higher-priority consequence visible."
+INC-045,H7,high,One Waymo stalled in the intersection in front of Trader Joes.
+INC-046,H7,high,The Waymo blocked westbound traffic before moving to the side.
+INC-047,H7,medium,"Waymo was advised to adhere to a geofence, but the truncated text identifies no active emergency scene or other higher-priority consequence."
+INC-048,H7,high,One Waymo stopped because of technical difficulties.
+INC-049,H7,high,One Waymo was stuck in the middle of the intersection and blocking.
+INC-050,H5,low,Two passengers were in a stuck Waymo and described as unable to do something; the truncation leaves possible entrapment uncertain.
+INC-051,H1,high,The narrative reports a noninjury accident between Muni and Waymo.
+INC-052,H7,high,One Waymo stalled and blocked traffic in the eastbound middle lane.
+INC-053,H5,high,"A rider was asleep in the Waymo back seat, and police were requested to wake them."
+INC-054,H5,high,Waymo received an alert about an unconscious rider.
+INC-055,H5,low,"The caller texted 911 from inside the Waymo, suggesting occupant help, although the request and immobilization mechanism are truncated."
+INC-056,H6,high,Five Waymo AVs were blocking traffic together.
+INC-057,H7,high,A passing caller saw one unoccupied Waymo stuck.
+INC-058,H7,medium,The fragment provides a location and direction but no consequence qualifying for a higher code.
+INC-059,H7,medium,The truncated Waymo call states no consequence qualifying for a higher code.
+INC-060,H7,high,One Waymo was holding up traffic.
+INC-061,H7,high,Traffic signals were malfunctioning; n_avs specifies one despite the narrative referring to Waymos.
+INC-062,H6,high,Traffic signals were malfunctioning and not allowing cars through; n_avs specifies three AVs.
+INC-063,H7,high,One Waymo was stranded at the median or intersection and needed police traffic direction while awaiting manual removal.
+INC-064,H2,high,The Zoox blocked a traffic lane where police were actively investigating possible shots from a building.
+INC-065,H7,high,One Waymo was not moving in lane three and blocked traffic.
+INC-066,H2,low,"A vehicle accident required traffic control, suggesting an active crash scene; the AV relation to that scene is unclear."
+INC-067,H7,high,"One Waymo was stuck on Market, causing vehicles to go around it."
+INC-068,H5,high,"A passenger left the door open, preventing the Waymo from moving and blocking the right traffic lane."
+INC-069,H7,high,"One disabled Waymo was in the intersection amid heavy traffic, awaiting technicians and requesting police assistance."
+INC-070,H5,high,A rider was asleep in the back seat and could not be roused through the speaker.
+INC-071,H7,high,One Waymo was blocking while an employee arrived to handle it.
+INC-072,H7,high,Police observed one Waymo creating traffic congestion.
+INC-073,H7,high,One Waymo stalled in traffic from an overheated battery and requested police traffic assistance while awaiting a tow.
+INC-074,H7,high,One Waymo blocked a one-way road.
+INC-075,H7,high,"One Waymo was disabled and blocking traffic, with roadside assistance on scene."
+INC-076,H7,high,One unoccupied Waymo was stuck in the intersection and impeding traffic.
+INC-077,H7,high,One unoccupied AV stalled on the street just off the Bayshore off-ramp.
+INC-078,H7,high,One disabled Waymo completely blocked the road until its service team handled it.
+INC-079,H2,high,The Waymo blocked the medics way.
+INC-080,H7,medium,"One Waymo was reported east of the intersection and later moving, with no higher-priority consequence stated."
+INC-081,H7,high,One Waymo with a flat tire was stuck in the roadway gore area and requested traffic assistance for safe access.
+INC-082,H7,high,One Waymo with damaged sensors was in the middle of the intersection awaiting roadside assistance.
+INC-083,H7,high,One Waymo was malfunctioning in the right lane.
+INC-084,H3,high,The Waymo blocked the Muni lane for five minutes.
+INC-085,H7,high,One Waymo was disabled at the intersection while employees and a tow were en route.
+INC-086,H7,high,One Waymo stalled on Brannan and blocked traffic.
+INC-087,H5,high,"An open door prevented the unoccupied Waymo from leaving, requiring someone to close it."
+INC-088,H3,high,Police observed the Waymo blocking a cable car.
+INC-089,H2,medium,Two Waymos were stuck on the street where a parking garage fire was occurring.
+INC-090,H3,high,The Waymo double parked and prevented the 31 transit line from passing.
+INC-091,H1,high,The narrative reports a vehicle accident between Waymo and a motorcycle.
+INC-092,H6,high,Three Waymos blocked the intersection along a protest route.
+INC-093,H3,high,"The Waymo blocked traffic, forcing bus lines to navigate around it."
+INC-094,H7,high,Something placed on the Waymo sensor prevented the vehicle from moving.
+INC-095,H7,high,One Waymo pulled up behind and blocked a tow truck towing another vehicle.
+INC-096,H7,high,One Waymo blocked traffic until a technician moved it remotely.
+INC-097,H3,high,The Waymo blocked traffic and Muni could not pass.
+INC-098,H3,high,The Waymo blocked a Muni track.
+INC-099,H1,high,The Waymo was involved in a noninjury accident with an SFFD medic vehicle.
+INC-100,H6,high,Twenty Waymos inside Fort Mason caused a traffic hazard.
+INC-101,H7,high,One Waymo was stranded in front of the address and police moved it out of the road.
+INC-102,H2,high,Two Waymos were stuck at a working fire with reports of someone trapped on the second floor.
+INC-103,H2,medium,Six Waymos blocked westbound traffic at a crash involving a vehicle on its side.
+INC-104,H7,high,One Waymo stalled westbound on Mission before 4th Street and requested road service.
+INC-105,H7,high,The caller reported one Waymo blocking the road.
+INC-106,H6,medium,The Waymo could not go south on Stockton; n_avs specifies two and no higher-priority consequence is visible.
+INC-107,H7,high,The Waymo was stuck on the left shoulder; unknown n_avs must be treated as one.
+INC-108,H1,low,"Waymo versus Muni reports a possible collision, but the visible text explicitly questions whether contact occurred."
+INC-109,H7,medium,"One Waymo had its hazards on for ten minutes, with no higher-priority consequence stated."
+INC-110,H6,high,A power outage affected the location with three Waymos mentioned and n_avs specifying three.
+INC-111,H6,high,"The Waymo was stuck in a lane impeding traffic, and n_avs specifies two AVs."
+INC-112,H7,low,The Waymo was near a railroad track and blocking an unspecified object; the truncation does not establish track obstruction.
+INC-113,H6,high,"Multiple Waymos were lined up on 15th Street, and n_avs specifies sixty."
+INC-114,H1,high,The Waymo hit the reporting party dog.
+INC-115,H7,high,One Waymo was stranded on Cesar Chavez and blocking traffic.
+INC-116,H7,medium,The fragment describes one unoccupied Waymo but states no higher-priority consequence.
+INC-117,H6,high,Two Waymo AVs had blinkers on and were blocking.
+INC-118,H7,high,"One AV was stranded and stuck, described as a traffic hazard in the northbound direction."
+INC-119,H7,high,One unoccupied Waymo blocked a lane.
+INC-120,H7,high,One Waymo blocked traffic with flashing lights on; no higher-priority consequence is visible.
+INC-121,H6,high,"Twenty or more Waymos were all stuck in the left lane, with n_avs specifying twenty."
+INC-122,H7,high,Waymo requested police assistance to move one AV out of the way.
+INC-123,H7,high,One disabled Waymo blocked the left northbound lane on Masonic.

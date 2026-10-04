@@ -19,10 +19,14 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Optional zero-shot transformer cross-check (CPU-only torch; large download).
+# Optional pretrained-model cross-checks (CPU-only torch; large downloads):
+# zero-shot NLI (BART-MNLI, DeBERTa-v3) and embedding similarity.
 nlp = [
     "transformers>=4.40",
     "torch>=2.2",
+    "sentence-transformers>=3.0",
+    "sentencepiece>=0.2",  # DeBERTa-v3 tokenizer
+    "protobuf>=4.25",
 ]
 
 [dependency-groups]

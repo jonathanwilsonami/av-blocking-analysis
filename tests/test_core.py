@@ -76,3 +76,30 @@ def test_mann_kendall_exact_monotone():
 
 def test_cochran_armitage_null():
     assert trends.cochran_armitage([5, 5, 5], [10, 10, 10], [1, 2, 3])["p_value"] == 1.0
+
+
+def test_mcnemar_counts_discordant_pairs():
+    from av_blocking import nlp
+
+    y = ["H1", "H2", "H7", "H7"]
+    res = nlp.mcnemar_exact(y, ["H1", "H2", "H7", "H1"], ["H7", "H2", "H7", "H7"])
+    assert (res["only_a_correct"], res["only_b_correct"]) == (1, 1)
+    assert res["p_value"] == 1.0
+
+
+def test_paired_bootstrap_identical_predictions_is_zero():
+    from av_blocking import nlp
+
+    y = ["H1", "H2", "H7", "H7", "H6"]
+    res = nlp.paired_bootstrap_f1(y, y, y, n_boot=200)
+    assert res["delta_macro_F1"] == 0 and res["ci_lo"] == 0 and res["ci_hi"] == 0
+
+
+def test_scores_to_frame_picks_argmax():
+    from av_blocking import nlp
+
+    df = pd.DataFrame({"incident_id": ["INC-001", "INC-002"]})
+    scores = np.zeros((2, len(nlp.ZEROSHOT_LABELS)))
+    scores[0, 0], scores[1, -1] = 0.9, 0.8  # H1, H7
+    out = nlp._scores_to_frame(df, scores)
+    assert out["zs_text_hazard"].tolist() == ["H1", "H7"]

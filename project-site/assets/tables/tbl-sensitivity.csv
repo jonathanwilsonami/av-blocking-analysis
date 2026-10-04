@@ -1,8 +1,8 @@
-Hazard,"Base (Bayesian, 30 d, covered months)",Plug-in MLE,7-day horizon,90-day horizon,Include February (212 d),+ supplementary incidents,Total freq x P90 impact
-H1 Collision,4x4 Very high,4x4 Very high,2x4 Medium,5x4 Extreme,4x4 Very high,4x4 Very high,4x4 Very high
-H2 Emergency obstruction,3x5 Very high,3x5 Very high,2x5 High,4x5 Extreme,3x5 Very high,3x5 Very high,4x5 Extreme
-H3 Transit obstruction,4x3 High,4x3 High,3x3 Medium,5x3 Very high,4x3 High,4x3 High,4x3 High
-H4 Ped/accessibility,3x3 Medium,3x3 Medium,2x3 Medium,4x3 High,3x3 Medium,3x3 Medium,3x3 Medium
-H5 Occupant-related,3x3 Medium,3x3 Medium,2x3 Medium,4x3 High,3x3 Medium,3x3 Medium,4x3 High
-H6 Multi-AV gridlock,4x3 High,4x3 High,3x3 Medium,5x3 Very high,4x3 High,4x3 High,5x3 Very high
-H7 Single-AV obstruction,5x3 Very high,5x3 Very high,3x3 Medium,5x3 Very high,5x3 Very high,5x3 Very high,5x3 Very high
+Hazard,"Base (Bayesian, 30 d, covered months)",Plug-in MLE,7-day horizon,90-day horizon,Include February (212 d),+ supplementary incidents,Total freq x P90 impact,Manual audit labels,Embedding-model labels
+H1 Collision,4x4 Very high,4x4 Very high,2x4 Medium,5x4 Extreme,4x4 Very high,4x4 Very high,4x4 Very high,4x4 Very high,4x4 Very high
+H2 Emergency obstruction,3x5 Very high,3x5 Very high,2x5 High,4x5 Extreme,3x5 Very high,3x5 Very high,4x5 Extreme,3x5 Very high,3x5 Very high
+H3 Transit obstruction,4x3 High,4x3 High,3x3 Medium,5x3 Very high,4x3 High,4x3 High,4x3 High,4x3 High,5x3 Very high
+H4 Ped/accessibility,3x3 Medium,3x3 Medium,2x3 Medium,4x3 High,3x3 Medium,3x3 Medium,3x3 Medium,3x3 Medium,4x3 High
+H5 Occupant-related,3x3 Medium,3x3 Medium,2x3 Medium,4x3 High,3x3 Medium,3x3 Medium,4x3 High,3x3 Medium,3x3 Medium
+H6 Multi-AV gridlock,4x3 High,4x3 High,3x3 Medium,5x3 Very high,4x3 High,4x3 High,5x3 Very high,4x3 High,4x3 High
+H7 Single-AV obstruction,5x3 Very high,5x3 Very high,3x3 Medium,5x3 Very high,5x3 Very high,5x3 Very high,5x3 Very high,5x3 Very high,4x3 High

@@ -268,7 +268,7 @@ def count_bar_plot(
 def classifier_comparison_plot(summary: pd.DataFrame):
     """Macro-F1 by method: CV mean +/- 1 SD for learned models, point values otherwise."""
     s = summary.iloc[::-1]
-    fig, ax = plt.subplots(figsize=(8, 3.2))
+    fig, ax = plt.subplots(figsize=(8, 1.0 + 0.45 * len(s)))
     y = np.arange(len(s))
     has_sd = s["macro_F1_sd"].notna()
     ax.hlines(

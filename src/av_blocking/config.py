@@ -16,8 +16,11 @@ RAW_PRIMARY = DATA_DIR / "AV-Brick-Report.xlsx"
 RAW_ANALYZED = DATA_DIR / "AV-Brick-Report-analyzed.xlsx"
 LABELS_DIR = DATA_DIR / "labels"
 MANUAL_LABELS = LABELS_DIR / "manual_hazard_labels.csv"
+# Blind second-coder audit: label-free coding packet + an LLM coder's labels
+BLIND_AUDIT_DIR = LABELS_DIR / "blind_audit"
+LLM_AUDIT_LABELS = BLIND_AUDIT_DIR / "llm_labels_codex.csv"
 PROCESSED_DIR = DATA_DIR / "processed"
-ZEROSHOT_CACHE = PROCESSED_DIR / "zeroshot_predictions.csv"
+
 
 SITE_DIR = ROOT / "project-site"
 ASSETS_DIR = SITE_DIR / "assets"
@@ -44,3 +47,8 @@ HORIZON_DAYS = 30
 PROB_BAND_EDGES = [0.05, 0.25, 0.50, 0.90]
 
 RANDOM_SEED = 568
+
+
+def zeroshot_cache(key: str) -> Path:
+    """Cached pretrained-model predictions for model ``key`` (see ``nlp.PRETRAINED_MODELS``)."""
+    return PROCESSED_DIR / f"zeroshot_{key}.csv"

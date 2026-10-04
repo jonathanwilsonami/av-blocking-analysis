@@ -59,7 +59,8 @@ is, and where it sits on a standard 5×5 risk matrix.
 | | `DEM Incidents Quant` | Hand-coded neighborhood zone (1–10), multi-AV flag, time-of-day bins, duration flags. |
 | | `plots and stats` | Monthly duration summaries, a six-group normality/rank-sum table, and a March-vs-October Mann–Whitney test. These are replicated and extended in the notebook. |
 | `data/labels/manual_hazard_labels.csv` | – | Hand-coded audit label for every incident, with notes on ambiguous cases. |
-| `data/processed/zeroshot_predictions.csv` | – | Cached zero-shot transformer predictions (optional method). |
+| `data/labels/blind_audit/` | – | Label-free coding packet (`coding_sheet.csv`, `CODING_GUIDE.md`) and the blind LLM second coder's labels (`llm_labels_codex.csv`, from OpenAI Codex, GPT-6-based). |
+| `data/processed/zeroshot_{bart,deberta,embedding}.csv` | – | Cached predictions from the three pretrained models (optional methods): BART-large-MNLI, DeBERTa-v3-large NLI, mxbai embedding similarity. |
 
 **Source and credit.** The incident records come from the **San Francisco Department of
 Emergency Management (DEM)** dispatch log of AV-related incidents. **Much of the difficult
@@ -82,7 +83,8 @@ was performed by Dr. Missy Cummings.** This project builds directly on that work
 |---|---|---|
 | Cleaning and joins | Time parsing, midnight-safe durations, joins to secondary sheets on (date, location) | `av_blocking.data` |
 | Hazard taxonomy | 7 consequence-based classes (H1 collision, H2 emergency obstruction, H3 transit, H4 pedestrian/accessibility, H5 occupant, H6 multi-AV gridlock, H7 single-AV obstruction), assigned by severity-first precedence; contributing cause coded on a separate axis | `av_blocking.taxonomy` |
-| Classifier selection | Transparent regex rules, compared with TF-IDF + logistic regression, TF-IDF + XGBoost (repeated stratified CV), and zero-shot BART-MNLI, all against the manual audit labels | `av_blocking.nlp` |
+| Classifier selection | Transparent regex rules, compared with TF-IDF + logistic regression and TF-IDF + XGBoost (repeated stratified CV), zero-shot NLI (BART-large-MNLI, DeBERTa-v3-large), and embedding similarity (mxbai-embed-large), all against the manual audit labels; paired McNemar and bootstrap tests between methods | `av_blocking.nlp` |
+| Label validation | Blind LLM second coder (Codex) given only the narratives and a written coding guide; Cohen's and Fleiss' κ; every disagreement reviewed | notebook §4.1, `data/labels/blind_audit/` |
 | Impact | Incident-level 1–5 score = max(hazard consequence, duration band, cluster size) | `av_blocking.severity` |
 | Frequency | Poisson rate with exact Garwood CI; Jeffreys Gamma posterior; posterior-predictive P(≥1 in 30 days) | `av_blocking.frequency` |
 | Trends | Exact Mann–Kendall, Poisson homogeneity, exact conditional rate test, Poisson/NB GLM; Kruskal–Wallis, Mann–Whitney, Jonckheere–Terpstra, Spearman/Theil–Sen; permutation chi-square, Cochran–Armitage | `av_blocking.trends` |
@@ -98,6 +100,22 @@ was performed by Dr. Missy Cummings.** This project builds directly on that work
 - The hazard mix appears to shift after July (p = 0.007), but this coincides with
   narratives switching from truncated fragments to full text. It is treated as a recording
   artifact, not a behavior change.
+- **Classifier comparison (macro-F1 against the manual audit):**
+    - Rules: 0.98 (in-sample).
+    - Frontier LLM given the coding guide (Codex): 0.95.
+    - Embedding similarity: 0.62. It is the best method that uses no labels, significantly
+      better than BART.
+    - TF-IDF + logistic regression: 0.47 (cross-validated).
+    - Zero-shot BART-MNLI: 0.40.
+    - Zero-shot DeBERTa-v3: 0.32. It is not significantly different from BART; both NLI
+      models over-predict collisions.
+- **Blind second coder:** OpenAI Codex (GPT-6-based) labeled all incidents from the
+  written guide alone. It agreed with the manual audit on 119/123 (κ = 0.95) and with the
+  rules on 120/123 (κ = 0.96); Fleiss' κ across all three coders is 0.965. All four
+  disagreements are defensible judgment calls on truncated narratives, so the labels were
+  kept unchanged.
+- **Robust to the labeler:** relabeling hazards with the manual audit leaves every
+  risk-matrix placement unchanged.
 - Risk-matrix placement (30-day horizon):
 
 | Hazard | Cell | Level |
@@ -149,14 +167,20 @@ the environment with `source .venv/bin/activate`.
 > not match` warning and still uses the project's `.venv`. Run `conda deactivate` to
 > silence it.
 
-**Optional transformer extra.** The zero-shot comparison uses Hugging Face `transformers`
-with CPU-only PyTorch (a large download). Its predictions are cached in
-`data/processed/`, so it is **not** needed to reproduce the analysis:
+**Optional pretrained-model extra.** The pretrained-model comparison uses Hugging Face
+`transformers` and `sentence-transformers` with CPU-only PyTorch. The models are large
+downloads: about 1.6 GB for BART, 1.7 GB for DeBERTa, and 0.7 GB for the embedding model.
+Their predictions are cached in `data/processed/`, so the extra is **not** needed to
+reproduce the analysis:
 
 ```bash
 uv sync --extra nlp
-make zeroshot      # re-runs BART-MNLI zero-shot and refreshes the cache
+make zeroshot      # re-runs all three models (~20 min on CPU) and refreshes the caches
 ```
+
+The models and their hazard descriptions are defined in `nlp.PRETRAINED_MODELS` and
+`nlp.ZEROSHOT_LABELS`. To try another Hugging Face model, add an entry there and run
+`nlp.run_zeroshot(df, key)`.
 
 ## Reproducing the analysis
 
@@ -219,8 +243,7 @@ git push
 ```
 
 The workflow file lives in `.github/workflows/gh-pages.yml`, the folder GitHub Actions
-reads. An identical copy remains in the original `workflows/` folder. In the repository
-settings, set **Pages → Source** to the `gh-pages` branch.
+reads.
 
 ## Repository layout
 
@@ -236,7 +259,7 @@ settings, set **Pages → Source** to the `gh-pages` branch.
 │   ├── frequency.py              # Poisson/Bayesian rates, risk-curve placement
 │   ├── trends.py                 # non-parametric and count trend tests
 │   ├── risk_matrix.py            # 5×5 template, banding, matrix plot
-│   ├── nlp.py                    # learned and zero-shot classifier comparison
+│   ├── nlp.py                    # supervised, zero-shot NLI, embedding classifier comparison
 │   ├── plotting.py               # figure functions and style
 │   ├── export.py                 # save_fig / save_table / save_text / save_var
 │   └── analysis.py               # prepare(): one call to an analysis-ready table
@@ -271,7 +294,8 @@ settings, set **Pages → Source** to the `gh-pages` branch.
 Rates are per calendar day, because the log has no mileage exposure. Incidents that never
 reached DEM are missing, so frequencies are lower bounds. Truncated narratives push
 incidents into the default class, which likely undercounts H1–H5. The taxonomy, rules, and
-audit labels come from a single analyst. Risk matrices are inherently coarse (Cox, 2008),
+audit labels come from a single analyst. A blind LLM second coder agreed closely, but a
+human second coder would be stronger evidence. Risk matrices are inherently coarse (Cox, 2008),
 so the underlying rates, intervals, and risk curves are published alongside each cell.
 
 ## Acknowledgments

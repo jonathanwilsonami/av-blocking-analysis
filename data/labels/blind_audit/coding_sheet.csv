@@ -1,0 +1,124 @@
+incident_id,date,location,n_avs,narrative
+INC-001,2025-02-01,"VAN NESS/TURK ST, SF",1,Waymo stopped in lane of traffic NB on Van Nes.. LP 2563A4//Bad LP#
+INC-002,2025-02-02,"300 EDDY ST, SF",1,PD on scene first for report of unconcious male..medic requested and had to respond from east or west bound on eddy SB Jones due to traffic blocked by Waymo AV//M566 Ack Waymo AV moved
+INC-003,2025-02-03,"1495 GEARY BL, SF",1,(no narrative)
+INC-004,2025-03-01,"PACIFIC AV/GRANT AV,",2,Waymos stuck and blkng traffic on Pacific bet
+INC-005,2025-03-01,"DIAMOND ST/BOSWORTH ST,",1,Per SFPD all traffic signals are Red..Signal Repair ntfyd.
+INC-006,2025-03-02,"FELL/VAN NESS AV,",1,Waymo stuck behind an occupyd stationary veh for
+INC-007,2025-03-05,"183 PAGE ST,",1,Waymo blkng handicap ramp..Waymo ntfyd and advid
+INC-008,2025-03-06,"PARK LIBRARY, SF",1,Waymo AV reportedly blkng handicapped ramp in the
+INC-009,2025-03-07,"9TH ST/HOWARD ST,",1,4 ago Waymo made right turn on 9th no signal an
+INC-010,2025-03-07,"FOLSOM ST/22ND ST,",1,Waymo AV blkng traffic LP 53515F3..Waymo advd and
+INC-011,2025-03-09,"11TH AV/LAKE ST,",1,Waymo stuck in cul de sac for past 30 mins LP
+INC-012,2025-03-12,"GREEN ST/POWELL ST,",1,AV stalled at intersection..Wht Jaguar LP 98051Y3
+INC-013,2025-03-12,SAN JOSE AV/ALEMANY,1,Waymo temporarily disabled in the intersection before
+INC-014,2025-03-14,"19TH AV/LINCOLN WY,",1,Waymo AV stalled NB 19th left lane at the stop
+INC-015,2025-03-16,GRANT / GREEN,3,Per PD 3 Waymo AV's stuck ..3A110 called Waymo and
+INC-016,2025-03-16,"DEM, SF Rep",1,"Rep of Waymo AV changed lanes mid intersection, by a"
+INC-017,2025-03-18,HARRISON ST/THE EMBARCADERO,1,Waymo AV went through the stop light and moved into
+INC-018,2025-03-19,"2732 24TH ST,",1,Waymo AV blkng all lanes for more than 10 mins
+INC-019,2025-03-19,"BATTERY ST/CALIFORNIA ST,",1,"Waymo AV appeared to be stuck, no hazards on, blkng"
+INC-020,2025-03-22,"MINNA ST/6TH ST,",1,Waymo AV stuck at a red light to turn SB..blkng traffic
+INC-021,2025-03-22,"1480 BROADWAY, SF",1,AV stalled in rt lane blkng traffic..Wht jag I pace LP
+INC-022,2025-03-22,"POWELL ST/CALIFORNIA ST,",1,Waymo AV on Powell btwn California/Hyde whie
+INC-023,2025-03-23,"61 RONDEL PL,",3,3 Waymo AV stuck for over half a hour in the alley
+INC-024,2025-03-24,3RD ST/MISSION ROCK,1,Stuck Waymo AV at intersection
+INC-025,2025-03-27,"STOCKTON TUNNEL, SF",1,Btwn California/Pine Waymo AV stuck in Stockton
+INC-026,2025-03-29,"BUSH ST/BATTERY ST,",1,Waymo blkng intersection..Wht Jaguar LP
+INC-027,2025-03-30,"WASHINGTON ST/KEARNY ST,",1,Wamo AV stalled for a while..Lights are visibl LP
+INC-028,2025-06-03,"JACKSON ST/KEARNY ST, SF",1,Waymo AV stopped in lane of traffic for several mins
+INC-029,2025-06-04,"STANYAN ST/FELL ST, SF",3,Waymo AV in lane of traffic not moving for three traffic
+INC-030,2025-06-16,"PRESIDIO BL/LIGGETT AV, PR",1,Stopped Waymo AV LP 76264V3 Blkng all the bike lane
+INC-031,2025-06-18,"ELLIS ST/MASON ST, SF",1,ON Ellis in crosswalk for past 5 mins Waymo stuck not
+INC-032,2025-06-19,"LINCOLN WY/19TH AV, SF",2,311 tx 2 Waymo trying to make a right onto 19th ave
+INC-033,2025-06-20,"BAYSHORE BL/INDUSTRIAL ST,",unknown,All of the stop lights are out at intersection..mult vehs
+INC-034,2025-06-20,"POWELL ST/BROADWAY, SF",1,On Powell btw Broadway/Pacific completely disabled
+INC-035,2025-06-20,"BATTERY ST/PACIFIC AV, SF",4,4 Waymo AV are trying to enter the parking lot at this
+INC-036,2025-06-20,"2115 JONES ST, SF",1,On Jones btw Filbert and Greenwich..Waymo stopped
+INC-037,2025-06-21,"301 MAIN ST, SF",1,01:16 Passenger asleep in the back seat Waymo reqs
+INC-038,2025-06-22,"HARRISON ST/1ST ST, SF",5,CHP TX 5 Waymos causing a traffic jam..they have
+INC-039,2025-06-23,"FRONT ST/PINE ST, SF",1,Waymo disabled in the intersection AV # PCP38152A
+INC-040,2025-06-23,"BRYANT ST/4TH ST, SF",1,Traffic lights are out..hazard for Muni trains..DPT trying
+INC-041,2025-06-24,"650 EDDY ST, SF",1,Subj inside of a Waymo rtl..AV stationary LP 76962Y3
+INC-042,2025-06-24,"DRUMM ST/MARKET ST, SF",1,Passing Muni hit the door of Waymo AV now stuck and
+INC-043,2025-06-26,"2ND ST/MINNA ST, SF",1,Rp in veh for past 20 mins multi vehs stuck behind
+INC-044,2025-06-27,"10TH ST/FOLSOM ST, SF",1,22:46 On Folsom..Waymo AV stopped in the middle of
+INC-045,2025-07-07,"MASONIC  AV/GEARY BL,",1,Waymo AV stalled in the intersection ifo Trader Joes in
+INC-046,2025-07-07,"EVANS  AV/SELBY ST,",1,Waymo blkng wb traffic..AV moved to the side of the
+INC-047,2025-07-08,"100  MONTGOMERY ST,",unknown,Waymo advd to adhere to GEO fence due to 1st
+INC-048,2025-07-08,"1540  NEWHALL ST,",1,Waymo AV having tech difficulties and stopped at this
+INC-049,2025-07-09,"CLIPPER  ST/CHURCH ST,",1,Waymo AV stuck in the middle of intersection blocking
+INC-050,2025-07-09,"BROADWAY  TUNNEL EB,",1,2 passengers in the Waymo AV stuck unable to
+INC-051,2025-07-11,"1117  FILLMORE ST,",1,Muni vs Waymo non inj accident Muni insp and
+INC-052,2025-07-12,"301  BRANNAN ST,",1,Waymo stalled blkng traffic in middle lane eb on
+INC-053,2025-07-13,"2054  36TH AV,",1,Rider asleep in the back of Waymo..reqs PD wake up
+INC-054,2025-07-13,"1300  SELBY ST,",1,Ron at Waymo got an alert of an unconcious rider in
+INC-055,2025-07-16,"MISSION  ST/4TH ST,",1,Text to 911..Rp inside of Waymo AV Wht Jaguar LP
+INC-056,2025-07-19,"PACIFIC  AV/SANSOME ST,",5,5 Waymo Av's blocking traffic..AV's are facing EB
+INC-057,2025-07-19,"CASTRO  ST/18TH ST,",1,Rp driving by and saw an unoccupied Waymo stuck in
+INC-058,2025-07-19,"ADMIRAL  AV/MISSION ST,",1,Admiral betwn Mission and Alemany facing SB twd
+INC-059,2025-07-19,"24TH  ST/UTAH ST,",1,Call from Waymo report of they have been trying
+INC-060,2025-07-21,"17TH  ST/VALENCIA ST,",1,Waymo holding up traffic..on cb to Waymo advd they
+INC-061,2025-07-23,"WARRIORS  WY/3RD ST,",1,Traffic signals malfunctioning and Waymos are
+INC-062,2025-07-25,"34TH  AV/LINCOLN WY,",3,Traffic signals malfunctioningon 34th not allowing cars
+INC-063,2025-08-01,"MARIN ST/BAYSHORE BL, SF",1,Waymo stranded at median/intersection at CC..needs PD to direct traffic wile waiting to staff for staff to arrive to manually drive AV away. Steven Woo is roadside asst who is stndng by in bright vest..
+INC-064,2025-08-01,"9TH ST/HOWARD ST, SF",1,Zoox blkng lane of traffic where poss shots heard coming from a building and PD actively investigating..another call AV disabled far right lane blkng traffic prior to Howard St called Zoox at 4155009354
+INC-065,2025-08-02,"FRANKLIN ST/MCALLISTER ST, SF",1,In #3 lane Waymo w/hazards on not moving and blocking traffic..unk LP..Waymo ntfyd.. AV moved
+INC-066,2025-08-06,"PACIFIC AV/MONTGOMERY ST, SF",1,Traffic hazard due to a veh accident..need PD for traffic control..tow truck en route no eta..PD resp..Waymo able to move AV..no need for PD
+INC-067,2025-08-06,"MARKET ST/CASTRO ST, SF",1,Just above Castro on Market facing downtown Waymo AV is stuck has hazards on causing AV to go around Unk LP Rp drove by by
+INC-068,2025-08-07,"PIER 35, SF",1,Waymo blkng NB direction rt lane of traffic Waymo is aware. Roadside is en route. This is caused from a passenger leaving the door open so the AV cant move
+INC-069,2025-08-10,"FREDERICK ST/STANYAN ST, SF",1,"Disabled veh in the intersection, req PD to respond, lots of traffic, Wht Jag LP 05551Z3..Waymo techs are en route 25 min eta..another call reporting veh on Frederick facing SB Hazards on"
+INC-070,2025-08-11,"767 HAIGHT ST, SF",1,"Rider in backseat Whi Jag laying down asleep, RP cant rouse him through the speaker, req PD to check and escort out of the veh..00:47 PD resp 00:53 on Scene and AV and Subj were gone."
+INC-071,2025-08-11,"12TH AV/IRVING ST, SF",1,Waymo AV blocking but Waymo employee arrvng OS to han while on LL w/RP. No asst needed
+INC-072,2025-08-11,"16TH ST/MISSION ST, SF",1,Waymo creating traffic congestion on viewed by PD
+INC-073,2025-08-13,"SAN JOSE AV/HIGHLAND AV, SF",1,"San Jose closest to SB Highland Av..Waymo AV stalled in traffic due to over heated battery, req PD to assist with traffic while they try to get a tow..it will be SB San Jose after Randall St under Highland overpass on the far right..Wht Jag Ipace LP 24261Y3..PD resp..flares set up Waymo tow eta 15 - 20 min"
+INC-074,2025-08-13,"NATOMA ST/7TH ST, SF",1,Waymo blocking one way road..Whi Jag Unk LP ..Waymo Ntfyd Advd will move in 5 mins resp Marcel
+INC-075,2025-08-13,"18TH ST/PENNSYLVANIA AV, SF",1,Waymo AV disabled and blkng traffic Wht Jag Ipace Lp 01239Z3 Raodside is on scene
+INC-076,2025-08-15,"UNION ST/COLUMBUS AV, SF",1,Waymo stuck in intersection impeding traffic..unoccupied..LP 84445W3 Waymo ntfyd..agent is working to get roadside asst team..eta 14 min eta..multiple calls..Waymo was able to move AV.. No need for PD resp.
+INC-077,2025-08-16,"EXIT 429C - 101NB PAUL AV, SF",1,Unoccupyd Wht Jag AV is stalled on the street right off of Bayshore off ramp..Tow is en route eta 40 min..called Waymo back for status..Waymo could not provide update because we did not have the LP. Waymo advd no need for service any longer
+INC-078,2025-08-18,"335 MELROSE AV, SF",1,ifo disabled Waymo blocking road completely wht Waymo 76957Y3 RP has already contacted Waymo Waymo service team arrived and handled call cancelled
+INC-079,2025-08-19,"7TH AV/LAWTON ST, SF",1,Waymo was blkng medics way
+INC-080,2025-08-19,"WASHINGTON ST/DAVIS ST, SF",1,East of intersection Waymo AV 6673884..per Waymo AV is moving
+INC-081,2025-08-21,"2831 CESAR CHAVEZ ST, SF",1,Near intersection ofCC/Hampshire..Waymo AV is experiencing a flat and stuck in gore area of roadway..Whi Jag LP 80825A4 engineer is 97 but will not approach AV due to gore ara and traffic req PD to assist w/traffic..Waymo cancelled managed to move AV out of the way on their own
+INC-082,2025-08-23,"16TH ST/DOLORES ST, SF",1,Waymo LP 05381B4 sensors are damaged and in the middle of the intersection roadside assistance has an eta 15 minutes
+INC-083,2025-08-24,"151 3RD ST, SF",1,Waymo malfunctioning in right lane
+INC-084,2025-08-24,"210 VAN NESS AV, SF",1,Waymo blkng Muni lane for five mins while on LL PD came and AV moved
+INC-085,2025-08-27,"CONGDON ST/ALEMANY BL, SF",1,Waymo AV disablled at the intersection..no employees on scene yet they are 12 mins away..LP 83526F3..cancel tow arrived
+INC-086,2025-08-28,"BRANNAN ST/4TH ST, SF",1,On Brannan Waymo stalled and blocking traffic Wht Waumo unk LP..no driver unk if pssngrs..Waymo said no Avs iao Brannan/7th
+INC-087,2025-08-31,"PINE ST/STOCKTON ST, SF",1,Waymo blkng traffic code on AV is waiting for passngr to get off but AV is unoccupied ntfyng Waymo Per Waymo door left open preventing AV from leaving they need road asst to close the door unless PD can get there sooner.. PD responded and AV is GOA
+INC-088,2025-09-11,Powell/Geary ,1,Onviewed by PD. WAYMO blocking Cable Car. Police were able to move vehicle out of the way and get it
+INC-089,2025-09-16,123 O'Farrell St,2,There was a fire inside a parking garage on O'Farrell and 2 WAYMO's were stuck on O'Farrell. No resolution
+INC-090,2025-09-18,Eddy/Taylor,1,"WAYMO double parked and 31 line could not pass by. By the time PD went out, UTL."
+INC-091,2025-09-18,Park Presidio/Fulton,1,WAYMO vs. Motorcycle vehicle accident. No reported injuries
+INC-092,2025-09-19,Bush/Montgomery,3,There was a protest frm 447 Sutter and during the route and 3 WAYMO's were blocking the intersection
+INC-093,2025-09-20,Geary/Fillmore,1,WAYMO blocking traffic. Onviewed by a PD unit. Bus lines needed to navigate around. Vehicle eventually
+INC-094,2025-09-21,Haight/Scott,1,Someone put something on the sensor of a WAYMO and vehicle could not move. PD went out and removed
+INC-095,2025-09-23,Palou/Selby,1,Tow truck was on scene towing another vehicle. A WAYMO pulled up behind it and blocked tow truck.
+INC-096,2025-09-23,Chain of Lakes/John F Kennedy Dr,1,WAYMO blocking traffic. A WAYMO tech was able to move it out of the way remotely.
+INC-097,2025-09-24,Tompkins/Folsom,1,WAYMO vehicle blocking traffic and MUNI unable to pass. Spoke to WAYMO tech and WAYMO tech said bus
+INC-098,2025-09-30,4th/Channel St,1,WAYMO blocking MUNI track. WAYMO tech en route
+INC-099,2025-10-05,Alabama/21st St ,1,WAYMO involved in a no injury accident with SFFDmedic.
+INC-100,2025-10-06,"1 Franklin St,",20,20 WAYMOS inside Fort Mason causing a traffichazard. WAYMO notified
+INC-101,2025-10-06,90 Terra Vista,1,WAYMO stranded in front of address. Police went outand moved vehicle out of the road
+INC-102,2025-10-07,417 Laguna Working,2,Working fire with reports of a and trappedin building on 2nd floor. 2 WAYMO vehicles stuck on
+INC-103,2025-10-08,Duboce/Valencia ,6,Vehicle accident involving a vehicle on it's side. 6 WAYMO's blocking westbound traffic on Duboce an
+INC-104,2025-10-15,"783 MISSION ST,",1,Per Waymo AV stalled WB Mission b4 4th st..Wht 2024 Jag LP 92549A4 Waymo called for road service..PD
+INC-105,2025-10-15,"PALACE HOTEL, SF",1,911 c/b RP stated Waymo AV blocking the road on
+INC-106,2025-10-15,"SUTTER ST/STOCKTON ST,",2,Waymo cannot go south on Post on Stockton had a
+INC-107,2025-10-15,1 101NB BAYSHORE,unknown,Waymo stuck on the left shoulder at the top of th
+INC-108,2025-10-17,"DIVISADERO ST/JACKSON ST,",1,"SWaymo vs Muni, unclear if contact was actually"
+INC-109,2025-10-20,"HAYES ST/OCTAVIA ST,",1,Waymo with hazards on for past 10 mins per SFPD
+INC-110,2025-10-21,"16TH ST/BRYANT ST,",3,Power outage at this location 3 Waymos and other
+INC-111,2025-10-23,"EVANS AV/RANKIN ST,",2,Waymo stuck in lane impeding traffic traffic..issue at
+INC-112,2025-10-23,"RANKIN ST/EVANS AV,",1,Waymo is near the railroad track blocking the
+INC-113,2025-10-23,"15TH ST/SHOTWELL ST,",60,At least 100 Waymos lined up on 15th St from Shotwell
+INC-114,2025-10-24,662 MISSION BAY,1,Waymo hit RP's dog..Emer Vet and Waymo contact
+INC-115,2025-10-26,HAMPSHIRE ST/CESAR CHAVEZWaymo,1,Waymo AV is stranded on CC blocking traffic ..tow and
+INC-116,2025-10-26,"STEINER ST/DUBOCE AV,",1,Waymo Rep was ntfyd of Waymo AV unoccupied
+INC-117,2025-10-27,"9TH ST/HARRISON ST,",2,311 tx rep of 2 Waymo AV w/blinkers on and blkng
+INC-118,2025-10-27,"PIER 38, SF",1,Traffic hazard AV is stranded and stuck in the NB
+INC-119,2025-10-27,"358 MAYNARD ST,",1,Waymo AV ifo unoccupyd blocking lane and causing
+INC-120,2025-10-29,"14TH ST/MARKET ST,",1,Waymo blking traffic with flashing lights on and other
+INC-121,2025-10-29,14TH ST/SOUTH VAN,20,311 TX 20+ Waymos all stuck in left lane Poss trying to
+INC-122,2025-10-30,"FOLSOM ST/1ST ST,",1,Waymo reqs PD asst to move AV out of the way and
+INC-123,2025-10-31,GOLDEN GATE AV/MASONIC,1,AWaymo disabled blkng left NB lane on Masonic just

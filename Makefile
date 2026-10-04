@@ -24,9 +24,10 @@ site: notebook-html  ## render paper, slides, and site into project-site/docs
 preview:          ## live-preview the website
 	cd project-site && uv run quarto preview
 
-zeroshot:         ## (optional) re-run the zero-shot transformer and refresh its cache
+zeroshot:         ## (optional) re-run BART-MNLI, DeBERTa-v3 NLI, and embedding models; refresh caches
 	uv sync --extra nlp
-	uv run python -c "from av_blocking import data, nlp; nlp.run_zeroshot(data.build_incidents())"
+	uv run python -c "from av_blocking import data, nlp; df = data.build_incidents(); \
+		[nlp.run_zeroshot(df, k) for k in nlp.PRETRAINED_MODELS]"
 
 clean:
 	rm -rf project-site/docs project-site/.quarto project-site/notebook.html

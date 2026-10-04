@@ -9,7 +9,9 @@ abstract: |
   AV blocking incidents recorded by the San Francisco Department of Emergency Management
   (DEM) between {{< var data.first_date >}} and {{< var data.last_date >}}. We design a
   consequence-based hazard taxonomy and classify each narrative with a transparent rule set,
-  which we compare against learned and zero-shot transformer classifiers. Frequencies are
+  which we compare against supervised models, two zero-shot transformers, and an
+  embedding-similarity baseline. A blind LLM second coder serves as a cross-check
+  (Cohen's $\kappa$ = {{< var taxon.cx_manual_kappa >}} with the manual audit). Frequencies are
   estimated with Poisson and Jeffreys-Bayesian models. Change over time is tested with
   non-parametric methods suited to six monthly counts and heavily skewed durations. Each
   hazard is placed on a 5×5 likelihood–consequence matrix with a "risk-curve" rule that pairs
@@ -219,15 +221,24 @@ involve up to 60 vehicles.
 Choosing a classifier is a question of fit to the data. The data here are 123 short,
 often truncated narratives written in dispatcher shorthand (`blkng`, `ntfyd`, `LP`). There
 are no gold-standard labels, and the safety-relevant classes have only 4–9 examples. We
-compared four approaches:
+compared five families of approach:
 
 * **Transparent rules**: keyword and regular-expression patterns plus the AV-count field,
   implemented in `av_blocking.taxonomy`.
 * **Supervised TF-IDF models**: word and character n-grams with multinomial logistic
   regression, and with XGBoost [@chen2016].
-* **Zero-shot NLI transformer**: BART-large-MNLI [@lewis2020; @yin2019], scoring each
-  narrative against plain-language hazard descriptions.
+* **Zero-shot NLI transformers** [@yin2019]: BART-large-MNLI [@lewis2020] and a
+  DeBERTa-v3-large model fine-tuned on several NLI datasets [@he2023; @laurer2024]. Each
+  plain-language hazard description becomes the hypothesis "This incident report describes
+  {description}", and the model scores how strongly the narrative entails it.
+* **Embedding similarity**: a sentence-embedding model (mxbai-embed-large [@mxbai2024];
+  see @reimers2019 for the approach) embeds each narrative and each hazard description, and
+  the most similar description (cosine similarity) wins.
 * **Majority-class baseline.**
+
+All three pretrained models use the *same* six hazard descriptions and see no labeled
+examples from this log. Each was run once on CPU, and its predictions are cached in
+`data/processed/`.
 
 Fine-tuning a transformer was not attempted. With so few examples it would overfit, and
 the result could not be audited.
@@ -245,27 +256,105 @@ margins. The rules were written by the same analyst who made the reference label
 figure is an internal-consistency check, not an independent validation. The one remaining
 disagreement is a genuinely ambiguous crash scene (@tbl-disagreements).
 
+**Blind second coder.** To address the single-analyst problem, a second coder from a
+different model family labeled all 123 incidents *blind*: OpenAI's Codex (based on GPT-6;
+the exact build is not exposed). It received only a label-free packet
+(`data/labels/blind_audit/`): the narratives and AV counts, plus a coding guide with the
+seven definitions, the precedence and AV-count rules, and a glossary of dispatcher
+shorthand. The guide contained no worked examples. Codex reported opening no other file,
+and the repository confirms it modified nothing else. It was told to judge each narrative
+itself rather than use keyword scripts, and to give a confidence level and rationale per
+incident.
+
+It agreed with the manual audit on {{< var taxon.cx_manual_agree >}} of 123 incidents
+($\kappa$ = {{< var taxon.cx_manual_kappa >}}) and with the rules on
+{{< var taxon.cx_rules_agree >}} ($\kappa$ = {{< var taxon.cx_rules_kappa >}}). Fleiss'
+$\kappa$ across all three coders is {{< var taxon.fleiss >}} (@tbl-coder-agreement). The
+{{< var taxon.cx_n_disagree >}} disagreements share one pattern: Codex read truncated
+narratives more literally, declining to infer a transit or occupant consequence that the
+visible text does not state. It flagged {{< var taxon.cx_n_low_in_dis >}} of them as low
+confidence itself (@tbl-coder-disagreements). On review, every disagreement is a
+defensible judgment call either way, so the labels and rules were kept unchanged. Because
+this is a *language-model* second coder, the agreement is evidence that the taxonomy can
+be applied consistently from its written definitions. It is not a substitute for human
+inter-rater reliability: two language models may share biases from training.
+
+{{< include assets/tables/tbl-coder-agreement.md >}}
+
+{{< include assets/tables/tbl-coder-disagreements.md >}}
+
 The learned models are scored out-of-sample, by 4-fold × 5-repeat stratified
 cross-validation (@tbl-classifiers, @fig-classifiers). They improve only modestly on the
 majority baseline: macro-F1 {{< var ml.lr_f1 >}} for logistic regression and
 {{< var ml.xgb_f1 >}} for XGBoost, against {{< var ml.base_f1 >}} for the baseline.
 Logistic regression's F1 on emergency obstruction is {{< var ml.lr_h2_f1 >}}, and the rare,
-high-consequence classes are precisely the ones that drive the risk matrix. The zero-shot
-model needs no labels, but it reaches macro-F1 {{< var ml.zs_f1 >}} and labels about a
-third of all narratives "collision". General-purpose NLI models do not read dispatcher
-shorthand well.
+high-consequence classes are precisely the ones that drive the risk matrix.
 
-**Choice:** the rule set. It is transparent, deterministic, auditable line by line, and
-uses domain vocabulary the learned models cannot pick up from ~120 examples. If the log
-grows, the manual labels can seed a supervised model.
+The pretrained models split into two groups (@tbl-classifiers, @tbl-pretrained-counts):
+
+* **Zero-shot NLI does not help, and a bigger model does not fix it.** BART-large-MNLI
+  reaches macro-F1 {{< var ml.bart.f1 >}}. The larger, newer DeBERTa-v3 model does
+  slightly *worse*, at {{< var ml.deberta.f1 >}}, with F1 = {{< var ml.deberta.h2_f1 >}}
+  on emergency obstruction. The difference from BART is not significant (paired bootstrap
+  ΔF1 = {{< var ml.deberta.vs_bart.delta_f1 >}}; McNemar p =
+  {{< var ml.deberta.vs_bart.mcnemar_p >}}). Both NLI models label about a third of all
+  narratives "collision" ({{< var ml.bart.n_h1 >}} and {{< var ml.deberta.n_h1 >}}
+  incidents, against 7 in the audit). General-purpose NLI models do not read dispatcher
+  shorthand well, regardless of size.
+* **Embedding similarity is the strongest label-free method.** It reaches macro-F1
+  {{< var ml.embedding.f1 >}}, significantly better than BART-MNLI (ΔF1 =
+  {{< var ml.embedding.vs_bart.delta_f1 >}}). It is the only non-rule method with real skill
+  on emergency obstruction (F1 = {{< var ml.embedding.h2_f1 >}}). It edges out
+  cross-validated logistic regression, though not significantly (ΔF1 =
+  {{< var ml.embedding.vs_lr.delta_f1 >}}; McNemar p =
+  {{< var ml.embedding.vs_lr.mcnemar_p >}}). Its errors run the other way from NLI: it
+  assigns too many incidents to transit and to pedestrian/accessibility.
+* **A frontier LLM given the written coding guide** is in a different league. Scored the
+  same way, the blind Codex second coder reaches macro-F1 {{< var ml.llm.f1 >}}
+  ($\kappa$ = {{< var ml.llm.kappa >}}), with F1 = {{< var ml.llm.h2_f1 >}} on emergency
+  obstruction. The deciding factor is the guide (definitions, precedence, shorthand
+  glossary), which the zero-shot models never see, as much as raw model size.
+
+The significance tests are paired, because every classifier labels the same incidents
+(@tbl-classifier-tests). The exact McNemar test [@mcnemar1947] uses only the discordant
+incidents, those one model gets right and the other wrong. With $b$ and $c$ such incidents,
+under $H_0$, $b \sim \operatorname{Bin}(b + c, \tfrac12)$. The macro-F1 difference gets a
+paired percentile-bootstrap 95% interval [@efron1993] from 5,000 resamples of incidents.
+Supervised models enter with their out-of-fold predictions.
+
+**Choice: the rule set, with the LLM as a cross-check.** A guided frontier LLM labels
+almost as well as the rules, so the choice is not about raw accuracy. It rests on four
+properties a hazard classification feeding a risk matrix needs:
+
+1. **Auditable.** Every label traces to a named pattern that a reviewer can read and
+   challenge. An LLM's rationale is a post-hoc explanation, not the mechanism.
+2. **Reproducible.** The rules give the same output forever. Hosted LLMs change version
+   silently; Codex could not even report its exact build, so its labels cannot be
+   regenerated bit-for-bit.
+3. **Precise where it matters.** The rules encode the severity-first precedence and the
+   AV-count rule exactly, and handle dispatcher shorthand and truncation explicitly.
+4. **Cheap and local.** No API cost, no download, and no need to send incident records to
+   a third-party service.
+
+The rules' weakness is generalization: they were written after reading these narratives
+and may miss phrasings in future logs. The guided LLM is the natural safeguard. Run it on
+new data, and treat its disagreements with the rules as candidates for review. If the log
+grows to several hundred incidents, the manual and LLM labels together could train a
+supervised model.
 
 {{< include assets/tables/tbl-classifiers.md >}}
+
+{{< include assets/tables/tbl-per-class-f1.md >}}
+
+{{< include assets/tables/tbl-pretrained-counts.md >}}
+
+{{< include assets/tables/tbl-classifier-tests.md >}}
 
 {{< include assets/tables/tbl-disagreements.md >}}
 :::
 
 ::: {.content-hidden when-format="revealjs"}
-![Macro-F1 of each classifier against the manual audit labels. Learned models show mean ± 1 SD across cross-validation folds. The rule-based score is in-sample.](assets/figures/fig-classifiers.png){#fig-classifiers}
+![Macro-F1 of each classifier against the manual audit labels. Supervised models show mean ± 1 SD across cross-validation folds; pretrained models and the LLM use no training data (the LLM was given the written coding guide). The rule-based score is in-sample.](assets/figures/fig-classifiers.png){#fig-classifiers}
 :::
 
 ::: {.content-visible when-format="revealjs"}
@@ -279,10 +368,16 @@ grows, the manual labels can seed a supervised model.
 - 123 short, truncated narratives in dispatcher shorthand; rare classes have 4–9 examples.
 - Learned models (cross-validated) barely beat the majority baseline. Logistic regression
   has **F1 = {{< var ml.lr_h2_f1 >}} on emergency obstruction**.
-- Zero-shot BART-MNLI calls about a third of incidents "collision".
+- Zero-shot NLI: BART-MNLI {{< var ml.bart.f1 >}}, DeBERTa-v3 {{< var ml.deberta.f1 >}}
+  (not significantly different). Both call about a third of incidents "collision".
+- Embedding similarity is the best label-free method ({{< var ml.embedding.f1 >}};
+  significantly better than BART), but over-predicts transit and pedestrian hazards.
 - Rules agree with the hand-coded audit at $\kappa$ = {{< var taxon.kappa >}}. This is a
   consistency check: the same analyst wrote both.
-- **Selected: transparent, auditable rules.**
+- A blind **LLM second coder** (Codex, given only a written guide) matches the audit at
+  $\kappa$ = {{< var taxon.cx_manual_kappa >}} (macro-F1 {{< var ml.llm.f1 >}}). The
+  taxonomy can be applied consistently.
+- **Selected: transparent, auditable, reproducible rules**, with the LLM as a cross-check.
 :::
 ::::
 :::
@@ -608,15 +703,23 @@ and impact then refer to the *same* event.
 ::: {.content-hidden when-format="revealjs"}
 @tbl-sensitivity re-places every hazard under alternative choices: a plug-in MLE
 probability, 7- and 90-day horizons, February included (212 exposure days, all 123
-incidents), the supplementary incidents added, and the conventional "total frequency ×
-90th-percentile impact" rule.
+incidents), the supplementary incidents added, the conventional "total frequency ×
+90th-percentile impact" rule, and two alternative *labelers*: the manual audit and the best
+pretrained model (embedding similarity). For the labeler columns, impact is re-scored
+because it depends on the hazard.
 
 * **Robust to data choices.** No placement changes under the MLE basis, when February is
   included, or when the supplementary incidents are added.
+* **Robust to the labeler.** Labeling hazards with the manual audit instead of the rules
+  gives *identical* placements, so the matrix does not hinge on rule errors. Labeling with
+  the embedding model moves transit (H3) and pedestrian/accessibility (H4) up one band and
+  H7 down one band. Those are exactly the classes it over-predicts (@tbl-pretrained-counts),
+  so this reflects the labeler's error, not a fragile matrix.
 * **The horizon sets the absolute level.** A 7-day horizon lowers every hazard one or two
   bands, and a 90-day horizon raises them. Choosing the horizon is a policy decision, not
   something the data can settle. The *ranking* is stable: in every column, H2 is at (or
-  tied for) the highest level, and H4 and H5 are at (or tied for) the lowest.
+  tied for) the highest level and H5 at (or tied for) the lowest. H4 is also at or tied
+  for the lowest everywhere except the embedding-label column.
 * **The placement rule matters for H2.** The conventional rule puts H2 at *Extreme*. It
   pairs H2's overall frequency (six events) with its rarer life-threatening tier (three
   events), overstating the probability of the Severe outcome. Avoiding exactly that
@@ -624,7 +727,7 @@ incidents), the supplementary incidents added, and the conventional "total frequ
 :::
 
 ::: {.content-visible when-format="revealjs"}
-## Sensitivity: robust to data choices, horizon sets the level
+## Sensitivity: robust to data and labeler, horizon sets the level
 :::
 
 {{< include assets/tables/tbl-sensitivity.md >}}
@@ -642,8 +745,10 @@ incidents), the supplementary incidents added, and the conventional "total frequ
 * **Narrative quality.** Truncation limits classification. Truncated incidents fall to the
   default H7, so the frequencies of H1–H5 are, if anything, *under*-estimated, especially
   before August.
-* **Single-analyst labels.** The taxonomy, rules, and audit labels come from one analyst. A
-  second, independent coder would allow a true inter-rater reliability estimate.
+* **Single-analyst labels, partly mitigated.** The taxonomy, rules, and audit labels come
+  from one analyst. A blind LLM second coder agreed closely ($\kappa$ =
+  {{< var taxon.cx_manual_kappa >}}), but agreement between language models is weaker
+  evidence than agreement between independent human coders, which remains the gold standard.
 * **Risk matrices are coarse.** Banding discards information and can rank risks
   inconsistently [@cox2008]. We mitigate this by publishing the underlying rates,
   intervals, and risk curves alongside each cell, and by showing the sensitivity of each
@@ -657,8 +762,9 @@ incidents), the supplementary incidents added, and the conventional "total frequ
   rate means a falling per-mile rate.
 - **Under-recording:** only incidents that reached DEM appear, so frequencies are lower bounds.
 - **Truncated narratives** push incidents into the H7 default, so H1–H5 are likely undercounted.
-- **One analyst** built the taxonomy, rules, and audit labels; a second coder would allow
-  a true reliability estimate.
+- **One analyst** built the taxonomy, rules, and audit labels. A blind LLM second coder
+  agreed at $\kappa$ = {{< var taxon.cx_manual_kappa >}}; a human second coder would be
+  stronger evidence.
 - **Risk matrices are coarse** [@cox2008], so the rates, intervals, and risk curves are
   published alongside each cell.
 :::

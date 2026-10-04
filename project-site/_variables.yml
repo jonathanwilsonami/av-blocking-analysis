@@ -56,12 +56,49 @@ freq:
   total_lo: '16.2'
   total_rate30: '19.6'
 ml:
+  bart:
+    acc: '0.59'
+    f1: '0.4'
+    h2_f1: '0.33'
+    kappa: '0.38'
+    n_h1: 38
+    vs_lr:
+      delta_f1: -0.14 (-0.29 to +0.02)
+      mcnemar_p: < 0.001
   base_f1: '0.25'
+  deberta:
+    acc: '0.5'
+    f1: '0.32'
+    h2_f1: '0'
+    kappa: '0.28'
+    n_h1: 39
+    vs_bart:
+      delta_f1: -0.07 (-0.20 to +0.05)
+      mcnemar_p: '0.064'
+    vs_lr:
+      delta_f1: -0.21 (-0.39 to -0.03)
+      mcnemar_p: < 0.001
+  embedding:
+    acc: '0.69'
+    f1: '0.62'
+    h2_f1: '0.67'
+    kappa: '0.56'
+    n_h1: 6
+    vs_bart:
+      delta_f1: +0.22 (+0.08 to +0.36)
+      mcnemar_p: '0.066'
+    vs_lr:
+      delta_f1: +0.09 (-0.06 to +0.23)
+      mcnemar_p: '0.119'
+  llm:
+    acc: '0.97'
+    f1: '0.95'
+    h2_f1: '0.92'
+    kappa: '0.95'
   lr_f1: '0.47'
   lr_h2_f1: '0'
   rule_f1: '0.98'
   xgb_f1: '0.32'
-  zs_f1: '0.4'
 risk:
   H1:
     impact: Major
@@ -114,6 +151,14 @@ risk:
     score: 15
 taxon:
   agree: 99.2%
+  cx_manual_agree: 119
+  cx_manual_kappa: '0.95'
+  cx_n_disagree: 4
+  cx_n_low: 7
+  cx_n_low_in_dis: 3
+  cx_rules_agree: 120
+  cx_rules_kappa: '0.96'
+  fleiss: '0.965'
   kappa: '0.99'
   n_disagree: 1
   n_multi_match: 8

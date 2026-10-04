@@ -1,8 +1,8 @@
-Hazard,n (manual),TF-IDF + logistic regression,TF-IDF + XGBoost,Zero-shot BART-MNLI,Rule-based
-H1 Collision,7,0.67,0.4,0.31,0.92
-H2 Emergency obstruction,6,0.0,0.0,0.33,0.92
-H3 Transit obstruction,8,0.46,0.22,0.22,1.0
-H4 Ped/accessibility,4,0.33,0.0,0.0,1.0
-H5 Occupant-related,9,0.46,0.0,0.5,1.0
-H6 Multi-AV gridlock,17,0.94,0.94,0.67,1.0
-H7 Single-AV obstruction,72,0.86,0.83,0.74,1.0
+Hazard,n (manual),TF-IDF + logistic regression,TF-IDF + XGBoost,Zero-shot BART-large-MNLI,Zero-shot DeBERTa-v3-large NLI,Embedding similarity (mxbai-embed-large),"LLM + coding guide (Codex, GPT-6-based)",Rule-based
+H1 Collision,7,0.67,0.4,0.31,0.26,0.62,0.92,0.92
+H2 Emergency obstruction,6,0.0,0.0,0.33,0.0,0.67,0.92,0.92
+H3 Transit obstruction,8,0.46,0.22,0.22,0.21,0.47,0.86,1.0
+H4 Ped/accessibility,4,0.33,0.0,0.0,0.4,0.43,1.0,1.0
+H5 Occupant-related,9,0.46,0.0,0.5,0.2,0.67,0.94,1.0
+H6 Multi-AV gridlock,17,0.94,0.94,0.67,0.48,0.71,1.0,1.0
+H7 Single-AV obstruction,72,0.86,0.83,0.74,0.71,0.78,0.98,1.0

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Jonathan Wilson">
-<meta name="dcterms.date" content="2026-10-03">
+<meta name="dcterms.date" content="2026-10-04">
 
 <title>Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco – AV Blocking Incidents</title>
 <style>
@@ -241,7 +241,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 3, 2026</p>
+      <p class="date">October 4, 2026</p>
     </div>
   </div>
   
@@ -251,7 +251,7 @@ window.Quarto = {
 <div>
   <div class="abstract">
     <div class="block-title">Abstract</div>
-    <p>Robotaxis that become immobilized in the roadway can obstruct general traffic, public transit, pedestrians, and emergency responders. We analyze the 123 AV blocking incidents recorded by the San Francisco Department of Emergency Management (DEM) between February 1, 2025 and October 31, 2025. We design a consequence-based hazard taxonomy and classify each narrative with a transparent rule set, which we compare against learned and zero-shot transformer classifiers. Frequencies are estimated with Poisson and Jeffreys-Bayesian models. Change over time is tested with non-parametric methods suited to six monthly counts and heavily skewed durations. Each hazard is placed on a 5×5 likelihood–consequence matrix with a “risk-curve” rule that pairs each consequence level with its own frequency. Blocking incidents occur about 19.6 times per 30 days, with no statistically detectable trend in rate or duration. AV-involved collisions, emergency-response obstruction, and routine single-AV lane blockages rank highest (<em>Very high</em>). Transit obstruction and multi-AV gridlock are <em>High</em>. Pedestrian/accessibility and occupant-related hazards are <em>Medium</em>.</p>
+    <p>Robotaxis that become immobilized in the roadway can obstruct general traffic, public transit, pedestrians, and emergency responders. We analyze the 123 AV blocking incidents recorded by the San Francisco Department of Emergency Management (DEM) between February 1, 2025 and October 31, 2025. We design a consequence-based hazard taxonomy and classify each narrative with a transparent rule set, which we compare against supervised models, two zero-shot transformers, and an embedding-similarity baseline. A blind LLM second coder serves as a cross-check (Cohen’s <span class="math inline">\(\kappa\)</span> = 0.95 with the manual audit). Frequencies are estimated with Poisson and Jeffreys-Bayesian models. Change over time is tested with non-parametric methods suited to six monthly counts and heavily skewed durations. Each hazard is placed on a 5×5 likelihood–consequence matrix with a “risk-curve” rule that pairs each consequence level with its own frequency. Blocking incidents occur about 19.6 times per 30 days, with no statistically detectable trend in rate or duration. AV-involved collisions, emergency-response obstruction, and routine single-AV lane blockages rank highest (<em>Very high</em>). Transit obstruction and multi-AV gridlock are <em>High</em>. Pedestrian/accessibility and occupant-related hazards are <em>Medium</em>.</p>
   </div>
 </div>
 
@@ -451,38 +451,190 @@ Table&nbsp;2: Consequence-based hazard taxonomy (assigned by severity-first prec
 </section>
 <section id="sec-classification" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="sec-classification"><span class="header-section-number">3.2</span> Classification method</h2>
-<p>Choosing a classifier is a question of fit to the data. The data here are 123 short, often truncated narratives written in dispatcher shorthand (<code>blkng</code>, <code>ntfyd</code>, <code>LP</code>). There are no gold-standard labels, and the safety-relevant classes have only 4–9 examples. We compared four approaches:</p>
+<p>Choosing a classifier is a question of fit to the data. The data here are 123 short, often truncated narratives written in dispatcher shorthand (<code>blkng</code>, <code>ntfyd</code>, <code>LP</code>). There are no gold-standard labels, and the safety-relevant classes have only 4–9 examples. We compared five families of approach:</p>
 <ul>
 <li><strong>Transparent rules</strong>: keyword and regular-expression patterns plus the AV-count field, implemented in <code>av_blocking.taxonomy</code>.</li>
 <li><strong>Supervised TF-IDF models</strong>: word and character n-grams with multinomial logistic regression, and with XGBoost <span class="citation" data-cites="chen2016">(<a href="#ref-chen2016" role="doc-biblioref">Chen and Guestrin 2016</a>)</span>.</li>
-<li><strong>Zero-shot NLI transformer</strong>: BART-large-MNLI <span class="citation" data-cites="lewis2020 yin2019">(<a href="#ref-lewis2020" role="doc-biblioref">Lewis et al. 2020</a>; <a href="#ref-yin2019" role="doc-biblioref">Yin, Hay, and Roth 2019</a>)</span>, scoring each narrative against plain-language hazard descriptions.</li>
+<li><strong>Zero-shot NLI transformers</strong> <span class="citation" data-cites="yin2019">(<a href="#ref-yin2019" role="doc-biblioref">Yin, Hay, and Roth 2019</a>)</span>: BART-large-MNLI <span class="citation" data-cites="lewis2020">(<a href="#ref-lewis2020" role="doc-biblioref">Lewis et al. 2020</a>)</span> and a DeBERTa-v3-large model fine-tuned on several NLI datasets <span class="citation" data-cites="he2023 laurer2024">(<a href="#ref-he2023" role="doc-biblioref">He, Gao, and Chen 2023</a>; <a href="#ref-laurer2024" role="doc-biblioref">Laurer et al. 2024</a>)</span>. Each plain-language hazard description becomes the hypothesis “This incident report describes {description}”, and the model scores how strongly the narrative entails it.</li>
+<li><strong>Embedding similarity</strong>: a sentence-embedding model (mxbai-embed-large <span class="citation" data-cites="mxbai2024">(<a href="#ref-mxbai2024" role="doc-biblioref">Mixedbread AI 2024</a>)</span>; see <span class="citation" data-cites="reimers2019">Reimers and Gurevych (<a href="#ref-reimers2019" role="doc-biblioref">2019</a>)</span> for the approach) embeds each narrative and each hazard description, and the most similar description (cosine similarity) wins.</li>
 <li><strong>Majority-class baseline.</strong></li>
 </ul>
+<p>All three pretrained models use the <em>same</em> six hazard descriptions and see no labeled examples from this log. Each was run once on CPU, and its predictions are cached in <code>data/processed/</code>.</p>
 <p>Fine-tuning a transformer was not attempted. With so few examples it would overfit, and the result could not be audited.</p>
 <p>As a reference, every narrative was read and hand-coded, with notes on ambiguous cases (<code>data/labels/manual_hazard_labels.csv</code>). Agreement between the rules and the manual labels is 99.2% (Cohen’s <span class="math inline">\(\kappa\)</span> = 0.99) <span class="citation" data-cites="cohen1960">(<a href="#ref-cohen1960" role="doc-biblioref">Cohen 1960</a>)</span>, where</p>
 <p><span class="math display">\[
 \kappa = \frac{p_o - p_e}{1 - p_e},
 \]</span></p>
-<p><span class="math inline">\(p_o\)</span> is the observed agreement and <span class="math inline">\(p_e\)</span> the agreement expected by chance from the label margins. The rules were written by the same analyst who made the reference labels, so this figure is an internal-consistency check, not an independent validation. The one remaining disagreement is a genuinely ambiguous crash scene (<a href="#tbl-disagreements" class="quarto-xref">Table&nbsp;4</a>).</p>
-<p>The learned models are scored out-of-sample, by 4-fold × 5-repeat stratified cross-validation (<a href="#tbl-classifiers" class="quarto-xref">Table&nbsp;3</a>, <a href="#fig-classifiers" class="quarto-xref">Figure&nbsp;1</a>). They improve only modestly on the majority baseline: macro-F1 0.47 for logistic regression and 0.32 for XGBoost, against 0.25 for the baseline. Logistic regression’s F1 on emergency obstruction is 0, and the rare, high-consequence classes are precisely the ones that drive the risk matrix. The zero-shot model needs no labels, but it reaches macro-F1 0.4 and labels about a third of all narratives “collision”. General-purpose NLI models do not read dispatcher shorthand well.</p>
-<p><strong>Choice:</strong> the rule set. It is transparent, deterministic, auditable line by line, and uses domain vocabulary the learned models cannot pick up from ~120 examples. If the log grows, the manual labels can seed a supervised model.</p>
+<p><span class="math inline">\(p_o\)</span> is the observed agreement and <span class="math inline">\(p_e\)</span> the agreement expected by chance from the label margins. The rules were written by the same analyst who made the reference labels, so this figure is an internal-consistency check, not an independent validation. The one remaining disagreement is a genuinely ambiguous crash scene (<a href="#tbl-disagreements" class="quarto-xref">Table&nbsp;9</a>).</p>
+<p><strong>Blind second coder.</strong> To address the single-analyst problem, a second coder from a different model family labeled all 123 incidents <em>blind</em>: OpenAI’s Codex (based on GPT-6; the exact build is not exposed). It received only a label-free packet (<code>data/labels/blind_audit/</code>): the narratives and AV counts, plus a coding guide with the seven definitions, the precedence and AV-count rules, and a glossary of dispatcher shorthand. The guide contained no worked examples. Codex reported opening no other file, and the repository confirms it modified nothing else. It was told to judge each narrative itself rather than use keyword scripts, and to give a confidence level and rationale per incident.</p>
+<p>It agreed with the manual audit on 119 of 123 incidents (<span class="math inline">\(\kappa\)</span> = 0.95) and with the rules on 120 (<span class="math inline">\(\kappa\)</span> = 0.96). Fleiss’ <span class="math inline">\(\kappa\)</span> across all three coders is 0.965 (<a href="#tbl-coder-agreement" class="quarto-xref">Table&nbsp;3</a>). The 4 disagreements share one pattern: Codex read truncated narratives more literally, declining to infer a transit or occupant consequence that the visible text does not state. It flagged 3 of them as low confidence itself (<a href="#tbl-coder-disagreements" class="quarto-xref">Table&nbsp;4</a>). On review, every disagreement is a defensible judgment call either way, so the labels and rules were kept unchanged. Because this is a <em>language-model</em> second coder, the agreement is evidence that the taxonomy can be applied consistently from its written definitions. It is not a substitute for human inter-rater reliability: two language models may share biases from training.</p>
+<div id="tbl-coder-agreement" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-coder-agreement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Inter-coder agreement on hazard labels (n = 123).
+</figcaption>
+<div aria-describedby="tbl-coder-agreement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 34%">
+<col style="width: 18%">
+<col style="width: 12%">
+<col style="width: 14%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Coder A</th>
+<th style="text-align: left;">Coder B</th>
+<th style="text-align: left;">Agree</th>
+<th style="text-align: left;">Percent</th>
+<th style="text-align: right;">Cohen kappa</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">LLM second coder (Codex)</td>
+<td style="text-align: left;">Manual audit</td>
+<td style="text-align: left;">119/123</td>
+<td style="text-align: left;">96.7%</td>
+<td style="text-align: right;">0.947</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LLM second coder (Codex)</td>
+<td style="text-align: left;">Rules</td>
+<td style="text-align: left;">120/123</td>
+<td style="text-align: left;">97.6%</td>
+<td style="text-align: right;">0.96</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Manual audit</td>
+<td style="text-align: left;">Rules</td>
+<td style="text-align: left;">122/123</td>
+<td style="text-align: left;">99.2%</td>
+<td style="text-align: right;">0.987</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">All three</td>
+<td style="text-align: left;">(Fleiss)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: right;">0.965</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div id="tbl-coder-disagreements" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-coder-disagreements-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Incidents where the LLM second coder disagrees with the manual audit, with its rationale and the resolution.
+</figcaption>
+<div aria-describedby="tbl-coder-disagreements-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 2%">
+<col style="width: 32%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 28%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Incident</th>
+<th style="text-align: left;">Narrative</th>
+<th style="text-align: left;">Manual</th>
+<th style="text-align: left;">Rules</th>
+<th style="text-align: left;">Codex</th>
+<th style="text-align: left;">Codex confidence</th>
+<th style="text-align: left;">Codex rationale</th>
+<th style="text-align: left;">Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">INC-040</td>
+<td style="text-align: left;">Traffic lights are out..hazard for Muni trains..DPT trying</td>
+<td style="text-align: left;">H3</td>
+<td style="text-align: left;">H3</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: left;">low</td>
+<td style="text-align: left;">Traffic lights were out and Muni trains faced a hazard, but AV obstruction of transit is not stated.</td>
+<td style="text-align: left;">Kept H3. The text does not say the AV blocked transit, but the analyzed sheet’s transit-impact flag is Y.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-041</td>
+<td style="text-align: left;">Subj inside of a Waymo rtl..AV stationary LP 76962Y3</td>
+<td style="text-align: left;">H5</td>
+<td style="text-align: left;">H5</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: left;">medium</td>
+<td style="text-align: left;">A subject was inside a stationary Waymo, but no occupant condition or action causing immobilization is stated.</td>
+<td style="text-align: left;">Kept H5. An occupant inside a stopped AV; whether they caused the stop is not stated. Either code is defensible.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">INC-066</td>
+<td style="text-align: left;">Traffic hazard due to a veh accident..need PD for traffic control..tow truck en route no eta..PD resp..Waymo able to move AV..no need for PD</td>
+<td style="text-align: left;">H1</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: left;">H2</td>
+<td style="text-align: left;">low</td>
+<td style="text-align: left;">A vehicle accident required traffic control, suggesting an active crash scene; the AV relation to that scene is unclear.</td>
+<td style="text-align: left;">Kept H1 (manual) / H2 (rules). Already flagged as ambiguous; Codex sided with the rules.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">INC-112</td>
+<td style="text-align: left;">Waymo is near the railroad track blocking the</td>
+<td style="text-align: left;">H3</td>
+<td style="text-align: left;">H3</td>
+<td style="text-align: left;">H7</td>
+<td style="text-align: left;">low</td>
+<td style="text-align: left;">The Waymo was near a railroad track and blocking an unspecified object; the truncation does not establish track obstruction.</td>
+<td style="text-align: left;">Kept H3. Truncated before saying what was blocked; Codex’s stricter H7 is also defensible.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The learned models are scored out-of-sample, by 4-fold × 5-repeat stratified cross-validation (<a href="#tbl-classifiers" class="quarto-xref">Table&nbsp;5</a>, <a href="#fig-classifiers" class="quarto-xref">Figure&nbsp;1</a>). They improve only modestly on the majority baseline: macro-F1 0.47 for logistic regression and 0.32 for XGBoost, against 0.25 for the baseline. Logistic regression’s F1 on emergency obstruction is 0, and the rare, high-consequence classes are precisely the ones that drive the risk matrix.</p>
+<p>The pretrained models split into two groups (<a href="#tbl-classifiers" class="quarto-xref">Table&nbsp;5</a>, <a href="#tbl-pretrained-counts" class="quarto-xref">Table&nbsp;7</a>):</p>
+<ul>
+<li><strong>Zero-shot NLI does not help, and a bigger model does not fix it.</strong> BART-large-MNLI reaches macro-F1 0.4. The larger, newer DeBERTa-v3 model does slightly <em>worse</em>, at 0.32, with F1 = 0 on emergency obstruction. The difference from BART is not significant (paired bootstrap ΔF1 = -0.07 (-0.20 to +0.05); McNemar p = 0.064). Both NLI models label about a third of all narratives “collision” (38 and 39 incidents, against 7 in the audit). General-purpose NLI models do not read dispatcher shorthand well, regardless of size.</li>
+<li><strong>Embedding similarity is the strongest label-free method.</strong> It reaches macro-F1 0.62, significantly better than BART-MNLI (ΔF1 = +0.22 (+0.08 to +0.36)). It is the only non-rule method with real skill on emergency obstruction (F1 = 0.67). It edges out cross-validated logistic regression, though not significantly (ΔF1 = +0.09 (-0.06 to +0.23); McNemar p = 0.119). Its errors run the other way from NLI: it assigns too many incidents to transit and to pedestrian/accessibility.</li>
+<li><strong>A frontier LLM given the written coding guide</strong> is in a different league. Scored the same way, the blind Codex second coder reaches macro-F1 0.95 (<span class="math inline">\(\kappa\)</span> = 0.95), with F1 = 0.92 on emergency obstruction. The deciding factor is the guide (definitions, precedence, shorthand glossary), which the zero-shot models never see, as much as raw model size.</li>
+</ul>
+<p>The significance tests are paired, because every classifier labels the same incidents (<a href="#tbl-classifier-tests" class="quarto-xref">Table&nbsp;8</a>). The exact McNemar test <span class="citation" data-cites="mcnemar1947">(<a href="#ref-mcnemar1947" role="doc-biblioref">McNemar 1947</a>)</span> uses only the discordant incidents, those one model gets right and the other wrong. With <span class="math inline">\(b\)</span> and <span class="math inline">\(c\)</span> such incidents, under <span class="math inline">\(H_0\)</span>, <span class="math inline">\(b \sim \operatorname{Bin}(b + c, \tfrac12)\)</span>. The macro-F1 difference gets a paired percentile-bootstrap 95% interval <span class="citation" data-cites="efron1993">(<a href="#ref-efron1993" role="doc-biblioref">Efron and Tibshirani 1993</a>)</span> from 5,000 resamples of incidents. Supervised models enter with their out-of-fold predictions.</p>
+<p><strong>Choice: the rule set, with the LLM as a cross-check.</strong> A guided frontier LLM labels almost as well as the rules, so the choice is not about raw accuracy. It rests on four properties a hazard classification feeding a risk matrix needs:</p>
+<ol type="1">
+<li><strong>Auditable.</strong> Every label traces to a named pattern that a reviewer can read and challenge. An LLM’s rationale is a post-hoc explanation, not the mechanism.</li>
+<li><strong>Reproducible.</strong> The rules give the same output forever. Hosted LLMs change version silently; Codex could not even report its exact build, so its labels cannot be regenerated bit-for-bit.</li>
+<li><strong>Precise where it matters.</strong> The rules encode the severity-first precedence and the AV-count rule exactly, and handle dispatcher shorthand and truncation explicitly.</li>
+<li><strong>Cheap and local.</strong> No API cost, no download, and no need to send incident records to a third-party service.</li>
+</ol>
+<p>The rules’ weakness is generalization: they were written after reading these narratives and may miss phrasings in future logs. The guided LLM is the natural safeguard. Run it on new data, and treat its disagreements with the rules as candidates for review. If the log grows to several hundred incidents, the manual and LLM labels together could train a supervised model.</p>
 <div id="tbl-classifiers" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-classifiers-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3: Narrative classifiers scored against the manual audit labels (learned models: mean and SD over 4-fold x 5 repeated stratified CV).
+Table&nbsp;5: Narrative classifiers scored against the manual audit labels (supervised models: mean and SD over 4-fold x 5 repeated stratified CV; pretrained models and the LLM use no training data; the LLM was given the written coding guide).
 </figcaption>
 <div aria-describedby="tbl-classifiers-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
-<col style="width: 42%">
-<col style="width: 14%">
-<col style="width: 18%">
-<col style="width: 14%">
+<col style="width: 35%">
+<col style="width: 25%">
 <col style="width: 10%">
+<col style="width: 12%">
+<col style="width: 10%">
+<col style="width: 7%">
 </colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">method</th>
+<th style="text-align: left;">family</th>
 <th style="text-align: right;">macro_F1</th>
 <th style="text-align: left;">macro_F1_sd</th>
 <th style="text-align: right;">accuracy</th>
@@ -492,6 +644,7 @@ Table&nbsp;3: Narrative classifiers scored against the manual audit labels (lear
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Majority class + count rule</td>
+<td style="text-align: left;">Baseline</td>
 <td style="text-align: right;">0.249</td>
 <td style="text-align: left;">—</td>
 <td style="text-align: right;">0.724</td>
@@ -499,6 +652,7 @@ Table&nbsp;3: Narrative classifiers scored against the manual audit labels (lear
 </tr>
 <tr class="even">
 <td style="text-align: left;">TF-IDF + XGBoost (CV)</td>
+<td style="text-align: left;">Supervised (cross-validated)</td>
 <td style="text-align: right;">0.32</td>
 <td style="text-align: left;">0.074</td>
 <td style="text-align: right;">0.735</td>
@@ -506,20 +660,47 @@ Table&nbsp;3: Narrative classifiers scored against the manual audit labels (lear
 </tr>
 <tr class="odd">
 <td style="text-align: left;">TF-IDF + logistic regression (CV)</td>
+<td style="text-align: left;">Supervised (cross-validated)</td>
 <td style="text-align: right;">0.47</td>
 <td style="text-align: left;">0.085</td>
 <td style="text-align: right;">0.774</td>
 <td style="text-align: right;">0.582</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">Zero-shot BART-MNLI</td>
+<td style="text-align: left;">Zero-shot BART-large-MNLI</td>
+<td style="text-align: left;">Pretrained, no training</td>
 <td style="text-align: right;">0.396</td>
 <td style="text-align: left;">—</td>
 <td style="text-align: right;">0.585</td>
 <td style="text-align: right;">0.378</td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">Zero-shot DeBERTa-v3-large NLI</td>
+<td style="text-align: left;">Pretrained, no training</td>
+<td style="text-align: right;">0.323</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: right;">0.504</td>
+<td style="text-align: right;">0.279</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Embedding similarity (mxbai-embed-large)</td>
+<td style="text-align: left;">Pretrained, no training</td>
+<td style="text-align: right;">0.62</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: right;">0.691</td>
+<td style="text-align: right;">0.563</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LLM + coding guide (Codex, GPT-6-based)</td>
+<td style="text-align: left;">LLM with coding guide</td>
+<td style="text-align: right;">0.946</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: right;">0.967</td>
+<td style="text-align: right;">0.947</td>
+</tr>
+<tr class="even">
 <td style="text-align: left;">Rule-based (selected; in-sample)</td>
+<td style="text-align: left;">Rules</td>
 <td style="text-align: right;">0.978</td>
 <td style="text-align: left;">—</td>
 <td style="text-align: right;">0.992</td>
@@ -530,10 +711,280 @@ Table&nbsp;3: Narrative classifiers scored against the manual audit labels (lear
 </div>
 </figure>
 </div>
+<div id="tbl-per-class-f1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-per-class-f1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;6: Per-class F1 by method.
+</figcaption>
+<div aria-describedby="tbl-per-class-f1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 5%">
+<col style="width: 12%">
+<col style="width: 7%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 17%">
+<col style="width: 16%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Hazard</th>
+<th style="text-align: right;">n (manual)</th>
+<th style="text-align: right;">TF-IDF + logistic regression</th>
+<th style="text-align: right;">TF-IDF + XGBoost</th>
+<th style="text-align: right;">Zero-shot BART-large-MNLI</th>
+<th style="text-align: right;">Zero-shot DeBERTa-v3-large NLI</th>
+<th style="text-align: right;">Embedding similarity (mxbai-embed-large)</th>
+<th style="text-align: right;">LLM + coding guide (Codex, GPT-6-based)</th>
+<th style="text-align: right;">Rule-based</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">H1 Collision</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">0.4</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">0.62</td>
+<td style="text-align: right;">0.92</td>
+<td style="text-align: right;">0.92</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H2 Emergency obstruction</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">0.92</td>
+<td style="text-align: right;">0.92</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H3 Transit obstruction</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0.46</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">0.47</td>
+<td style="text-align: right;">0.86</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H4 Ped/accessibility</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.4</td>
+<td style="text-align: right;">0.43</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H5 Occupant-related</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">0.46</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">0.2</td>
+<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">0.94</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H6 Multi-AV gridlock</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">0.94</td>
+<td style="text-align: right;">0.94</td>
+<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">0.48</td>
+<td style="text-align: right;">0.71</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H7 Single-AV obstruction</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">0.86</td>
+<td style="text-align: right;">0.83</td>
+<td style="text-align: right;">0.74</td>
+<td style="text-align: right;">0.71</td>
+<td style="text-align: right;">0.78</td>
+<td style="text-align: right;">0.98</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div id="tbl-pretrained-counts" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pretrained-counts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;7: Number of incidents assigned to each hazard by the manual audit and by each pretrained model.
+</figcaption>
+<div aria-describedby="tbl-pretrained-counts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 10%">
+<col style="width: 19%">
+<col style="width: 22%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Hazard</th>
+<th style="text-align: right;">Manual audit</th>
+<th style="text-align: right;">Zero-shot BART-large-MNLI</th>
+<th style="text-align: right;">Zero-shot DeBERTa-v3-large NLI</th>
+<th style="text-align: right;">Embedding similarity (mxbai-embed-large)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">H1 Collision</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H2 Emergency obstruction</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H3 Transit obstruction</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">22</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H4 Ped/accessibility</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H5 Occupant-related</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H6 Multi-AV gridlock</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H7 Single-AV obstruction</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">53</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div id="tbl-classifier-tests" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-classifier-tests-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;8: Paired comparisons of classifiers on the same incidents: exact McNemar test on correctness and paired-bootstrap 95% CI for the macro-F1 difference.
+</figcaption>
+<div aria-describedby="tbl-classifier-tests-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 20%">
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 7%">
+<col style="width: 15%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">A</th>
+<th style="text-align: left;">B</th>
+<th style="text-align: right;">Only A correct</th>
+<th style="text-align: right;">Only B correct</th>
+<th style="text-align: left;">McNemar p</th>
+<th style="text-align: left;">Macro-F1 A - B (95% CI)</th>
+<th style="text-align: left;">CI excludes 0?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Zero-shot DeBERTa-v3-large NLI</td>
+<td style="text-align: left;">Zero-shot BART-large-MNLI</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: left;">0.064</td>
+<td style="text-align: left;">-0.07 (-0.20 to +0.05)</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Embedding similarity (mxbai-embed-large)</td>
+<td style="text-align: left;">Zero-shot BART-large-MNLI</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">0.066</td>
+<td style="text-align: left;">+0.22 (+0.08 to +0.36)</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Zero-shot BART-large-MNLI</td>
+<td style="text-align: left;">TF-IDF + logistic regression (CV)</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: left;">&lt; 0.001</td>
+<td style="text-align: left;">-0.14 (-0.29 to +0.02)</td>
+<td style="text-align: left;">No</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Zero-shot DeBERTa-v3-large NLI</td>
+<td style="text-align: left;">TF-IDF + logistic regression (CV)</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: left;">&lt; 0.001</td>
+<td style="text-align: left;">-0.21 (-0.39 to -0.03)</td>
+<td style="text-align: left;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Embedding similarity (mxbai-embed-large)</td>
+<td style="text-align: left;">TF-IDF + logistic regression (CV)</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: left;">0.119</td>
+<td style="text-align: left;">+0.09 (-0.06 to +0.23)</td>
+<td style="text-align: left;">No</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
 <div id="tbl-disagreements" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-disagreements-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4: Incidents where the rule classifier and the manual audit disagree.
+Table&nbsp;9: Incidents where the rule classifier and the manual audit disagree.
 </figcaption>
 <div aria-describedby="tbl-disagreements-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -572,18 +1023,18 @@ Table&nbsp;4: Incidents where the rule classifier and the manual audit disagree.
 <img src="assets/figures/fig-classifiers.png" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-classifiers-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Macro-F1 of each classifier against the manual audit labels. Learned models show mean ± 1 SD across cross-validation folds. The rule-based score is in-sample.
+Figure&nbsp;1: Macro-F1 of each classifier against the manual audit labels. Supervised models show mean ± 1 SD across cross-validation folds; pretrained models and the LLM use no training data (the LLM was given the written coding guide). The rule-based score is in-sample.
 </figcaption>
 </figure>
 </div>
 </section>
 <section id="contributing-causes" class="level2" data-number="3.3">
 <h2 data-number="3.3" class="anchored" data-anchor-id="contributing-causes"><span class="header-section-number">3.3</span> Contributing causes</h2>
-<p><a href="#tbl-hazard-cause" class="quarto-xref">Table&nbsp;5</a> cross-tabulates hazard against contributing cause. Most narratives give no cause at all (“stalled”, “stuck”). That reflects the terse, truncated dispatcher text, and it is why cause is reported descriptively rather than used to define hazards.</p>
+<p><a href="#tbl-hazard-cause" class="quarto-xref">Table&nbsp;10</a> cross-tabulates hazard against contributing cause. Most narratives give no cause at all (“stalled”, “stuck”). That reflects the terse, truncated dispatcher text, and it is why cause is reported descriptively rather than used to define hazards.</p>
 <div id="tbl-hazard-cause" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-hazard-cause-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;5: Hazard (consequence) by contributing cause (mechanism), all 123 incidents.
+Table&nbsp;10: Hazard (consequence) by contributing cause (mechanism), all 123 incidents.
 </figcaption>
 <div aria-describedby="tbl-hazard-cause-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -698,11 +1149,11 @@ Table&nbsp;5: Hazard (consequence) by contributing cause (mechanism), all 123 in
 </section>
 <section id="sec-impact" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Impact scoring</h1>
-<p>Each incident receives an impact level on the matrix’s 1–5 scale. The level is the <em>maximum</em> of three component scores: a hazard-specific consequence, a duration band, and an AV-cluster size. Taking the maximum means one serious attribute, such as a delayed ambulance, is never averaged away by benign ones. The rubric (<a href="#tbl-impact-rubric" class="quarto-xref">Table&nbsp;6</a>) is an explicit ordinal judgment, written down so that it can be challenged. Its anchors follow common practice: <em>Major</em> means interference with emergency services or a damaging collision, and <em>Severe</em> means a life-safety consequence.</p>
+<p>Each incident receives an impact level on the matrix’s 1–5 scale. The level is the <em>maximum</em> of three component scores: a hazard-specific consequence, a duration band, and an AV-cluster size. Taking the maximum means one serious attribute, such as a delayed ambulance, is never averaged away by benign ones. The rubric (<a href="#tbl-impact-rubric" class="quarto-xref">Table&nbsp;11</a>) is an explicit ordinal judgment, written down so that it can be challenged. Its anchors follow common practice: <em>Major</em> means interference with emergency services or a damaging collision, and <em>Severe</em> means a life-safety consequence.</p>
 <div id="tbl-impact-rubric" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-impact-rubric-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;6: Incident-level impact rubric (the highest criterion met sets the level).
+Table&nbsp;11: Incident-level impact rubric (the highest criterion met sets the level).
 </figcaption>
 <div aria-describedby="tbl-impact-rubric-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -781,11 +1232,11 @@ P(N_h \ge 1 \mid n) = 1 - \left(\frac{T}{T + h}\right)^{n + 1/2}.
 </section>
 <section id="results" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="results"><span class="header-section-number">5.2</span> Results</h2>
-<p>Blocking incidents occur at 19.6 per 30 days (95% CI 16.2–23.4), about 4.6 per week, or one every 1.5 days. Single-AV traffic obstruction (H7) accounts for most of them, at about 11.41 per 30 days. Even the rarest hazards recur on a monthly timescale: collisions (H1) and emergency-response obstruction (H2) each average one every 31 days (<a href="#tbl-frequency" class="quarto-xref">Table&nbsp;7</a>, <a href="#fig-hazard-rates" class="quarto-xref">Figure&nbsp;3</a>).</p>
+<p>Blocking incidents occur at 19.6 per 30 days (95% CI 16.2–23.4), about 4.6 per week, or one every 1.5 days. Single-AV traffic obstruction (H7) accounts for most of them, at about 11.41 per 30 days. Even the rarest hazards recur on a monthly timescale: collisions (H1) and emergency-response obstruction (H2) each average one every 31 days (<a href="#tbl-frequency" class="quarto-xref">Table&nbsp;12</a>, <a href="#fig-hazard-rates" class="quarto-xref">Figure&nbsp;3</a>).</p>
 <div id="tbl-frequency" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-frequency-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;7: Hazard frequencies over the 184 covered days (Mar, Jun-Oct 2025).
+Table&nbsp;12: Hazard frequencies over the 184 covered days (Mar, Jun-Oct 2025).
 </figcaption>
 <div aria-describedby="tbl-frequency-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -986,7 +1437,7 @@ Figure&nbsp;5: Incident duration by month (log scale). Box plots show medians an
 <div id="tbl-tests" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-tests-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;8: Statistical tests for change over time (covered months).
+Table&nbsp;13: Statistical tests for change over time (covered months).
 </figcaption>
 <div aria-describedby="tbl-tests-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1151,11 +1602,11 @@ p_{h,k} = 1 - \left(\frac{T}{T+30}\right)^{n_{h,\ge k} + 1/2}.
 <p><span class="math display">\[
 k^*_h = \arg\max_{k \le k^{\max}_h} \; \mathrm{Level}\!\big(\mathrm{band}(p_{h,k}),\, k\big),
 \]</span></p>
-<p>with ties broken toward the higher impact. Probability and impact then always describe <strong>the same event</strong>, “an <span class="math inline">\(h\)</span> incident at least as severe as <span class="math inline">\(k\)</span>”. Tiers that never occurred are not extrapolated (<a href="#tbl-risk-curves" class="quarto-xref">Table&nbsp;9</a>).</p>
+<p>with ties broken toward the higher impact. Probability and impact then always describe <strong>the same event</strong>, “an <span class="math inline">\(h\)</span> incident at least as severe as <span class="math inline">\(k\)</span>”. Tiers that never occurred are not extrapolated (<a href="#tbl-risk-curves" class="quarto-xref">Table&nbsp;14</a>).</p>
 <div id="tbl-risk-curves" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-risk-curves-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;9: Risk-curve candidates: each observed impact tier with its own frequency and risk level.
+Table&nbsp;14: Risk-curve candidates: each observed impact tier with its own frequency and risk level.
 </figcaption>
 <div aria-describedby="tbl-risk-curves-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1388,7 +1839,7 @@ Figure&nbsp;7: 5×5 risk matrix of AV blocking hazards. Probability is the Jeffr
 <div id="tbl-risk-placement" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-risk-placement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;10: Risk-matrix placement of each hazard (Bayesian predictive probability, 30-day horizon).
+Table&nbsp;15: Risk-matrix placement of each hazard (Bayesian predictive probability, 30-day horizon).
 </figcaption>
 <div aria-describedby="tbl-risk-placement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -1506,28 +1957,31 @@ Table&nbsp;10: Risk-matrix placement of each hazard (Bayesian predictive probabi
 </section>
 <section id="sec-sensitivity" class="level1" data-number="8">
 <h1 data-number="8"><span class="header-section-number">8</span> Sensitivity analysis</h1>
-<p><a href="#tbl-sensitivity" class="quarto-xref">Table&nbsp;11</a> re-places every hazard under alternative choices: a plug-in MLE probability, 7- and 90-day horizons, February included (212 exposure days, all 123 incidents), the supplementary incidents added, and the conventional “total frequency × 90th-percentile impact” rule.</p>
+<p><a href="#tbl-sensitivity" class="quarto-xref">Table&nbsp;16</a> re-places every hazard under alternative choices: a plug-in MLE probability, 7- and 90-day horizons, February included (212 exposure days, all 123 incidents), the supplementary incidents added, the conventional “total frequency × 90th-percentile impact” rule, and two alternative <em>labelers</em>: the manual audit and the best pretrained model (embedding similarity). For the labeler columns, impact is re-scored because it depends on the hazard.</p>
 <ul>
 <li><strong>Robust to data choices.</strong> No placement changes under the MLE basis, when February is included, or when the supplementary incidents are added.</li>
-<li><strong>The horizon sets the absolute level.</strong> A 7-day horizon lowers every hazard one or two bands, and a 90-day horizon raises them. Choosing the horizon is a policy decision, not something the data can settle. The <em>ranking</em> is stable: in every column, H2 is at (or tied for) the highest level, and H4 and H5 are at (or tied for) the lowest.</li>
+<li><strong>Robust to the labeler.</strong> Labeling hazards with the manual audit instead of the rules gives <em>identical</em> placements, so the matrix does not hinge on rule errors. Labeling with the embedding model moves transit (H3) and pedestrian/accessibility (H4) up one band and H7 down one band. Those are exactly the classes it over-predicts (<a href="#tbl-pretrained-counts" class="quarto-xref">Table&nbsp;7</a>), so this reflects the labeler’s error, not a fragile matrix.</li>
+<li><strong>The horizon sets the absolute level.</strong> A 7-day horizon lowers every hazard one or two bands, and a 90-day horizon raises them. Choosing the horizon is a policy decision, not something the data can settle. The <em>ranking</em> is stable: in every column, H2 is at (or tied for) the highest level and H5 at (or tied for) the lowest. H4 is also at or tied for the lowest everywhere except the embedding-label column.</li>
 <li><strong>The placement rule matters for H2.</strong> The conventional rule puts H2 at <em>Extreme</em>. It pairs H2’s overall frequency (six events) with its rarer life-threatening tier (three events), overstating the probability of the Severe outcome. Avoiding exactly that inconsistency is why the risk-curve method is the base case.</li>
 </ul>
 <div id="tbl-sensitivity" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;11: Sensitivity of risk-matrix placement (cell shown as probability x impact and level).
+Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x impact and level).
 </figcaption>
 <div aria-describedby="tbl-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
-<col style="width: 12%">
-<col style="width: 20%">
+<col style="width: 10%">
+<col style="width: 16%">
+<col style="width: 6%">
+<col style="width: 6%">
 <col style="width: 7%">
-<col style="width: 8%">
-<col style="width: 8%">
-<col style="width: 13%">
-<col style="width: 14%">
-<col style="width: 13%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 10%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1539,6 +1993,8 @@ Table&nbsp;11: Sensitivity of risk-matrix placement (cell shown as probability x
 <th style="text-align: left;">Include February (212 d)</th>
 <th style="text-align: left;">+ supplementary incidents</th>
 <th style="text-align: left;">Total freq x P90 impact</th>
+<th style="text-align: left;">Manual audit labels</th>
+<th style="text-align: left;">Embedding-model labels</th>
 </tr>
 </thead>
 <tbody>
@@ -1548,6 +2004,8 @@ Table&nbsp;11: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">2x4 Medium</td>
 <td style="text-align: left;">5x4 Extreme</td>
+<td style="text-align: left;">4x4 Very high</td>
+<td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
 <td style="text-align: left;">4x4 Very high</td>
@@ -1561,6 +2019,8 @@ Table&nbsp;11: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">3x5 Very high</td>
 <td style="text-align: left;">3x5 Very high</td>
 <td style="text-align: left;">4x5 Extreme</td>
+<td style="text-align: left;">3x5 Very high</td>
+<td style="text-align: left;">3x5 Very high</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">H3 Transit obstruction</td>
@@ -1571,6 +2031,8 @@ Table&nbsp;11: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">5x3 Very high</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">H4 Ped/accessibility</td>
@@ -1581,6 +2043,8 @@ Table&nbsp;11: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">4x3 High</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">H5 Occupant-related</td>
@@ -1591,6 +2055,8 @@ Table&nbsp;11: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">3x3 Medium</td>
 <td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">H6 Multi-AV gridlock</td>
@@ -1601,6 +2067,8 @@ Table&nbsp;11: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">4x3 High</td>
 <td style="text-align: left;">5x3 Very high</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">H7 Single-AV obstruction</td>
@@ -1611,6 +2079,8 @@ Table&nbsp;11: Sensitivity of risk-matrix placement (cell shown as probability x
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
 <td style="text-align: left;">5x3 Very high</td>
+<td style="text-align: left;">5x3 Very high</td>
+<td style="text-align: left;">4x3 High</td>
 </tr>
 </tbody>
 </table>
@@ -1624,7 +2094,7 @@ Table&nbsp;11: Sensitivity of risk-matrix placement (cell shown as probability x
 <li><strong>No exposure denominator.</strong> Rates are per calendar day. If fleet size or vehicle-miles grew during 2025, a flat incident rate would mean a <em>falling</em> per-mile rate. Adding exposure, for example from CPUC quarterly reports, is a one-argument change in <code>av_blocking.frequency</code>.</li>
 <li><strong>Under-recording and selection.</strong> The DEM log captures incidents that reached dispatchers. Brief blockages cleared before anyone called are missing, so all frequencies are lower bounds.</li>
 <li><strong>Narrative quality.</strong> Truncation limits classification. Truncated incidents fall to the default H7, so the frequencies of H1–H5 are, if anything, <em>under</em>-estimated, especially before August.</li>
-<li><strong>Single-analyst labels.</strong> The taxonomy, rules, and audit labels come from one analyst. A second, independent coder would allow a true inter-rater reliability estimate.</li>
+<li><strong>Single-analyst labels, partly mitigated.</strong> The taxonomy, rules, and audit labels come from one analyst. A blind LLM second coder agreed closely (<span class="math inline">\(\kappa\)</span> = 0.95), but agreement between language models is weaker evidence than agreement between independent human coders, which remains the gold standard.</li>
 <li><strong>Risk matrices are coarse.</strong> Banding discards information and can rank risks inconsistently <span class="citation" data-cites="cox2008">(<a href="#ref-cox2008" role="doc-biblioref">Cox 2008</a>)</span>. We mitigate this by publishing the underlying rates, intervals, and risk curves alongside each cell, and by showing the sensitivity of each placement.</li>
 </ul>
 </section>
@@ -1658,8 +2128,14 @@ Cohen, Jacob. 1960. <span>“A Coefficient of Agreement for Nominal Scales.”</
 <div id="ref-cox2008" class="csl-entry" role="listitem">
 Cox, Jr., Louis Anthony. 2008. <span>“What’s Wrong with Risk Matrices?”</span> <em>Risk Analysis</em> 28 (2): 497–512.
 </div>
+<div id="ref-efron1993" class="csl-entry" role="listitem">
+Efron, Bradley, and Robert J. Tibshirani. 1993. <em>An Introduction to the Bootstrap</em>. New York: Chapman &amp; Hall.
+</div>
 <div id="ref-garwood1936" class="csl-entry" role="listitem">
 Garwood, F. 1936. <span>“Fiducial Limits for the <span>Poisson</span> Distribution.”</span> <em>Biometrika</em> 28 (3/4): 437–42.
+</div>
+<div id="ref-he2023" class="csl-entry" role="listitem">
+He, Pengcheng, Jianfeng Gao, and Weizhu Chen. 2023. <span>“<span>DeBERTaV3</span>: Improving <span>DeBERTa</span> Using <span>ELECTRA</span>-Style Pre-Training with Gradient-Disentangled Embedding Sharing.”</span> In <em>The Eleventh International Conference on Learning Representations (ICLR)</em>.
 </div>
 <div id="ref-jeffreys1946" class="csl-entry" role="listitem">
 Jeffreys, Harold. 1946. <span>“An Invariant Form for the Prior Probability in Estimation Problems.”</span> <em>Proceedings of the Royal Society of London. Series A</em> 186 (1007): 453–61.
@@ -1673,6 +2149,9 @@ Kendall, Maurice G. 1975. <em>Rank Correlation Methods</em>. 4th ed. London: Cha
 <div id="ref-kruskal1952" class="csl-entry" role="listitem">
 Kruskal, William H., and W. Allen Wallis. 1952. <span>“Use of Ranks in One-Criterion Variance Analysis.”</span> <em>Journal of the American Statistical Association</em> 47 (260): 583–621.
 </div>
+<div id="ref-laurer2024" class="csl-entry" role="listitem">
+Laurer, Moritz, Wouter van Atteveldt, Andreu Casas, and Kasper Welbers. 2024. <span>“Less Annotating, More Classifying: Addressing the Data Scarcity Issue of Supervised Machine Learning with Deep Transfer Learning and <span>BERT-NLI</span>.”</span> <em>Political Analysis</em> 32 (1): 84–100.
+</div>
 <div id="ref-lewis2020" class="csl-entry" role="listitem">
 Lewis, Mike, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Veselin Stoyanov, and Luke Zettlemoyer. 2020. <span>“<span>BART</span>: Denoising Sequence-to-Sequence Pre-Training for Natural Language Generation, Translation, and Comprehension.”</span> In <em>Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics</em>, 7871–80.
 </div>
@@ -1681,6 +2160,15 @@ Mann, Henry B. 1945. <span>“Nonparametric Tests Against Trend.”</span> <em>E
 </div>
 <div id="ref-mann1947" class="csl-entry" role="listitem">
 Mann, Henry B., and Donald R. Whitney. 1947. <span>“On a Test of Whether One of Two Random Variables Is Stochastically Larger Than the Other.”</span> <em>The Annals of Mathematical Statistics</em> 18 (1): 50–60.
+</div>
+<div id="ref-mcnemar1947" class="csl-entry" role="listitem">
+McNemar, Quinn. 1947. <span>“Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages.”</span> <em>Psychometrika</em> 12 (2): 153–57.
+</div>
+<div id="ref-mxbai2024" class="csl-entry" role="listitem">
+Mixedbread AI. 2024. <span>“Mxbai-Embed-Large-V1.”</span> <a href="https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1" class="uri">https://huggingface.co/mixedbread-ai/mxbai-embed-large-v1</a>.
+</div>
+<div id="ref-reimers2019" class="csl-entry" role="listitem">
+Reimers, Nils, and Iryna Gurevych. 2019. <span>“Sentence-<span>BERT</span>: Sentence Embeddings Using <span>Siamese</span> <span>BERT</span>-Networks.”</span> In <em>Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing (EMNLP-IJCNLP)</em>, 3982–92.
 </div>
 <div id="ref-sen1968" class="csl-entry" role="listitem">
 Sen, Pranab Kumar. 1968. <span>“Estimates of the Regression Coefficient Based on <span class="nocase">Kendall’s</span> Tau.”</span> <em>Journal of the American Statistical Association</em> 63 (324): 1379–89.
