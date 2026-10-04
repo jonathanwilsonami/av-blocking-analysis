@@ -1,5 +1,7 @@
 # AV Blocking Incident Analysis
 
+**Authors:** Jonathan Wilson and Chujiang (CJ) Wu
+
 Frequency, hazard classification, and risk-matrix placement of **autonomous-vehicle (robotaxi)
 blocking incidents** in San Francisco: cases where a driverless vehicle becomes immobilized
 and obstructs traffic, public transit, pedestrians, or emergency responders.

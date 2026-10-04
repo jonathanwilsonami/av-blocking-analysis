@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Frequency, hazard classification, and risk-matrix analysis of autonomous-vehicle (robotaxi) blocking incidents in San Francisco."
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
-authors = [{ name = "Jonathan Wilson" }]
+authors = [{ name = "Jonathan Wilson" }, { name = "Chujiang (CJ) Wu" }]
 dependencies = [
     "numpy>=1.26",
     "pandas>=2.2",

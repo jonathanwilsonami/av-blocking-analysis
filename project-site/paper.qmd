@@ -1,7 +1,9 @@
 ---
 title: "Blocked: Autonomous-Vehicle Blocking Incidents in San Francisco"
 subtitle: "Frequency, hazard classification, and risk-matrix placement from the 2025 DEM incident log"
-author: "Jonathan Wilson"
+author:
+  - "Jonathan Wilson"
+  - "Chujiang (CJ) Wu"
 date: last-modified
 abstract: |
   Robotaxis that become immobilized in the roadway can obstruct general traffic, public

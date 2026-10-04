@@ -1,6 +1,9 @@
 ---
 title: "AV Blocking Incidents in San Francisco"
 subtitle: "Frequency, hazard classification, and risk-matrix placement of robotaxi blocking events"
+author:
+  - "Jonathan Wilson"
+  - "Chujiang (CJ) Wu"
 ---
 
 When an autonomous vehicle (AV) becomes immobilized in a travel lane, intersection, transit
