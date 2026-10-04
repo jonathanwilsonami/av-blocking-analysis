@@ -11486,6 +11486,25 @@ that actually occurred are considered.</p>
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7c9135ef">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><strong>Two kinds of red.</strong> The matrix puts hazards with very different profiles in the same band.
+H1 (collision) and H2 (emergency obstruction) are <em>consequence-driven</em>: they happen about
+monthly, but each one can harm people or delay emergency care. H7 (single-AV obstruction)
+is <em>volume-driven</em>: no single incident is worse than an hour-long traffic delay, but those
+happen about every 11 days, so a <em>Significant</em> blockage is almost certain in any month.
+Both readings are "Very high", but they call for different responses. H1 and H2 are safety
+problems; H7 is an operational problem (recovery speed). Risk matrices are known to blur
+this distinction [Cox 2008], which is why the rates and risk curves are reported alongside
+each cell.</p>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0d53c5d2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -11699,6 +11718,143 @@ the hazard.</li>
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d3890edf">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="How-much-does-the-Significant-duration-threshold-matter?">How much does the <em>Significant</em> duration threshold matter?<a class="anchor-link" href="#How-much-does-the-Significant-duration-threshold-matter?">¶</a></h4><p>The rubric calls a blockage <em>Significant</em> at 60 minutes. That threshold is a judgment call,
+and it mainly drives H7 and H6. Below, every incident is re-scored with the threshold at 60,
+90, 120, and 180 minutes, and every hazard is re-placed. The 10-minute <em>Minor</em> threshold
+and all other rubric criteria are held fixed. This shows how the 60-minute choice drives
+the result; it does not replace the base case, which was fixed before placement.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=0b44bf59">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">thr_rows</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">thr</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">180</span><span class="p">]:</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">sv</span><span class="o">.</span><span class="n">score_incidents</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">duration_edges</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">thr</span><span class="p">))</span>
+    <span class="n">thr_rows</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Significant at &gt;= </span><span class="si">{</span><span class="n">thr</span><span class="si">}</span><span class="s2"> min"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span><span class="p">(</span><span class="n">fq</span><span class="o">.</span><span class="n">place_hazards</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">in_covered_window</span><span class="p">],</span> <span class="n">T</span><span class="p">))</span>
+<span class="n">thr_sens</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">thr_rows</span><span class="p">)</span>
+<span class="n">h7</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">hazard</span> <span class="o">==</span> <span class="s2">"H7"</span><span class="p">]</span>
+<span class="n">thr_sens</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">"H7 incidents at/above threshold"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="n">h7</span><span class="o">.</span><span class="n">duration_min</span> <span class="o">&gt;=</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">180</span><span class="p">]]</span>
+<span class="n">thr_sens</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">HAZ_LABEL</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">thr_sens</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+<span class="n">display</span><span class="p">(</span><span class="n">thr_sens</span><span class="p">)</span>
+<span class="n">save_table</span><span class="p">(</span><span class="n">thr_sens</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="s2">"Hazard"</span><span class="p">),</span> <span class="s2">"tbl-threshold-sensitivity"</span><span class="p">,</span>
+           <span class="s2">"Risk-matrix placement when the duration threshold for a Significant impact is raised (all incidents re-scored; base case 60 minutes)."</span><span class="p">)</span>
+<span class="n">save_vars</span><span class="p">({</span><span class="sa">f</span><span class="s2">"h7_</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">thr_sens</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">HAZ_LABEL</span><span class="p">[</span><span class="s2">"H7"</span><span class="p">],</span> <span class="sa">f</span><span class="s2">"Significant at &gt;= </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> min"</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">" "</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+           <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">180</span><span class="p">]},</span> <span class="s2">"thr"</span><span class="p">)</span>
+<span class="n">save_vars</span><span class="p">({</span><span class="sa">f</span><span class="s2">"h7_n</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="nb">int</span><span class="p">((</span><span class="n">h7</span><span class="o">.</span><span class="n">duration_min</span> <span class="o">&gt;=</span> <span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">180</span><span class="p">]},</span> <span class="s2">"thr"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Significant at &gt;= 60 min</th>
+<th>Significant at &gt;= 90 min</th>
+<th>Significant at &gt;= 120 min</th>
+<th>Significant at &gt;= 180 min</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>H1 Collision</th>
+<td>4x4 Very high</td>
+<td>4x4 Very high</td>
+<td>4x4 Very high</td>
+<td>4x4 Very high</td>
+</tr>
+<tr>
+<th>H2 Emergency obstruction</th>
+<td>3x5 Very high</td>
+<td>3x5 Very high</td>
+<td>3x5 Very high</td>
+<td>3x5 Very high</td>
+</tr>
+<tr>
+<th>H3 Transit obstruction</th>
+<td>4x3 High</td>
+<td>4x3 High</td>
+<td>4x3 High</td>
+<td>4x3 High</td>
+</tr>
+<tr>
+<th>H4 Ped/accessibility</th>
+<td>3x3 Medium</td>
+<td>3x3 Medium</td>
+<td>3x3 Medium</td>
+<td>3x3 Medium</td>
+</tr>
+<tr>
+<th>H5 Occupant-related</th>
+<td>3x3 Medium</td>
+<td>3x3 Medium</td>
+<td>3x3 Medium</td>
+<td>3x3 Medium</td>
+</tr>
+<tr>
+<th>H6 Multi-AV gridlock</th>
+<td>4x3 High</td>
+<td>4x3 High</td>
+<td>4x3 High</td>
+<td>4x3 High</td>
+</tr>
+<tr>
+<th>H7 Single-AV obstruction</th>
+<td>5x3 Very high</td>
+<td>4x3 High</td>
+<td>4x3 High</td>
+<td>5x2 High</td>
+</tr>
+<tr>
+<th>H7 incidents at/above threshold</th>
+<td>17</td>
+<td>11</td>
+<td>9</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=acdefe6e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -11719,6 +11875,11 @@ bands; a 90-day horizon raises them. The horizon is a <em>policy</em> choice: 30
 monthly operations-review cycle. The <em>ranking</em> is stable: under every column, H2 is at (or tied for) the
 highest level and H5 at (or tied for) the lowest. H4 is also at or tied for the lowest
 everywhere except the embedding-label column.</li>
+<li><strong>The duration threshold matters for H7.</strong> H7 is <em>Very high</em> only because a 60-minute
+blockage counts as <em>Significant</em>. At a threshold of 90 minutes or more it drops to <em>High</em>
+and stays there, even at 180 minutes, because routine 10-minute-plus blockages make it
+Almost certain × Minor (threshold table below). Every other hazard keeps its cell: H1-H5
+get their impact from the consequence type, and H6 mostly from clusters of 5+ AVs.</li>
 <li><strong>The placement rule matters for H2.</strong> The conventional "total frequency × P90 impact"
 rule puts H2 at <em>Extreme</em>. That pairs H2's overall frequency (6 events) with its rarer
 life-threatening tier (3 events), which overstates the probability of the Severe outcome.
@@ -11732,7 +11893,7 @@ The risk-curve method avoids that inconsistency, which is why it is the base cas
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">headline</span> <span class="o">=</span> <span class="p">(</span>

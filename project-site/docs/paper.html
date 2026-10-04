@@ -211,7 +211,11 @@ window.Quarto = {
   <li><a href="#why-each-hazard-sits-where-it-does" id="toc-why-each-hazard-sits-where-it-does" class="nav-link" data-scroll-target="#why-each-hazard-sits-where-it-does"><span class="header-section-number">7.3</span> Why each hazard sits where it does</a></li>
   </ul></li>
   <li><a href="#sec-sensitivity" id="toc-sec-sensitivity" class="nav-link" data-scroll-target="#sec-sensitivity"><span class="header-section-number">8</span> Sensitivity analysis</a></li>
-  <li><a href="#discussion-and-limitations" id="toc-discussion-and-limitations" class="nav-link" data-scroll-target="#discussion-and-limitations"><span class="header-section-number">9</span> Discussion and limitations</a></li>
+  <li><a href="#discussion-and-limitations" id="toc-discussion-and-limitations" class="nav-link" data-scroll-target="#discussion-and-limitations"><span class="header-section-number">9</span> Discussion and limitations</a>
+  <ul class="collapse">
+  <li><a href="#sec-judgment" id="toc-sec-judgment" class="nav-link" data-scroll-target="#sec-judgment"><span class="header-section-number">9.1</span> What is measured and what is judged</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations"><span class="header-section-number">9.2</span> Limitations</a></li>
+  </ul></li>
   <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions"><span class="header-section-number">10</span> Conclusions</a></li>
   <li><a href="#acknowledgments" id="toc-acknowledgments" class="nav-link" data-scroll-target="#acknowledgments">Acknowledgments</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
@@ -281,7 +285,7 @@ window.Quarto = {
 <li><strong>Hazard classification.</strong> What hazards do these incidents create, and how can free-text dispatcher narratives be classified into them defensibly?</li>
 <li><strong>Risk.</strong> Where does each hazard sit on a standard 5×5 red/yellow/green risk matrix, and is anything changing over time?</li>
 </ol>
-<p>The emphasis throughout is on conclusions that are statistically defensible given a small, irregular, and imperfect sample.</p>
+<p>The emphasis throughout is on conclusions that are statistically defensible given a small, irregular, and imperfect sample. Several steps also require judgment, such as how hazards are defined and how severe an hour-long blockage is. <a href="#sec-judgment" class="quarto-xref">Section&nbsp;9.1</a> separates what is measured from what is judged.</p>
 </section>
 <section id="data" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Data</h1>
@@ -1951,8 +1955,9 @@ Table&nbsp;15: Risk-matrix placement of each hazard (Bayesian predictive probabi
 <li><strong>H4 Pedestrian / accessibility: Medium.</strong> Four events, <span class="math inline">\(p\)</span> = 0.49: Moderate × Significant.</li>
 <li><strong>H5 Occupant-related: Medium.</strong> Most are <em>Minor</em> (an asleep rider, a door left open). 3 reach <em>Significant</em>: an unconscious rider, an occupant texting 911, and a door-left-open blockage lasting over an hour. That gives Moderate × Significant.</li>
 <li><strong>H6 Multi-AV gridlock: High.</strong> 10 of 17 clusters were <em>Significant</em> (5+ AVs or 60+ minutes), giving <span class="math inline">\(p\)</span> = 0.8: Likely × Significant.</li>
-<li><strong>H7 Single-AV obstruction: Very high.</strong> Individually mundane, but 17 single-AV blockages lasted an hour or more, about one every 11 days. That makes a <em>Significant</em> blockage Almost certain within any 30-day window.</li>
+<li><strong>H7 Single-AV obstruction: Very high.</strong> Individually mundane: no single-AV incident did worse than delay traffic. But 17 of them lasted an hour or more, about one every 11 days, so a <em>Significant</em> blockage is Almost certain within any 30-day window. This rating depends on the rubric’s 60-minute cutoff for <em>Significant</em>. At a 90-minute or higher cutoff, H7 is <em>High</em> (<a href="#sec-sensitivity" class="quarto-xref">Section&nbsp;8</a>).</li>
 </ul>
+<p><strong>Two kinds of red.</strong> H1, H2, and H7 share the <em>Very high</em> band for different reasons. H1 and H2 are <strong>consequence-driven</strong>: they occur about monthly, but each can injure someone or delay emergency care, so they are <em>safety</em> problems. H7 is <strong>volume-driven</strong>: its worst outcome is a traffic delay, but it happens so often that the delay is a near-certainty, so it is an <em>operational</em> problem whose lever is faster recovery. A risk matrix collapses frequency and consequence into one color, and is known to blur exactly this distinction <span class="citation" data-cites="cox2008">(<a href="#ref-cox2008" role="doc-biblioref">Cox 2008</a>)</span>. Read the H7 rating as “routine and costly”, not “dangerous”.</p>
 </section>
 </section>
 <section id="sec-sensitivity" class="level1" data-number="8">
@@ -1962,6 +1967,7 @@ Table&nbsp;15: Risk-matrix placement of each hazard (Bayesian predictive probabi
 <li><strong>Robust to data choices.</strong> No placement changes under the MLE basis, when February is included, or when the supplementary incidents are added.</li>
 <li><strong>Robust to the labeler.</strong> Labeling hazards with the manual audit instead of the rules gives <em>identical</em> placements, so the matrix does not hinge on rule errors. Labeling with the embedding model moves transit (H3) and pedestrian/accessibility (H4) up one band and H7 down one band. Those are exactly the classes it over-predicts (<a href="#tbl-pretrained-counts" class="quarto-xref">Table&nbsp;7</a>), so this reflects the labeler’s error, not a fragile matrix.</li>
 <li><strong>The horizon sets the absolute level.</strong> A 7-day horizon lowers every hazard one or two bands, and a 90-day horizon raises them. Choosing the horizon is a policy decision, not something the data can settle. The <em>ranking</em> is stable: in every column, H2 is at (or tied for) the highest level and H5 at (or tied for) the lowest. H4 is also at or tied for the lowest everywhere except the embedding-label column.</li>
+<li><strong>The duration cutoff matters for H7.</strong> H7 is <em>Very high</em> only because the rubric counts a 60-minute blockage as <em>Significant</em> (<a href="#tbl-threshold-sensitivity" class="quarto-xref">Table&nbsp;17</a>). At a cutoff of 90 minutes or more it drops to <em>High</em>, and it stays <em>High</em> even at 180 minutes, because routine 10-minute-plus blockages keep it Almost certain × Minor. No other hazard moves: H1–H5 take their impact from the consequence type, and H6 mostly from clusters of 5+ AVs. We keep 60 minutes as the base case because it was fixed before placement; raising it after seeing the result would tune the rubric to the answer.</li>
 <li><strong>The placement rule matters for H2.</strong> The conventional rule puts H2 at <em>Extreme</em>. It pairs H2’s overall frequency (six events) with its rarer life-threatening tier (three events), overstating the probability of the Severe outcome. Avoiding exactly that inconsistency is why the risk-curve method is the base case.</li>
 </ul>
 <div id="tbl-sensitivity" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2087,9 +2093,149 @@ Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x
 </div>
 </figure>
 </div>
+<div id="tbl-threshold-sensitivity" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-threshold-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;17: Risk-matrix placement when the duration threshold for a Significant impact is raised (all incidents re-scored; base case 60 minutes).
+</figcaption>
+<div aria-describedby="tbl-threshold-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 19%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Hazard</th>
+<th style="text-align: left;">Significant at &gt;= 60 min</th>
+<th style="text-align: left;">Significant at &gt;= 90 min</th>
+<th style="text-align: left;">Significant at &gt;= 120 min</th>
+<th style="text-align: left;">Significant at &gt;= 180 min</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">H1 Collision</td>
+<td style="text-align: left;">4x4 Very high</td>
+<td style="text-align: left;">4x4 Very high</td>
+<td style="text-align: left;">4x4 Very high</td>
+<td style="text-align: left;">4x4 Very high</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H2 Emergency obstruction</td>
+<td style="text-align: left;">3x5 Very high</td>
+<td style="text-align: left;">3x5 Very high</td>
+<td style="text-align: left;">3x5 Very high</td>
+<td style="text-align: left;">3x5 Very high</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H3 Transit obstruction</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H4 Ped/accessibility</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H5 Occupant-related</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+<td style="text-align: left;">3x3 Medium</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H6 Multi-AV gridlock</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H7 Single-AV obstruction</td>
+<td style="text-align: left;">5x3 Very high</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">4x3 High</td>
+<td style="text-align: left;">5x2 High</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H7 incidents at/above threshold</td>
+<td style="text-align: left;">17</td>
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
 </section>
 <section id="discussion-and-limitations" class="level1" data-number="9">
 <h1 data-number="9"><span class="header-section-number">9</span> Discussion and limitations</h1>
+<section id="sec-judgment" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="sec-judgment"><span class="header-section-number">9.1</span> What is measured and what is judged</h2>
+<p>Risk assessment mixes measurement with judgment, and the two deserve different levels of trust.</p>
+<p><strong>Measured (reproducible from the data):</strong> incident counts, durations, and AV counts; the Poisson and Bayesian rate estimates and their intervals; every statistical test of change over time; and the classifier and inter-coder agreement scores.</p>
+<p><strong>Judged (defensible, but someone else could reasonably choose differently):</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Judgment</th>
+<th>Where it enters</th>
+<th>How sensitive the result is</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>The hazard taxonomy and its severity-first precedence</td>
+<td>Which hazard each incident counts toward</td>
+<td>Low: an independent LLM coder reproduced about 97% of labels from the written definitions</td>
+</tr>
+<tr class="even">
+<td>The impact rubric, e.g.&nbsp;60 minutes = <em>Significant</em>, emergency obstruction = <em>Major</em></td>
+<td>The impact axis</td>
+<td>High for H7 (<em>Very high</em> at 60 minutes, <em>High</em> at 90+); none for H1–H5</td>
+</tr>
+<tr class="odd">
+<td>The 30-day planning horizon</td>
+<td>The probability axis</td>
+<td>High for absolute levels (a 7-day horizon lowers every hazard); low for the ranking</td>
+</tr>
+<tr class="even">
+<td>The template’s probability bands and cell colors</td>
+<td>Converting numbers into bands</td>
+<td>Fixed by the course template, not tuned to this data</td>
+</tr>
+<tr class="odd">
+<td>Risk-curve placement over “total frequency × worst impact”</td>
+<td>Pairing probability with impact</td>
+<td>Matters for H2 only (<em>Very high</em> vs <em>Extreme</em>)</td>
+</tr>
+<tr class="even">
+<td>Treating February and April–May as coverage gaps</td>
+<td>The exposure window</td>
+<td>None: including February changes no placement</td>
+</tr>
+</tbody>
+</table>
+<p>Every judgment was fixed before the risk matrix was drawn, and each is written down in code (<code>av_blocking.severity</code>, <code>av_blocking.config</code>) so that it can be challenged and re-run. The sensitivity tables show how far each choice moves the result. The colors on the matrix should therefore be read as a structured, transparent <em>opinion</em> built on measured rates, not as a measurement. The rates, intervals, and risk curves reported beside it are the measured part.</p>
+</section>
+<section id="limitations" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="limitations"><span class="header-section-number">9.2</span> Limitations</h2>
 <ul>
 <li><strong>No exposure denominator.</strong> Rates are per calendar day. If fleet size or vehicle-miles grew during 2025, a flat incident rate would mean a <em>falling</em> per-mile rate. Adding exposure, for example from CPUC quarterly reports, is a one-argument change in <code>av_blocking.frequency</code>.</li>
 <li><strong>Under-recording and selection.</strong> The DEM log captures incidents that reached dispatchers. Brief blockages cleared before anyone called are missing, so all frequencies are lower bounds.</li>
@@ -2097,6 +2243,7 @@ Table&nbsp;16: Sensitivity of risk-matrix placement (cell shown as probability x
 <li><strong>Single-analyst labels, partly mitigated.</strong> The taxonomy, rules, and audit labels come from one analyst. A blind LLM second coder agreed closely (<span class="math inline">\(\kappa\)</span> = 0.95), but agreement between language models is weaker evidence than agreement between independent human coders, which remains the gold standard.</li>
 <li><strong>Risk matrices are coarse.</strong> Banding discards information and can rank risks inconsistently <span class="citation" data-cites="cox2008">(<a href="#ref-cox2008" role="doc-biblioref">Cox 2008</a>)</span>. We mitigate this by publishing the underlying rates, intervals, and risk curves alongside each cell, and by showing the sensitivity of each placement.</li>
 </ul>
+</section>
 </section>
 <section id="conclusions" class="level1" data-number="10">
 <h1 data-number="10"><span class="header-section-number">10</span> Conclusions</h1>

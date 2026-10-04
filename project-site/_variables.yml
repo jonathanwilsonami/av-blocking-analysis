@@ -162,6 +162,15 @@ taxon:
   kappa: '0.99'
   n_disagree: 1
   n_multi_match: 8
+thr:
+  h7_120: High
+  h7_180: High
+  h7_60: Very high
+  h7_90: High
+  h7_n120: 9
+  h7_n180: 3
+  h7_n60: 17
+  h7_n90: 11
 trend:
   ca_p: '0.17'
   disp_p: '0.2'

@@ -103,3 +103,8 @@ def test_scores_to_frame_picks_argmax():
     scores[0, 0], scores[1, -1] = 0.9, 0.8  # H1, H7
     out = nlp._scores_to_frame(df, scores)
     assert out["zs_text_hazard"].tolist() == ["H1", "H7"]
+
+
+def test_duration_edges_parameter():
+    assert severity.duration_score(75) == 3
+    assert severity.duration_score(75, edges=(10, 90)) == 2

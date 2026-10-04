@@ -76,7 +76,9 @@ This paper asks three questions of the DEM blocking-incident log:
    and is anything changing over time?
 
 The emphasis throughout is on conclusions that are statistically defensible given a small,
-irregular, and imperfect sample.
+irregular, and imperfect sample. Several steps also require judgment, such as how hazards
+are defined and how severe an hour-long blockage is. @sec-judgment separates what is
+measured from what is judged.
 :::
 
 ::: {.content-visible when-format="revealjs"}
@@ -648,6 +650,12 @@ are not extrapolated (@tbl-risk-curves).
 
 ![5×5 risk matrix of AV blocking hazards. Probability is the Jeffreys posterior-predictive probability of at least one qualifying incident in the next 30 days. Impact is the governing tier of each hazard's risk curve.](assets/figures/fig-risk-matrix.png){#fig-risk-matrix}
 
+::: {.content-visible when-format="revealjs"}
+**Two kinds of red:** H1 and H2 are *consequence-driven* (safety problems). H7 is
+*volume-driven*: its worst outcome is a traffic delay, but it happens every ~11 days
+(an operational problem).
+:::
+
 ::: {.content-hidden when-format="revealjs"}
 {{< include assets/tables/tbl-risk-placement.md >}}
 
@@ -675,9 +683,19 @@ are not extrapolated (@tbl-risk-curves).
 * **H6 Multi-AV gridlock: {{< var risk.H6.level >}}.** {{< var risk.H6.n_ge >}} of 17
   clusters were *Significant* (5+ AVs or 60+ minutes), giving $p$ = {{< var risk.H6.p >}}:
   Likely × Significant.
-* **H7 Single-AV obstruction: {{< var risk.H7.level >}}.** Individually mundane, but
-  {{< var risk.H7.n_ge >}} single-AV blockages lasted an hour or more, about one every 11
-  days. That makes a *Significant* blockage Almost certain within any 30-day window.
+* **H7 Single-AV obstruction: {{< var risk.H7.level >}}.** Individually mundane: no
+  single-AV incident did worse than delay traffic. But {{< var risk.H7.n_ge >}} of them
+  lasted an hour or more, about one every 11 days, so a *Significant* blockage is Almost
+  certain within any 30-day window. This rating depends on the rubric's 60-minute cutoff
+  for *Significant*. At a 90-minute or higher cutoff, H7 is *High* (@sec-sensitivity).
+
+**Two kinds of red.** H1, H2, and H7 share the *Very high* band for different reasons. H1
+and H2 are **consequence-driven**: they occur about monthly, but each can injure someone or
+delay emergency care, so they are *safety* problems. H7 is **volume-driven**: its worst
+outcome is a traffic delay, but it happens so often that the delay is a near-certainty, so
+it is an *operational* problem whose lever is faster recovery. A risk matrix collapses
+frequency and consequence into one color, and is known to blur exactly this distinction
+[@cox2008]. Read the H7 rating as "routine and costly", not "dangerous".
 :::
 
 ::: {.content-visible when-format="revealjs"}
@@ -720,6 +738,13 @@ because it depends on the hazard.
   something the data can settle. The *ranking* is stable: in every column, H2 is at (or
   tied for) the highest level and H5 at (or tied for) the lowest. H4 is also at or tied
   for the lowest everywhere except the embedding-label column.
+* **The duration cutoff matters for H7.** H7 is *Very high* only because the rubric counts
+  a 60-minute blockage as *Significant* (@tbl-threshold-sensitivity). At a cutoff of 90
+  minutes or more it drops to *High*, and it stays *High* even at 180 minutes, because
+  routine 10-minute-plus blockages keep it Almost certain × Minor. No other hazard moves:
+  H1–H5 take their impact from the consequence type, and H6 mostly from clusters of 5+ AVs.
+  We keep 60 minutes as the base case because it was fixed before placement; raising it
+  after seeing the result would tune the rubric to the answer.
 * **The placement rule matters for H2.** The conventional rule puts H2 at *Extreme*. It
   pairs H2's overall frequency (six events) with its rarer life-threatening tier (three
   events), overstating the probability of the Severe outcome. Avoiding exactly that
@@ -732,9 +757,60 @@ because it depends on the hazard.
 
 {{< include assets/tables/tbl-sensitivity.md >}}
 
+::: {.content-visible when-format="revealjs"}
+## Sensitivity: the 60-minute cutoff drives H7
+
+H7 is *Very high* only at the 60-minute cutoff for *Significant*. At 90 minutes or more
+it is *High*. Nothing else moves.
+:::
+
+{{< include assets/tables/tbl-threshold-sensitivity.md >}}
+
 # Discussion and limitations
 
 ::: {.content-hidden when-format="revealjs"}
+## What is measured and what is judged {#sec-judgment}
+
+Risk assessment mixes measurement with judgment, and the two deserve different levels of
+trust.
+
+**Measured (reproducible from the data):** incident counts, durations, and AV counts; the
+Poisson and Bayesian rate estimates and their intervals; every statistical test of change
+over time; and the classifier and inter-coder agreement scores.
+
+**Judged (defensible, but someone else could reasonably choose differently):**
+
+| Judgment | Where it enters | How sensitive the result is |
+|---|---|---|
+| The hazard taxonomy and its severity-first precedence | Which hazard each incident counts toward | Low: an independent LLM coder reproduced about 97% of labels from the written definitions |
+| The impact rubric, e.g. 60 minutes = *Significant*, emergency obstruction = *Major* | The impact axis | High for H7 (*Very high* at 60 minutes, *High* at 90+); none for H1–H5 |
+| The 30-day planning horizon | The probability axis | High for absolute levels (a 7-day horizon lowers every hazard); low for the ranking |
+| The template's probability bands and cell colors | Converting numbers into bands | Fixed by the course template, not tuned to this data |
+| Risk-curve placement over "total frequency × worst impact" | Pairing probability with impact | Matters for H2 only (*Very high* vs *Extreme*) |
+| Treating February and April–May as coverage gaps | The exposure window | None: including February changes no placement |
+
+Every judgment was fixed before the risk matrix was drawn, and each is written down in code
+(`av_blocking.severity`, `av_blocking.config`) so that it can be challenged and re-run.
+The sensitivity tables show how far each choice moves the result. The colors on the matrix
+should therefore be read as a structured, transparent *opinion* built on measured rates,
+not as a measurement. The rates, intervals, and risk curves reported beside it are the
+measured part.
+:::
+
+::: {.content-visible when-format="revealjs"}
+## Measured vs judged
+
+- **Measured:** counts, durations, rates and intervals, trend tests, agreement scores.
+- **Judged:** the taxonomy, the impact rubric (60 min = *Significant*), the 30-day
+  horizon, the template's bands, and the placement rule. All were fixed before the matrix
+  was drawn and are written in code.
+- The colors are a **transparent, structured opinion built on measured rates**; the
+  sensitivity tables show how far each choice moves them.
+:::
+
+::: {.content-hidden when-format="revealjs"}
+## Limitations
+
 * **No exposure denominator.** Rates are per calendar day. If fleet size or vehicle-miles
   grew during 2025, a flat incident rate would mean a *falling* per-mile rate. Adding
   exposure, for example from CPUC quarterly reports, is a one-argument change in

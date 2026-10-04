@@ -53,10 +53,10 @@ _INJURY = re.compile(r"\binj(?:ury|uries|ured)?\b", re.I)
 _NO_INJURY = re.compile(r"\b(?:no|non)[ -]?(?:reported )?inj", re.I)
 
 
-def duration_score(minutes: float) -> int:
+def duration_score(minutes: float, edges: tuple[int, int] = DURATION_EDGES) -> int:
     if minutes is None or np.isnan(minutes):
         return 1
-    lo, hi = DURATION_EDGES
+    lo, hi = edges
     return 1 if minutes < lo else 2 if minutes < hi else 3
 
 
@@ -77,10 +77,16 @@ def hazard_score(hazard: str, text) -> int:
     return 1
 
 
-def score_incidents(df: pd.DataFrame) -> pd.DataFrame:
-    """Add component scores, ``impact`` (1-5), ``impact_label`` and the driving component."""
+def score_incidents(
+    df: pd.DataFrame, duration_edges: tuple[int, int] = DURATION_EDGES
+) -> pd.DataFrame:
+    """Add component scores, ``impact`` (1-5), ``impact_label`` and the driving component.
+
+    ``duration_edges`` = (Minor, Significant) thresholds in minutes; varied only in the
+    sensitivity analysis.
+    """
     out = df.copy()
-    out["impact_duration"] = out["duration_min"].map(duration_score)
+    out["impact_duration"] = out["duration_min"].map(lambda m: duration_score(m, duration_edges))
     out["impact_cluster"] = out["n_avs_filled"].map(cluster_score)
     out["impact_hazard"] = [
         hazard_score(h, t) for h, t in zip(out["hazard"], out["narrative"], strict=True)

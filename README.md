@@ -114,6 +114,10 @@ was performed by Dr. Missy Cummings.** This project builds directly on that work
   rules on 120/123 (κ = 0.96); Fleiss' κ across all three coders is 0.965. All four
   disagreements are defensible judgment calls on truncated narratives, so the labels were
   kept unchanged.
+- **Two kinds of red:** collisions and emergency obstruction are *Very high* because of their
+  consequences (safety). Single-AV obstruction is *Very high* because of sheer volume
+  (operations): an hour-long blockage happens about every 11 days. Its rating depends on
+  the rubric's 60-minute cutoff for *Significant*; at 90+ minutes it is *High*.
 - **Robust to the labeler:** relabeling hazards with the manual audit leaves every
   risk-matrix placement unchanged.
 - Risk-matrix placement (30-day horizon):
@@ -295,7 +299,11 @@ Rates are per calendar day, because the log has no mileage exposure. Incidents t
 reached DEM are missing, so frequencies are lower bounds. Truncated narratives push
 incidents into the default class, which likely undercounts H1–H5. The taxonomy, rules, and
 audit labels come from a single analyst. A blind LLM second coder agreed closely, but a
-human second coder would be stronger evidence. Risk matrices are inherently coarse (Cox, 2008),
+human second coder would be stronger evidence. Several inputs are judgments rather than
+measurements: the taxonomy, the impact rubric (e.g. 60 minutes = *Significant*), the
+30-day horizon, and the placement rule. All were fixed before the matrix was drawn, are
+written in code, and are varied in the sensitivity analysis. The paper's "What is measured
+and what is judged" section lists them. Risk matrices are inherently coarse (Cox, 2008),
 so the underlying rates, intervals, and risk curves are published alongside each cell.
 
 ## Acknowledgments
